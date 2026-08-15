@@ -1,29 +1,17 @@
-# Vite+ Monorepo Starter
+# Ardoise
 
-A starter for creating a Vite+ monorepo.
+Dépenses, services et règlements entre potes, organisés en groupes.
 
 ## Development
 
-- Check everything is ready:
-
 ```bash
-vp run ready
+bun install
+vp dev
 ```
 
-- Run the tests:
+`vp dev` lance le web (Vite) et l’api (Hono). Le web proxifie `/api` vers l’api.
 
 ```bash
-vp run -r test
-```
-
-- Build the monorepo:
-
-```bash
-vp run -r build
-```
-
-- Run the development server:
-
-```bash
-vp run dev
+vp test
+vp check
 ```

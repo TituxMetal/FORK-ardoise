@@ -1,16 +1,33 @@
-import { defineConfig } from "vite-plus";
+import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
+  defaultPackage: './apps/web',
   staged: {
-    "*": "vp check --fix",
+    '*': 'vp check --fix'
   },
-  fmt: {},
+  fmt: {
+    semi: false,
+    singleQuote: true,
+    tabWidth: 2,
+    printWidth: 100,
+    trailingComma: 'none',
+    arrowParens: 'avoid'
+  },
   lint: {
-    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
-    rules: { "vite-plus/prefer-vite-plus-imports": "error" },
+    jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
+    rules: { 'vite-plus/prefer-vite-plus-imports': 'error' },
     options: { typeAware: true, typeCheck: true },
+    overrides: [
+      {
+        files: ['apps/web/**'],
+        plugins: ['react']
+      }
+    ]
+  },
+  test: {
+    include: ['**/*.spec.ts', '**/*.spec.tsx']
   },
   run: {
-    cache: true,
-  },
-});
+    cache: true
+  }
+})
