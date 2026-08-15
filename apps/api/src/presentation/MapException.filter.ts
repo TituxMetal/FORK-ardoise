@@ -9,7 +9,7 @@ export const mapException = (error: Error, c: Context) => {
         code: error.code,
         message: error.message
       },
-      error.statusCode as 401
+      error.statusCode as 400 | 401 | 404 | 409 | 500
     )
   }
 

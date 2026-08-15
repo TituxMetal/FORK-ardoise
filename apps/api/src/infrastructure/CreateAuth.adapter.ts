@@ -17,9 +17,12 @@ export const createAuth = (prisma: PrismaClient): IAuth => {
 
   return {
     handler: request => auth.handler(request),
-    getSessionUserId: async headers => {
+    getSessionUser: async headers => {
       const session = await auth.api.getSession({ headers })
-      return session?.user.id ?? null
+      if (!session) {
+        return null
+      }
+      return { id: session.user.id, name: session.user.name }
     }
   }
 }

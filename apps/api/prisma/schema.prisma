@@ -16,6 +16,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  membres       Membre[]
 
   @@unique([email])
   @@map("user")
@@ -67,4 +68,26 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Groupe {
+  id      String   @id
+  name    String
+  membres Membre[]
+
+  @@map("groupe")
+}
+
+model Membre {
+  id       String @id
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupeId String
+  groupe   Groupe @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  name     String
+
+  @@unique([userId, groupeId])
+  @@index([userId])
+  @@index([groupeId])
+  @@map("membre")
 }

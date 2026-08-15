@@ -4,13 +4,18 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expect, test } from 'vite-plus/test'
-import { createAuth } from '../infrastructure/CreateAuth.adapter.ts'
 import { createPrismaClient } from '../infrastructure/CreatePrisma.client.ts'
 import { createApp } from './CreateApp.ts'
 
-const migrationSql = readFileSync(
+const sessionSql = readFileSync(
   fileURLToPath(
     new URL('../../prisma/migrations/20260815130000_session_user/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+const groupeSql = readFileSync(
+  fileURLToPath(
+    new URL('../../prisma/migrations/20260815190000_groupe_membre/migration.sql', import.meta.url)
   ),
   'utf8'
 )
@@ -19,9 +24,9 @@ const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
-  await sqlite.executeMultiple(migrationSql)
+  await sqlite.executeMultiple(`${sessionSql}\n${groupeSql}`)
   sqlite.close()
-  return createApp(createAuth(createPrismaClient(url)))
+  return createApp(createPrismaClient(url))
 }
 
 const credentials = {
@@ -111,7 +116,8 @@ test('write with a session reaches the use-case', async () => {
   const opened = await signUp(app)
   const response = await app.request('/groups', {
     method: 'POST',
-    headers: { cookie: cookieHeader(opened) }
+    headers: { cookie: cookieHeader(opened), 'content-type': 'application/json' },
+    body: JSON.stringify({ name: 'Potes de Bob' })
   })
   expect(response.status).toBe(201)
 })

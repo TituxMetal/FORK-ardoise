@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { authClient } from '../infrastructure/CreateAuth.client.ts'
+import { GroupesScreen } from './GroupesScreen.tsx'
 
 const field = (form: FormData, name: string) => {
   const value = form.get(name)
@@ -51,6 +52,7 @@ export const AuthScreen = () => {
         >
           Fermer la session
         </button>
+        <GroupesScreen />
       </section>
     )
   }
