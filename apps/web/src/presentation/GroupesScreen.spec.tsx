@@ -5,6 +5,8 @@ import { expect, test } from 'vite-plus/test'
 import type { GroupeDto, GroupeSummary } from '../infrastructure/CreateGroupes.client.ts'
 import { GroupesScreen } from './GroupesScreen.tsx'
 
+globalThis.IS_REACT_ACT_ENVIRONMENT = true
+
 const emptyGroupe = (id: string, name: string, members: GroupeDto['members']): GroupeDto => ({
   id,
   name,
@@ -87,4 +89,15 @@ test('two Groupes created by the same User stay on two distinct lines', async ()
     ['Potes de Bob', 'Collègues'].includes(button.textContent ?? '')
   )
   expect(lines.map(line => line.textContent)).toEqual(['Potes de Bob', 'Collègues'])
+})
+
+test('a failed list shows an error instead of throwing', async () => {
+  const client = {
+    ...memoryClient(),
+    list: async () => {
+      throw new Error('Groupe introuvable')
+    }
+  }
+  const container = await render(<GroupesScreen client={client} />)
+  expect(container.textContent).toContain('Impossible de lister les Groupes')
 })

@@ -21,7 +21,10 @@ export const GroupesScreen = ({ client = groupesClient }: Props) => {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    void client.list().then(setGroupes)
+    void client
+      .list()
+      .then(setGroupes)
+      .catch(() => setError('Impossible de lister les Groupes'))
   }, [client])
 
   const create = async (event: FormEvent<HTMLFormElement>) => {
