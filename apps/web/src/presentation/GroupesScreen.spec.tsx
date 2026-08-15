@@ -1,11 +1,11 @@
 /** @vitest-environment happy-dom */
-import { act, type ReactNode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { expect, test } from 'vite-plus/test'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, expect, test } from 'vite-plus/test'
 import type { GroupeDto, GroupeSummary } from '../infrastructure/CreateGroupes.client.ts'
 import { GroupesScreen } from './GroupesScreen.tsx'
 
-globalThis.IS_REACT_ACT_ENVIRONMENT = true
+afterEach(cleanup)
 
 const emptyGroupe = (id: string, name: string, members: GroupeDto['members']): GroupeDto => ({
   id,
@@ -37,67 +37,55 @@ const memoryClient = () => {
   }
 }
 
-const render = async (ui: ReactNode) => {
-  const container = document.createElement('div')
-  document.body.append(container)
-  const root = createRoot(container)
-  await act(async () => {
-    root.render(ui)
-  })
-  return container
-}
-
-const submitCreate = async (container: HTMLElement, name: string) => {
-  const input = container.querySelector('input[name="name"]') as HTMLInputElement
-  const form = input.form as HTMLFormElement
-  input.value = name
-  await act(async () => {
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-  })
+const createNamed = async (name: string) => {
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Nom')
+  await user.clear(input)
+  await user.type(input, name)
+  await user.click(screen.getByRole('button', { name: 'Créer le Groupe' }))
 }
 
 test('creating a Groupe lists it and opens an empty ardoise', async () => {
   const client = memoryClient()
-  const container = await render(<GroupesScreen client={client} />)
+  render(<GroupesScreen client={client} />)
 
-  await submitCreate(container, 'Potes de Bob')
+  await createNamed('Potes de Bob')
+  const open = await screen.findByRole('button', { name: 'Potes de Bob' })
+  await userEvent.click(open)
 
-  expect(container.textContent).toContain('Potes de Bob')
-
-  const open = [...container.querySelectorAll('button')].find(
-    button => button.textContent === 'Potes de Bob'
-  )
-  await act(async () => {
-    open?.click()
-  })
-
-  expect(container.textContent).toContain('Potes de Bob')
-  expect(container.textContent).toContain('Aucune Dépense')
-  expect(container.textContent).toContain('Aucun Service')
-  expect(container.textContent).toContain('Aucun Règlement')
-  expect(container.textContent).toMatch(/Léa.*0/)
+  expect(screen.getByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
+  expect(screen.getByText('Aucune Dépense')).toBeTruthy()
+  expect(screen.getByText('Aucun Service')).toBeTruthy()
+  expect(screen.getByText('Aucun Règlement')).toBeTruthy()
+  expect(screen.getByText('Léa 0')).toBeTruthy()
 })
 
 test('two Groupes created by the same User stay on two distinct lines', async () => {
-  const client = memoryClient()
-  const container = await render(<GroupesScreen client={client} />)
+  render(<GroupesScreen client={memoryClient()} />)
 
-  await submitCreate(container, 'Potes de Bob')
-  await submitCreate(container, 'Collègues')
+  await createNamed('Potes de Bob')
+  await createNamed('Collègues')
 
-  const lines = [...container.querySelectorAll('button')].filter(button =>
-    ['Potes de Bob', 'Collègues'].includes(button.textContent ?? '')
-  )
-  expect(lines.map(line => line.textContent)).toEqual(['Potes de Bob', 'Collègues'])
+  expect(
+    (await screen.findAllByRole('button', { name: /Potes de Bob|Collègues/ })).map(
+      button => button.textContent
+    )
+  ).toEqual(['Potes de Bob', 'Collègues'])
 })
 
 test('a failed list shows an error instead of throwing', async () => {
-  const client = {
-    ...memoryClient(),
-    list: async () => {
-      throw new Error('Groupe introuvable')
-    }
-  }
-  const container = await render(<GroupesScreen client={client} />)
-  expect(container.textContent).toContain('Impossible de lister les Groupes')
+  render(
+    <GroupesScreen
+      client={{
+        ...memoryClient(),
+        list: async () => {
+          throw new Error('Groupe introuvable')
+        }
+      }}
+    />
+  )
+
+  await waitFor(() => {
+    expect(screen.getByRole('alert').textContent).toBe('Impossible de lister les Groupes')
+  })
 })
