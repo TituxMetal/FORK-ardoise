@@ -1,0 +1,278 @@
+import { createClient } from '@libsql/client'
+import { mkdtempSync, readFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { expect, test } from 'vite-plus/test'
+import type { GroupeDto } from '../../groupes/application/Groupe.dto.ts'
+import { createPrismaClient } from '../../infrastructure/CreatePrisma.client.ts'
+import { createApp } from '../../presentation/CreateApp.ts'
+import { Reglement } from '../domain/Reglement.entity.ts'
+
+const sessionSql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260815130000_session_user/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+const groupeSql = readFileSync(
+  fileURLToPath(
+    new URL(
+      '../../../prisma/migrations/20260815190000_groupe_membre/migration.sql',
+      import.meta.url
+    )
+  ),
+  'utf8'
+)
+const invitationSql = readFileSync(
+  fileURLToPath(
+    new URL(
+      '../../../prisma/migrations/20260816042947_invitation_secret/migration.sql',
+      import.meta.url
+    )
+  ),
+  'utf8'
+)
+const depenseSql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260816052720_depense/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+const serviceSql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260816061030_service/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+const reglementSql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260816070637_reglement/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+
+const createTestApp = async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
+  const url = `file:${join(dir, 'test.db')}`
+  const sqlite = createClient({ url })
+  await sqlite.executeMultiple(
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${reglementSql}`
+  )
+  sqlite.close()
+  return createApp(createPrismaClient(url))
+}
+
+const credentials = {
+  email: 'lea@example.com',
+  password: 'password1234',
+  name: 'Léa'
+}
+
+const signUp = (app: ReturnType<typeof createApp>, user = credentials) =>
+  app.request('/auth/sign-up/email', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(user)
+  })
+
+const sessionCookie = (response: Response) =>
+  response.headers.getSetCookie().find(cookie => cookie.includes('session_token'))
+
+const cookieHeader = (response: Response) => sessionCookie(response)?.split(';')[0] ?? ''
+
+const createGroupe = (app: ReturnType<typeof createApp>, cookie: string, name: string) =>
+  app.request('/groups', {
+    method: 'POST',
+    headers: { cookie, 'content-type': 'application/json' },
+    body: JSON.stringify({ name })
+  })
+
+const openArdoise = async () => {
+  const app = await createTestApp()
+  const leaRes = await signUp(app)
+  const bobRes = await signUp(app, {
+    email: 'bob@example.com',
+    password: 'password1234',
+    name: 'Bob'
+  })
+  const camilleRes = await signUp(app, {
+    email: 'camille@example.com',
+    password: 'password1234',
+    name: 'Camille'
+  })
+  const created = await createGroupe(app, cookieHeader(leaRes), 'Potes de Bob')
+  const createdBody = (await created.json()) as GroupeDto
+  await app.request(`/invitations/${createdBody.invitation.secret}`, {
+    method: 'POST',
+    headers: { cookie: cookieHeader(bobRes) }
+  })
+  await app.request(`/invitations/${createdBody.invitation.secret}`, {
+    method: 'POST',
+    headers: { cookie: cookieHeader(camilleRes) }
+  })
+  const opened = await app.request(`/groups/${createdBody.id}`, {
+    headers: { cookie: cookieHeader(leaRes) }
+  })
+  const groupe = (await opened.json()) as GroupeDto
+  const membre = (name: string) => groupe.members.find(item => item.name === name)!
+  return {
+    app,
+    groupe,
+    lea: { cookie: cookieHeader(leaRes), ...membre('Léa') },
+    bob: { cookie: cookieHeader(bobRes), ...membre('Bob') },
+    camille: { cookie: cookieHeader(camilleRes), ...membre('Camille') }
+  }
+}
+
+const createDepense = (
+  app: ReturnType<typeof createApp>,
+  cookie: string,
+  groupeId: string,
+  body: Record<string, unknown>
+) =>
+  app.request(`/groups/${groupeId}/expenses`, {
+    method: 'POST',
+    headers: { cookie, 'content-type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+
+const createReglement = (
+  app: ReturnType<typeof createApp>,
+  cookie: string,
+  groupeId: string,
+  body: Record<string, unknown>
+) =>
+  app.request(`/groups/${groupeId}/settlements`, {
+    method: 'POST',
+    headers: { cookie, 'content-type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+
+const pizza = async () => {
+  const ardoise = await openArdoise()
+  await createDepense(ardoise.app, ardoise.lea.cookie, ardoise.groupe.id, {
+    label: 'Pizza',
+    day: '2026-08-15',
+    amount: 100,
+    payerId: ardoise.lea.userId,
+    participantIds: [ardoise.lea.userId, ardoise.bob.userId, ardoise.camille.userId]
+  })
+  return ardoise
+}
+
+test('a partial Règlement under the plafond is real money, not a Dépense', async () => {
+  const { app, groupe, lea, bob, camille } = await pizza()
+
+  const response = await createReglement(app, bob.cookie, groupe.id, {
+    debtorId: bob.userId,
+    creditorId: lea.userId,
+    amount: 20
+  })
+
+  expect(response.status).toBe(201)
+  const body = (await response.json()) as GroupeDto
+  expect(body.expenses).toHaveLength(1)
+  expect(body.settlements).toEqual([
+    {
+      id: expect.any(String),
+      debtorId: bob.userId,
+      creditorId: lea.userId,
+      amount: 20
+    }
+  ])
+  expect(body.balances).toEqual([
+    { userId: lea.userId, name: 'Léa', amount: 46 },
+    { userId: bob.userId, name: 'Bob', amount: -13 },
+    { userId: camille.userId, name: 'Camille', amount: -33 }
+  ])
+  expect(body.balances.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
+})
+
+test('any Membre can constater a Règlement at the plafond', async () => {
+  const { app, groupe, lea, bob, camille } = await pizza()
+
+  const response = await createReglement(app, camille.cookie, groupe.id, {
+    debtorId: bob.userId,
+    creditorId: lea.userId,
+    amount: 33
+  })
+
+  expect(response.status).toBe(201)
+  const body = (await response.json()) as GroupeDto
+  expect(body.settlements[0]?.amount).toBe(33)
+  expect(body.balances).toEqual([
+    { userId: lea.userId, name: 'Léa', amount: 33 },
+    { userId: bob.userId, name: 'Bob', amount: 0 },
+    { userId: camille.userId, name: 'Camille', amount: -33 }
+  ])
+})
+
+test('above the plafond, a non-négatif débiteur or a non-positif créancier is 400', async () => {
+  const { app, groupe, lea, bob, camille } = await pizza()
+  const refusals = [
+    {
+      body: { debtorId: bob.userId, creditorId: lea.userId, amount: 34 },
+      message: Reglement.ABOVE_PLAFOND
+    },
+    {
+      body: { debtorId: lea.userId, creditorId: bob.userId, amount: 10 },
+      message: Reglement.DEBTOR_NOT_NEGATIVE
+    },
+    {
+      body: { debtorId: bob.userId, creditorId: camille.userId, amount: 10 },
+      message: Reglement.CREDITOR_NOT_POSITIVE
+    },
+    {
+      body: { debtorId: 'inconnu', creditorId: lea.userId, amount: 10 },
+      message: 'Membre introuvable'
+    }
+  ]
+
+  for (const refusal of refusals) {
+    const response = await createReglement(app, lea.cookie, groupe.id, refusal.body)
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({
+      statusCode: 400,
+      code: 'INVALID_DATA',
+      message: refusal.message
+    })
+  }
+
+  const listed = await app.request(`/groups/${groupe.id}`, { headers: { cookie: lea.cookie } })
+  expect(((await listed.json()) as GroupeDto).settlements).toEqual([])
+})
+
+test('any Membre can delete a Règlement; a second delete is 404', async () => {
+  const { app, groupe, lea, bob, camille } = await pizza()
+  const created = await createReglement(app, lea.cookie, groupe.id, {
+    debtorId: bob.userId,
+    creditorId: lea.userId,
+    amount: 20
+  })
+  const { settlements } = (await created.json()) as GroupeDto
+
+  const deleted = await app.request(`/groups/${groupe.id}/settlements/${settlements[0]!.id}`, {
+    method: 'DELETE',
+    headers: { cookie: camille.cookie }
+  })
+  expect(deleted.status).toBe(200)
+  const after = (await deleted.json()) as GroupeDto
+  expect(after.settlements).toEqual([])
+  expect(after.balances).toEqual([
+    { userId: lea.userId, name: 'Léa', amount: 66 },
+    { userId: bob.userId, name: 'Bob', amount: -33 },
+    { userId: camille.userId, name: 'Camille', amount: -33 }
+  ])
+
+  const second = await app.request(`/groups/${groupe.id}/settlements/${settlements[0]!.id}`, {
+    method: 'DELETE',
+    headers: { cookie: lea.cookie }
+  })
+  expect(second.status).toBe(404)
+  expect(await second.json()).toEqual({
+    statusCode: 404,
+    code: 'NOT_FOUND',
+    message: 'Règlement introuvable'
+  })
+})

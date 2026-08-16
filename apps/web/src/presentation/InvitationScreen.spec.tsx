@@ -35,7 +35,9 @@ const joiningClient = (joined: string[]) =>
     createExpense: async () => groupe,
     deleteExpense: async () => groupe,
     createService: async () => groupe,
-    deleteService: async () => groupe
+    deleteService: async () => groupe,
+    createSettlement: async () => groupe,
+    deleteSettlement: async () => groupe
   }) satisfies GroupesClient
 
 test('a User with a session who opens the Invitation becomes Membre', async () => {

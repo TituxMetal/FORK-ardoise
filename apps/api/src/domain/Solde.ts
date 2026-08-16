@@ -18,10 +18,17 @@ export type ServiceForSolde = {
   parts: Part[]
 }
 
+export type ReglementForSolde = {
+  debtorId: string
+  creditorId: string
+  amount: number
+}
+
 export const soldesOf = (
   membres: { userId: string; name: string }[],
   depenses: DepenseForSolde[],
-  services: ServiceForSolde[] = []
+  services: ServiceForSolde[] = [],
+  reglements: ReglementForSolde[] = []
 ): Solde[] =>
   membres.map(membre => {
     let amount = 0
@@ -43,6 +50,14 @@ export const soldesOf = (
         if (part.userId === membre.userId) {
           amount -= part.amount.value
         }
+      }
+    }
+    for (const reglement of reglements) {
+      if (reglement.creditorId === membre.userId) {
+        amount -= reglement.amount
+      }
+      if (reglement.debtorId === membre.userId) {
+        amount += reglement.amount
       }
     }
     return { userId: membre.userId, name: membre.name, amount }

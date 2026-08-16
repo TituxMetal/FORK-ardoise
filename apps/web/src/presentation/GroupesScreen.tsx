@@ -14,6 +14,8 @@ const field = (form: FormData, name: string) => {
 const euros = (cents: number) =>
   `${cents < 0 ? '−' : ''}${(Math.abs(cents) / 100).toFixed(2).replace('.', ',')} €`
 
+const centsFromEuros = (value: string) => Math.round(Number(value.replace(',', '.')) * 100)
+
 type Props = {
   client?: GroupesClient
   copy?: (text: string) => Promise<void>
@@ -26,6 +28,8 @@ export const GroupesScreen = ({
   const [groupes, setGroupes] = useState<GroupeSummary[]>([])
   const [opened, setOpened] = useState<GroupeDto | null>(null)
   const [error, setError] = useState('')
+  const [debtorId, setDebtorId] = useState('')
+  const [creditorId, setCreditorId] = useState('')
 
   useEffect(() => {
     void client
@@ -127,6 +131,59 @@ export const GroupesScreen = ({
       setError('Service introuvable')
     }
   }
+
+  const createSettlement = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!opened) {
+      return
+    }
+    const form = new FormData(event.currentTarget)
+    event.currentTarget.reset()
+    try {
+      setOpened(
+        await client.createSettlement(opened.id, {
+          debtorId: field(form, 'debtorId'),
+          creditorId: field(form, 'creditorId'),
+          amount: centsFromEuros(field(form, 'amount'))
+        })
+      )
+      setError('')
+    } catch {
+      setError('Impossible de constater le Règlement')
+    }
+  }
+
+  const deleteSettlement = async (settlementId: string) => {
+    if (!opened) {
+      return
+    }
+    try {
+      setOpened(await client.deleteSettlement(opened.id, settlementId))
+      setError('')
+    } catch {
+      setError('Règlement introuvable')
+    }
+  }
+
+  const creditors =
+    opened?.balances
+      .filter(solde => solde.amount > 0)
+      .slice()
+      .sort((a, b) => b.amount - a.amount) ?? []
+  const selectedDebtorId = opened?.members.some(membre => membre.userId === debtorId)
+    ? debtorId
+    : (opened?.balances.find(solde => solde.amount < 0)?.userId ?? opened?.members[0]?.userId ?? '')
+  const selectedCreditorId = creditors.some(solde => solde.userId === creditorId)
+    ? creditorId
+    : (creditors[0]?.userId ?? '')
+  const nameOf = (userId: string) =>
+    opened?.members.find(membre => membre.userId === userId)?.name ?? userId
+  const plafond = opened
+    ? Math.min(
+        -(opened.balances.find(solde => solde.userId === selectedDebtorId)?.amount ?? 0),
+        opened.balances.find(solde => solde.userId === selectedCreditorId)?.amount ?? 0
+      )
+    : 0
 
   return (
     <section className="space-y-4">
@@ -305,6 +362,57 @@ export const GroupesScreen = ({
               Constater le Service
             </button>
           </form>
+          <form
+            className="flex flex-col gap-3"
+            aria-label="Constater un Règlement"
+            onSubmit={createSettlement}
+          >
+            <h3 className="font-medium">Qui doit quoi</h3>
+            <label className="flex flex-col gap-1">
+              Débiteur
+              <select
+                name="debtorId"
+                required
+                value={selectedDebtorId}
+                onChange={event => setDebtorId(event.target.value)}
+                className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
+              >
+                {opened.members.map(membre => (
+                  <option key={membre.userId} value={membre.userId}>
+                    {membre.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1">
+              Créancier
+              <select
+                name="creditorId"
+                required
+                value={selectedCreditorId}
+                onChange={event => setCreditorId(event.target.value)}
+                className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
+              >
+                {creditors.map(solde => (
+                  <option key={solde.userId} value={solde.userId}>
+                    {solde.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p>Plafond {euros(plafond)}</p>
+            <label className="flex flex-col gap-1">
+              Montant
+              <input
+                name="amount"
+                required
+                className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
+              />
+            </label>
+            <button type="submit" className="rounded bg-zinc-100 px-3 py-2 text-zinc-900">
+              Constater le Règlement
+            </button>
+          </form>
           {opened.expenses.length === 0 ? (
             <p>Aucune Dépense</p>
           ) : (
@@ -345,7 +453,28 @@ export const GroupesScreen = ({
               ))}
             </ul>
           )}
-          <p>Aucun Règlement</p>
+          {opened.settlements.length === 0 ? (
+            <p>Aucun Règlement</p>
+          ) : (
+            <ul className="space-y-2">
+              {opened.settlements.map(reglement => (
+                <li key={reglement.id} className="space-y-1">
+                  <p>
+                    {nameOf(reglement.debtorId)} → {nameOf(reglement.creditorId)}{' '}
+                    {euros(reglement.amount)}
+                  </p>
+                  <button
+                    type="button"
+                    className="rounded bg-zinc-800 px-3 py-2"
+                    onClick={() => void deleteSettlement(reglement.id)}
+                  >
+                    Supprimer le Règlement {nameOf(reglement.debtorId)} →{' '}
+                    {nameOf(reglement.creditorId)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <ul>
             {opened.balances.map(solde => (
               <li key={solde.userId}>

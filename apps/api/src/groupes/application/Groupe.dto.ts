@@ -34,6 +34,13 @@ export type ServiceDto = {
   parts: PartDto[]
 }
 
+export type ReglementDto = {
+  id: string
+  debtorId: string
+  creditorId: string
+  amount: number
+}
+
 export type GroupeDto = {
   id: string
   name: string
@@ -43,6 +50,6 @@ export type GroupeDto = {
   }
   expenses: DepenseDto[]
   services: ServiceDto[]
-  settlements: []
+  settlements: ReglementDto[]
   balances: SoldeDto[]
 }

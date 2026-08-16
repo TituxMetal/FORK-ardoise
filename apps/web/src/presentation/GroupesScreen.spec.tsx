@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, expect, test } from 'vite-plus/test'
 import type {
   CreateDepenseInput,
+  CreateReglementInput,
   CreateServiceInput,
   GroupeDto,
   GroupeSummary
@@ -57,6 +58,14 @@ const soldesFrom = (groupe: GroupeDto) =>
         if (part.userId === membre.userId) {
           amount -= part.amount
         }
+      }
+    }
+    for (const reglement of groupe.settlements) {
+      if (reglement.creditorId === membre.userId) {
+        amount -= reglement.amount
+      }
+      if (reglement.debtorId === membre.userId) {
+        amount += reglement.amount
       }
     }
     return { ...membre, amount }
@@ -157,6 +166,40 @@ const memoryClient = () => {
       const next: GroupeDto = {
         ...groupe,
         services: groupe.services.filter(service => service.id !== serviceId)
+      }
+      next.balances = soldesFrom(next)
+      groupes.set(groupeId, next)
+      return next
+    },
+    createSettlement: async (groupeId: string, input: CreateReglementInput): Promise<GroupeDto> => {
+      const groupe = groupes.get(groupeId)
+      if (!groupe) {
+        throw new Error('Groupe introuvable')
+      }
+      const next: GroupeDto = {
+        ...groupe,
+        settlements: [
+          ...groupe.settlements,
+          {
+            id: crypto.randomUUID(),
+            debtorId: input.debtorId,
+            creditorId: input.creditorId,
+            amount: input.amount
+          }
+        ]
+      }
+      next.balances = soldesFrom(next)
+      groupes.set(groupeId, next)
+      return next
+    },
+    deleteSettlement: async (groupeId: string, settlementId: string): Promise<GroupeDto> => {
+      const groupe = groupes.get(groupeId)
+      if (!groupe) {
+        throw new Error('Groupe introuvable')
+      }
+      const next: GroupeDto = {
+        ...groupe,
+        settlements: groupe.settlements.filter(reglement => reglement.id !== settlementId)
       }
       next.balances = soldesFrom(next)
       groupes.set(groupeId, next)
@@ -311,4 +354,87 @@ test('any Membre can delete a Service from the list', async () => {
 
   expect(await screen.findByText('Aucun Service')).toBeTruthy()
   expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
+})
+
+const constaterPizza = async () => {
+  const user = userEvent.setup()
+  const form = screen.getByRole('form', { name: 'Constater une Dépense' })
+  await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
+  await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
+  await user.type(within(form).getByLabelText('Montant'), '1')
+  await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
+  await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
+}
+
+test('qui doit quoi lists strictly positive Soldes descending and shows the plafond', async () => {
+  render(<GroupesScreen client={memoryClient()} />)
+  await openNamed('Potes de Bob')
+  await constaterPizza()
+
+  expect(await screen.findByRole('heading', { name: 'Qui doit quoi' })).toBeTruthy()
+  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+  const creditors = within(form).getByLabelText('Créancier')
+  expect([...creditors.querySelectorAll('option')].map(option => option.textContent)).toEqual([
+    'Léa'
+  ])
+  expect(within(form).getByText('Plafond 0,33 €')).toBeTruthy()
+})
+
+test('a Membre constate a Règlement from the chosen créancier', async () => {
+  render(<GroupesScreen client={memoryClient()} />)
+  await openNamed('Potes de Bob')
+  await constaterPizza()
+
+  const user = userEvent.setup()
+  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+  await user.selectOptions(within(form).getByLabelText('Débiteur'), 'bob')
+  await user.selectOptions(within(form).getByLabelText('Créancier'), 'lea')
+  await user.type(within(form).getByLabelText('Montant'), '0,20')
+  await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
+
+  expect(await screen.findByText('Bob → Léa 0,20 €')).toBeTruthy()
+  expect(screen.getByText('Léa 0,46 €')).toBeTruthy()
+  expect(screen.getByText('Bob −0,13 €')).toBeTruthy()
+})
+
+test('any Membre can delete a Règlement from the list', async () => {
+  render(<GroupesScreen client={memoryClient()} />)
+  await openNamed('Potes de Bob')
+  await constaterPizza()
+
+  const user = userEvent.setup()
+  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+  await user.selectOptions(within(form).getByLabelText('Débiteur'), 'bob')
+  await user.selectOptions(within(form).getByLabelText('Créancier'), 'lea')
+  await user.type(within(form).getByLabelText('Montant'), '0,20')
+  await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
+  await user.click(await screen.findByRole('button', { name: 'Supprimer le Règlement Bob → Léa' }))
+
+  expect(await screen.findByText('Aucun Règlement')).toBeTruthy()
+  expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
+})
+
+test('changing débiteur or créancier updates the displayed plafond', async () => {
+  render(<GroupesScreen client={memoryClient()} />)
+  await openNamed('Potes de Bob')
+  await constaterPizza()
+
+  const user = userEvent.setup()
+  const service = screen.getByRole('form', { name: 'Constater un Service' })
+  await user.type(within(service).getByLabelText('Libellé'), 'Ordi Bob')
+  await user.type(within(service).getByLabelText('Jour'), '2026-08-16')
+  await user.type(within(service).getByLabelText('Montant'), '0.90')
+  await user.selectOptions(within(service).getByLabelText('Prestataire'), 'bob')
+  await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
+
+  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+  const creditors = within(form).getByLabelText('Créancier')
+  expect([...creditors.querySelectorAll('option')].map(option => option.textContent)).toEqual([
+    'Léa',
+    'Bob'
+  ])
+  expect(within(form).getByText('Plafond 0,36 €')).toBeTruthy()
+
+  await user.selectOptions(within(form).getByLabelText('Créancier'), 'bob')
+  expect(within(form).getByText('Plafond 0,27 €')).toBeTruthy()
 })

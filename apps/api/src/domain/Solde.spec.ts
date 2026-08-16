@@ -86,3 +86,55 @@ test('a Service is not a Dépense: only services reconnus credit the Prestataire
 
   expect(soldes.find(solde => solde.userId === 'lea')?.amount).toBe(66)
 })
+
+test('Règlement credits the débiteur and debits the créancier', () => {
+  const parts = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'lea')
+  const soldes = soldesOf(
+    membres,
+    [{ payerId: 'lea', amount: 100, parts: parts.list }],
+    [],
+    [{ debtorId: 'bob', creditorId: 'lea', amount: 33 }]
+  )
+
+  expect(soldes).toEqual([
+    { userId: 'lea', name: 'Léa', amount: 33 },
+    { userId: 'bob', name: 'Bob', amount: 0 },
+    { userId: 'camille', name: 'Camille', amount: -33 }
+  ])
+  expect(soldes.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
+})
+
+test('a partial Règlement leaves remaining Soldes that still sum to 0', () => {
+  const parts = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'lea')
+  const soldes = soldesOf(
+    membres,
+    [{ payerId: 'lea', amount: 100, parts: parts.list }],
+    [],
+    [{ debtorId: 'bob', creditorId: 'lea', amount: 20 }]
+  )
+
+  expect(soldes).toEqual([
+    { userId: 'lea', name: 'Léa', amount: 46 },
+    { userId: 'bob', name: 'Bob', amount: -13 },
+    { userId: 'camille', name: 'Camille', amount: -33 }
+  ])
+  expect(soldes.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
+})
+
+test('complete Solde is payé + services reconnus − parts − reçu + versé', () => {
+  const pizza = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'lea')
+  const ordi = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'bob')
+  const soldes = soldesOf(
+    membres,
+    [{ payerId: 'lea', amount: 100, parts: pizza.list }],
+    [{ providerId: 'bob', amount: 100, parts: ordi.list }],
+    [{ debtorId: 'camille', creditorId: 'lea', amount: 33 }]
+  )
+
+  expect(soldes).toEqual([
+    { userId: 'lea', name: 'Léa', amount: 0 },
+    { userId: 'bob', name: 'Bob', amount: 33 },
+    { userId: 'camille', name: 'Camille', amount: -33 }
+  ])
+  expect(soldes.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
+})

@@ -1,5 +1,6 @@
 import type { Depense } from '../../depenses/domain/Depense.entity.ts'
 import { soldesOf } from '../../domain/Solde.ts'
+import type { Reglement } from '../../reglements/domain/Reglement.entity.ts'
 import type { Service } from '../../services/domain/Service.entity.ts'
 import type { Groupe } from '../domain/Groupe.entity.ts'
 import type { GroupeDto } from './Groupe.dto.ts'
@@ -7,7 +8,8 @@ import type { GroupeDto } from './Groupe.dto.ts'
 export const toGroupeDto = (
   groupe: Groupe,
   depenses: Depense[] = [],
-  services: Service[] = []
+  services: Service[] = [],
+  reglements: Reglement[] = []
 ): GroupeDto => {
   const members = groupe.membres.map(membre => ({
     userId: membre.userId,
@@ -42,7 +44,12 @@ export const toGroupeDto = (
         amount: part.amount.value
       }))
     })),
-    settlements: [],
+    settlements: reglements.map(reglement => ({
+      id: reglement.id,
+      debtorId: reglement.debtorId,
+      creditorId: reglement.creditorId,
+      amount: reglement.amount.value
+    })),
     balances: soldesOf(
       members,
       depenses.map(depense => ({
@@ -54,6 +61,11 @@ export const toGroupeDto = (
         providerId: service.providerId,
         amount: service.amount.value,
         parts: service.parts.list
+      })),
+      reglements.map(reglement => ({
+        debtorId: reglement.debtorId,
+        creditorId: reglement.creditorId,
+        amount: reglement.amount.value
       }))
     )
   }

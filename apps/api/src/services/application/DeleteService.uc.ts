@@ -2,13 +2,15 @@ import type { IDepenseRepository } from '../../depenses/domain/IDepense.reposito
 import { NotFound } from '../../domain/NotFound.error.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
+import type { IReglementRepository } from '../../reglements/domain/IReglement.repository.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
 
 export class DeleteService {
   constructor(
     private readonly groupes: IGroupeRepository,
     private readonly depenses: IDepenseRepository,
-    private readonly services: IServiceRepository
+    private readonly services: IServiceRepository,
+    private readonly reglements: IReglementRepository
   ) {}
 
   async execute(userId: string, groupeId: string, serviceId: string) {
@@ -24,7 +26,8 @@ export class DeleteService {
     return toGroupeDto(
       groupe,
       await this.depenses.findByGroupeId(groupeId),
-      await this.services.findByGroupeId(groupeId)
+      await this.services.findByGroupeId(groupeId),
+      await this.reglements.findByGroupeId(groupeId)
     )
   }
 }

@@ -71,12 +71,13 @@ model Verification {
 }
 
 model Groupe {
-  id               String    @id
+  id               String      @id
   name             String
-  invitationSecret String    @unique
+  invitationSecret String      @unique
   membres          Membre[]
   depenses         Depense[]
   services         Service[]
+  reglements       Reglement[]
 
   @@map("groupe")
 }
@@ -165,4 +166,16 @@ model ServicePart {
 
   @@id([serviceId, userId])
   @@map("service_part")
+}
+
+model Reglement {
+  id         String @id
+  groupeId   String
+  groupe     Groupe @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  debtorId   String
+  creditorId String
+  amount     Int
+
+  @@index([groupeId])
+  @@map("reglement")
 }

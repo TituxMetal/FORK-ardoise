@@ -34,6 +34,13 @@ export type ServiceDto = {
   parts: PartDto[]
 }
 
+export type ReglementDto = {
+  id: string
+  debtorId: string
+  creditorId: string
+  amount: number
+}
+
 export type GroupeDto = {
   id: string
   name: string
@@ -43,7 +50,7 @@ export type GroupeDto = {
   }
   expenses: DepenseDto[]
   services: ServiceDto[]
-  settlements: []
+  settlements: ReglementDto[]
   balances: SoldeDto[]
 }
 
@@ -68,6 +75,12 @@ export type CreateServiceInput = {
   participantIds?: string[]
 }
 
+export type CreateReglementInput = {
+  debtorId: string
+  creditorId: string
+  amount: number
+}
+
 export type GroupesClient = {
   list: () => Promise<GroupeSummary[]>
   create: (name: string) => Promise<GroupeDto>
@@ -77,6 +90,8 @@ export type GroupesClient = {
   deleteExpense: (groupeId: string, expenseId: string) => Promise<GroupeDto>
   createService: (groupeId: string, input: CreateServiceInput) => Promise<GroupeDto>
   deleteService: (groupeId: string, serviceId: string) => Promise<GroupeDto>
+  createSettlement: (groupeId: string, input: CreateReglementInput) => Promise<GroupeDto>
+  deleteSettlement: (groupeId: string, settlementId: string) => Promise<GroupeDto>
 }
 
 const request = async <T>(path: string, init?: { method?: string; body?: string }): Promise<T> => {
@@ -120,6 +135,15 @@ export const groupesClient: GroupesClient = {
     }),
   deleteService: (groupeId, serviceId) =>
     request<GroupeDto>(`/api/groups/${groupeId}/services/${serviceId}`, {
+      method: 'DELETE'
+    }),
+  createSettlement: (groupeId, input) =>
+    request<GroupeDto>(`/api/groups/${groupeId}/settlements`, {
+      method: 'POST',
+      body: JSON.stringify(input)
+    }),
+  deleteSettlement: (groupeId, settlementId) =>
+    request<GroupeDto>(`/api/groups/${groupeId}/settlements/${settlementId}`, {
       method: 'DELETE'
     })
 }
