@@ -1,16 +1,23 @@
 import type { DomainError } from '../domain/DomainError.ts'
 import type { Context } from 'hono'
 
+const isDomainError = (error: Error): error is DomainError =>
+  error instanceof Error &&
+  'code' in error &&
+  'statusCode' in error &&
+  typeof error.code === 'string' &&
+  typeof error.statusCode === 'number' &&
+  [400, 401, 404, 409, 500].includes(error.statusCode)
+
 export const mapException = (error: Error, c: Context) => {
-  if ('code' in error && 'statusCode' in error) {
-    const domain = error as DomainError
+  if (isDomainError(error)) {
     return c.json(
       {
-        statusCode: domain.statusCode,
-        code: domain.code,
-        message: domain.message
+        statusCode: error.statusCode,
+        code: error.code,
+        message: error.message
       },
-      domain.statusCode as 400 | 401 | 404 | 409 | 500
+      error.statusCode as 400 | 401 | 404 | 409 | 500
     )
   }
 
