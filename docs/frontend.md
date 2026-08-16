@@ -12,7 +12,6 @@ Dark theme only. Light theme is a defect.
 
 - Visible strings: French. Identifiers behind them: English (`CONTEXT.md`).
 - Amounts display as euros (`12,50 €`); storage is cents.
-- Pages + features + routes. Not one file for every form.
-- Modeled on [cube-master web](https://github.com/TituxMetal/cube-master/tree/develop/apps/web/src): a page is a page, a feature owns its components.
+- Pages + features + routes. Not one file for every form. A page is a page; a feature owns its components.
 
 A design-system ticket (tokens, type, shared widgets) is not a blocker for the retrofit. Add it when a prototype says we need one.

@@ -11,7 +11,7 @@ Do not merge them into one Hono+SPA app. The HTTP API is the product seam.
 
 ## API
 
-Folders by vocabulary (`groups`, `expenses`, `services`, `paybacks`, …). Inside a vocabulary, cube-engine layers:
+Folders by vocabulary (`groups`, `expenses`, `services`, `paybacks`, …). Inside a vocabulary, three layers:
 
 ```text
 domain/           types, pure rules (Amount, Parts, Balance, Payback plafond)
@@ -19,7 +19,7 @@ application/      use cases as `export const`
 infrastructure/   Prisma adapters
 ```
 
-No `class`. No `function` keyword. A use case is `export const createPayback = (deps) => async (input) => { … }`, not `class CreateReglement`.
+No `class`. No `function` keyword. A use case is `export const createPayback = (deps) => async (input) => { … }`.
 
 HTTP English, bijection with `CONTEXT.md`:
 
@@ -37,7 +37,7 @@ The tree today still uses French identifiers and classes. New code follows this 
 
 ## Web
 
-Cube-master layout, not one god screen:
+Pages, features, layouts — not one god screen:
 
 ```text
 apps/web/src/
@@ -62,8 +62,8 @@ New specs use `describe` / `it`. Existing `test()` dies on the retrofit ticket. 
 
 ## Names
 
-- Folders: kebab-case (`use-cases/`, `features/groups/`).
-- Component and type files: PascalCase (`Home.tsx`, `CubePlayground.tsx` → here `GroupPage.tsx`).
+- Folders: kebab-case (`features/groups/`).
+- Component and type files: PascalCase (`GroupPage.tsx`).
 - Function modules: camelCase (`createPayback.ts`, `amountFromCents.ts`).
 - Specs sit next to the file, suffix `.spec.ts` / `.spec.tsx`.
 - Identifiers: `CONTEXT.md` English. No accents.
