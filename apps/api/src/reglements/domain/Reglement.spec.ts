@@ -4,8 +4,8 @@ import { Reglement } from './Reglement.entity.ts'
 
 describe('Reglement', () => {
   it('caps a Payback at the min of what the debtor owes and the creditor is owed', () => {
-    expect(Reglement.plafond(-33, 66)).toBe(33)
-    expect(Reglement.plafond(-66, 33)).toBe(33)
+    expect(Reglement.cap(-33, 66)).toBe(33)
+    expect(Reglement.cap(-66, 33)).toBe(33)
   })
 
   it('accepts a Payback under the cap', () => {
@@ -24,7 +24,7 @@ describe('Reglement', () => {
 
   it('refuses a Payback above the cap', () => {
     expect(() => Reglement.create('groupe', 'bob', 'lea', amountFromCents(34), -33, 66)).toThrow(
-      Reglement.ABOVE_PLAFOND
+      Reglement.ABOVE_CAP
     )
   })
 

@@ -171,7 +171,7 @@ const pizza = async () => {
   return ardoise
 }
 
-test('a partial Règlement under the plafond is real money, not a Dépense', async () => {
+test('a partial Règlement under the cap is real money, not a Dépense', async () => {
   const { app, groupe, lea, bob, camille } = await pizza()
 
   const response = await createReglement(app, bob.cookie, groupe.id, {
@@ -199,7 +199,7 @@ test('a partial Règlement under the plafond is real money, not a Dépense', asy
   expect(body.balances.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
 })
 
-test('any Membre can constater a Règlement at the plafond', async () => {
+test('any Membre can constater a Règlement at the cap', async () => {
   const { app, groupe, lea, bob, camille } = await pizza()
 
   const response = await createReglement(app, camille.cookie, groupe.id, {
@@ -218,12 +218,12 @@ test('any Membre can constater a Règlement at the plafond', async () => {
   ])
 })
 
-test('above the plafond, a non-négatif débiteur or a non-positif créancier is 400', async () => {
+test('above the cap, a non-négatif débiteur or a non-positif créancier is 400', async () => {
   const { app, groupe, lea, bob, camille } = await pizza()
   const refusals = [
     {
       body: { debtorId: bob.userId, creditorId: lea.userId, amount: 34 },
-      message: Reglement.ABOVE_PLAFOND
+      message: Reglement.ABOVE_CAP
     },
     {
       body: { debtorId: lea.userId, creditorId: bob.userId, amount: 10 },

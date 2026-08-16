@@ -2,7 +2,7 @@ import { invalidData } from '../../domain/invalidData.ts'
 import { type Amount } from '../../domain/Amount.ts'
 
 export class Reglement {
-  static readonly ABOVE_PLAFOND = 'Montant au-dessus du plafond'
+  static readonly ABOVE_CAP = 'Montant au-dessus du plafond'
   static readonly DEBTOR_NOT_NEGATIVE = 'Débiteur au Solde non négatif'
   static readonly CREDITOR_NOT_POSITIVE = 'Créancier au Solde non positif'
 
@@ -14,7 +14,7 @@ export class Reglement {
     private readonly _amount: Amount
   ) {}
 
-  static plafond(debtorBalance: number, creditorBalance: number) {
+  static cap(debtorBalance: number, creditorBalance: number) {
     return Math.min(-debtorBalance, creditorBalance)
   }
 
@@ -32,9 +32,9 @@ export class Reglement {
     if (creditorBalance <= 0) {
       throw invalidData(Reglement.CREDITOR_NOT_POSITIVE)
     }
-    const plafond = Reglement.plafond(debtorBalance, creditorBalance)
-    if (amount.value > plafond) {
-      throw invalidData(Reglement.ABOVE_PLAFOND)
+    const cap = Reglement.cap(debtorBalance, creditorBalance)
+    if (amount.value > cap) {
+      throw invalidData(Reglement.ABOVE_CAP)
     }
     return new Reglement(crypto.randomUUID(), groupeId, debtorId, creditorId, amount)
   }
