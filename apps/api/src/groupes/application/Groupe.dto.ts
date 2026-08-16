@@ -9,6 +9,21 @@ export type SoldeDto = {
   amount: number
 }
 
+export type PartDto = {
+  userId: string
+  amount: number
+}
+
+export type DepenseDto = {
+  id: string
+  label: string
+  day: string
+  amount: number
+  payerId: string
+  participantIds: string[]
+  parts: PartDto[]
+}
+
 export type GroupeDto = {
   id: string
   name: string
@@ -16,7 +31,7 @@ export type GroupeDto = {
   invitation: {
     secret: string
   }
-  expenses: []
+  expenses: DepenseDto[]
   services: []
   settlements: []
   balances: SoldeDto[]

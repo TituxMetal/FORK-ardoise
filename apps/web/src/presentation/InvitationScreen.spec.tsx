@@ -31,7 +31,9 @@ const joiningClient = (joined: string[]) =>
     join: async secret => {
       joined.push(secret)
       return groupe
-    }
+    },
+    createExpense: async () => groupe,
+    deleteExpense: async () => groupe
   }) satisfies GroupesClient
 
 test('a User with a session who opens the Invitation becomes Membre', async () => {

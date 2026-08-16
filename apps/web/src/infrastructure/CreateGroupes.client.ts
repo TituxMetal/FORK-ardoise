@@ -9,6 +9,21 @@ export type SoldeDto = {
   amount: number
 }
 
+export type PartDto = {
+  userId: string
+  amount: number
+}
+
+export type DepenseDto = {
+  id: string
+  label: string
+  day: string
+  amount: number
+  payerId: string
+  participantIds: string[]
+  parts: PartDto[]
+}
+
 export type GroupeDto = {
   id: string
   name: string
@@ -16,7 +31,7 @@ export type GroupeDto = {
   invitation: {
     secret: string
   }
-  expenses: []
+  expenses: DepenseDto[]
   services: []
   settlements: []
   balances: SoldeDto[]
@@ -27,11 +42,21 @@ export type GroupeSummary = {
   name: string
 }
 
+export type CreateDepenseInput = {
+  label: string
+  day: string
+  amount: number
+  payerId: string
+  participantIds?: string[]
+}
+
 export type GroupesClient = {
   list: () => Promise<GroupeSummary[]>
   create: (name: string) => Promise<GroupeDto>
   get: (id: string) => Promise<GroupeDto>
   join: (secret: string) => Promise<GroupeDto>
+  createExpense: (groupeId: string, input: CreateDepenseInput) => Promise<GroupeDto>
+  deleteExpense: (groupeId: string, expenseId: string) => Promise<GroupeDto>
 }
 
 const request = async <T>(path: string, init?: { method?: string; body?: string }): Promise<T> => {
@@ -58,5 +83,14 @@ export const groupesClient: GroupesClient = {
   join: secret =>
     request<GroupeDto>(`/api/invitations/${secret}`, {
       method: 'POST'
+    }),
+  createExpense: (groupeId, input) =>
+    request<GroupeDto>(`/api/groups/${groupeId}/expenses`, {
+      method: 'POST',
+      body: JSON.stringify(input)
+    }),
+  deleteExpense: (groupeId, expenseId) =>
+    request<GroupeDto>(`/api/groups/${groupeId}/expenses/${expenseId}`, {
+      method: 'DELETE'
     })
 }

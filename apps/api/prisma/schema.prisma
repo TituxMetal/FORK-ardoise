@@ -71,10 +71,11 @@ model Verification {
 }
 
 model Groupe {
-  id               String   @id
+  id               String    @id
   name             String
-  invitationSecret String   @unique
+  invitationSecret String    @unique
   membres          Membre[]
+  depenses         Depense[]
 
   @@map("groupe")
 }
@@ -91,4 +92,40 @@ model Membre {
   @@index([userId])
   @@index([groupeId])
   @@map("membre")
+}
+
+model Depense {
+  id            String                @id
+  groupeId      String
+  groupe        Groupe                @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  label         String
+  day           String
+  amount        Int
+  payerId       String
+  participants  DepenseParticipant[]
+  parts         DepensePart[]
+
+  @@index([groupeId])
+  @@map("depense")
+}
+
+model DepenseParticipant {
+  depenseId String
+  userId    String
+  ordinal   Int
+  depense   Depense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
+
+  @@id([depenseId, userId])
+  @@map("depense_participant")
+}
+
+model DepensePart {
+  depenseId String
+  userId    String
+  amount    Int
+  ordinal   Int
+  depense   Depense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
+
+  @@id([depenseId, userId])
+  @@map("depense_part")
 }
