@@ -1,7 +1,7 @@
 import { Jour } from '../../depenses/domain/Jour.vo.ts'
 import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
-import { Montant } from '../../domain/Montant.vo.ts'
-import { Parts } from '../../domain/Parts.ts'
+import type { Amount } from '../../domain/Amount.ts'
+import { equalParts, type Part } from '../../domain/Part.ts'
 
 export class Service {
   private constructor(
@@ -9,17 +9,17 @@ export class Service {
     private readonly _groupeId: string,
     private readonly _label: Libelle,
     private readonly _day: Jour,
-    private readonly _amount: Montant,
+    private readonly _amount: Amount,
     private readonly _providerId: string,
     private readonly _participantIds: string[],
-    private readonly _parts: Parts
+    private readonly _parts: Part[]
   ) {}
 
   static create(
     groupeId: string,
     label: Libelle,
     day: Jour,
-    amount: Montant,
+    amount: Amount,
     providerId: string,
     participantIds: string[]
   ) {
@@ -31,7 +31,7 @@ export class Service {
       amount,
       providerId,
       participantIds,
-      Parts.equal(amount, participantIds, providerId)
+      equalParts(amount, participantIds, providerId)
     )
   }
 
@@ -40,10 +40,10 @@ export class Service {
     groupeId: string,
     label: Libelle,
     day: Jour,
-    amount: Montant,
+    amount: Amount,
     providerId: string,
     participantIds: string[],
-    parts: Parts
+    parts: Part[]
   ) {
     return new Service(id, groupeId, label, day, amount, providerId, participantIds, parts)
   }

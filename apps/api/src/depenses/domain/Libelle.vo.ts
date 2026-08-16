@@ -1,4 +1,4 @@
-import { InvalidData } from '../../domain/InvalidData.error.ts'
+import { invalidData } from '../../domain/invalidData.ts'
 
 export class Libelle {
   static readonly REQUIRED = 'Libellé requis'
@@ -8,7 +8,7 @@ export class Libelle {
   static from(value: string) {
     const trimmed = value.trim()
     if (trimmed.length === 0) {
-      throw new InvalidData(Libelle.REQUIRED)
+      throw invalidData(Libelle.REQUIRED)
     }
     return new Libelle(trimmed)
   }

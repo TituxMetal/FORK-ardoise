@@ -1,8 +1,8 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { InvalidData } from '../../domain/InvalidData.error.ts'
-import { Montant } from '../../domain/Montant.vo.ts'
+import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
+import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
@@ -15,7 +15,7 @@ import { Libelle } from '../domain/Libelle.vo.ts'
 const createDepenseBody = z.object({
   label: z.string({ error: Libelle.REQUIRED }),
   day: z.string({ error: Jour.REQUIRED }),
-  amount: z.number({ error: Montant.POSITIVE }),
+  amount: z.number({ error: AMOUNT_POSITIVE }),
   payerId: z.string(),
   participantIds: z.array(z.string()).optional()
 })
@@ -35,7 +35,7 @@ export const createDepensesRoutes = (
     zValidator('json', createDepenseBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
-        throw new InvalidData(issue?.message ?? Libelle.REQUIRED)
+        throw invalidData(issue?.message ?? Libelle.REQUIRED)
       }
     }),
     async c => {

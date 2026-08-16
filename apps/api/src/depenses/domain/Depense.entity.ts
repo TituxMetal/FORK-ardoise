@@ -1,5 +1,5 @@
-import { Montant } from '../../domain/Montant.vo.ts'
-import { Parts } from '../../domain/Parts.ts'
+import type { Amount } from '../../domain/Amount.ts'
+import { equalParts, type Part } from '../../domain/Part.ts'
 import { Jour } from './Jour.vo.ts'
 import { Libelle } from './Libelle.vo.ts'
 
@@ -9,17 +9,17 @@ export class Depense {
     private readonly _groupeId: string,
     private readonly _label: Libelle,
     private readonly _day: Jour,
-    private readonly _amount: Montant,
+    private readonly _amount: Amount,
     private readonly _payerId: string,
     private readonly _participantIds: string[],
-    private readonly _parts: Parts
+    private readonly _parts: Part[]
   ) {}
 
   static create(
     groupeId: string,
     label: Libelle,
     day: Jour,
-    amount: Montant,
+    amount: Amount,
     payerId: string,
     participantIds: string[]
   ) {
@@ -31,7 +31,7 @@ export class Depense {
       amount,
       payerId,
       participantIds,
-      Parts.equal(amount, participantIds, payerId)
+      equalParts(amount, participantIds, payerId)
     )
   }
 
@@ -40,10 +40,10 @@ export class Depense {
     groupeId: string,
     label: Libelle,
     day: Jour,
-    amount: Montant,
+    amount: Amount,
     payerId: string,
     participantIds: string[],
-    parts: Parts
+    parts: Part[]
   ) {
     return new Depense(id, groupeId, label, day, amount, payerId, participantIds, parts)
   }

@@ -1,4 +1,4 @@
-import { NotFound } from '../../domain/NotFound.error.ts'
+import { notFound } from '../../domain/notFound.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
@@ -16,11 +16,11 @@ export class DeleteDepense {
   async execute(userId: string, groupeId: string, depenseId: string) {
     const groupe = await this.groupes.findById(groupeId)
     if (!groupe || !groupe.hasMembre(userId)) {
-      throw new NotFound('Groupe introuvable')
+      throw notFound('Groupe introuvable')
     }
     const depense = await this.depenses.findById(depenseId)
     if (!depense || depense.groupeId !== groupeId) {
-      throw new NotFound('Dépense introuvable')
+      throw notFound('Dépense introuvable')
     }
     await this.depenses.delete(depenseId)
     return toGroupeDto(

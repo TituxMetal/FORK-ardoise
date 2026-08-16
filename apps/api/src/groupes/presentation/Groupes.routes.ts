@@ -4,7 +4,7 @@ import { z } from 'zod'
 import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
 import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import { InvalidData } from '../../domain/InvalidData.error.ts'
+import { invalidData } from '../../domain/invalidData.ts'
 import { CreateGroupe } from '../application/CreateGroupe.uc.ts'
 import { GetGroupe } from '../application/GetGroupe.uc.ts'
 import { ListGroupes } from '../application/ListGroupes.uc.ts'
@@ -30,7 +30,7 @@ export const createGroupesRoutes = (
     '/',
     zValidator('json', createGroupeBody, result => {
       if (!result.success) {
-        throw new InvalidData(GroupeName.REQUIRED)
+        throw invalidData(GroupeName.REQUIRED)
       }
     }),
     async c => {

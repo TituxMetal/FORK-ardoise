@@ -1,5 +1,5 @@
-import { InvalidData } from '../../domain/InvalidData.error.ts'
-import { Montant } from '../../domain/Montant.vo.ts'
+import { invalidData } from '../../domain/invalidData.ts'
+import { type Amount } from '../../domain/Amount.ts'
 
 export class Reglement {
   static readonly ABOVE_PLAFOND = 'Montant au-dessus du plafond'
@@ -11,7 +11,7 @@ export class Reglement {
     private readonly _groupeId: string,
     private readonly _debtorId: string,
     private readonly _creditorId: string,
-    private readonly _amount: Montant
+    private readonly _amount: Amount
   ) {}
 
   static plafond(soldeDebiteur: number, soldeCreancier: number) {
@@ -22,19 +22,19 @@ export class Reglement {
     groupeId: string,
     debtorId: string,
     creditorId: string,
-    amount: Montant,
+    amount: Amount,
     soldeDebiteur: number,
     soldeCreancier: number
   ) {
     if (soldeDebiteur >= 0) {
-      throw new InvalidData(Reglement.DEBTOR_NOT_NEGATIVE)
+      throw invalidData(Reglement.DEBTOR_NOT_NEGATIVE)
     }
     if (soldeCreancier <= 0) {
-      throw new InvalidData(Reglement.CREDITOR_NOT_POSITIVE)
+      throw invalidData(Reglement.CREDITOR_NOT_POSITIVE)
     }
     const plafond = Reglement.plafond(soldeDebiteur, soldeCreancier)
     if (amount.value > plafond) {
-      throw new InvalidData(Reglement.ABOVE_PLAFOND)
+      throw invalidData(Reglement.ABOVE_PLAFOND)
     }
     return new Reglement(crypto.randomUUID(), groupeId, debtorId, creditorId, amount)
   }
@@ -44,7 +44,7 @@ export class Reglement {
     groupeId: string,
     debtorId: string,
     creditorId: string,
-    amount: Montant
+    amount: Amount
   ) {
     return new Reglement(id, groupeId, debtorId, creditorId, amount)
   }

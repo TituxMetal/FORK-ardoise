@@ -3,7 +3,7 @@ export type MembreDto = {
   name: string
 }
 
-export type SoldeDto = {
+export type BalanceDto = {
   userId: string
   name: string
   amount: number
@@ -51,7 +51,7 @@ export type GroupeDto = {
   expenses: DepenseDto[]
   services: ServiceDto[]
   settlements: ReglementDto[]
-  balances: SoldeDto[]
+  balances: BalanceDto[]
 }
 
 export type GroupeSummary = {

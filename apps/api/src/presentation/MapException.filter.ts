@@ -1,15 +1,16 @@
-import { DomainError } from '../domain/DomainError.error.ts'
+import type { DomainError } from '../domain/DomainError.ts'
 import type { Context } from 'hono'
 
 export const mapException = (error: Error, c: Context) => {
-  if (error instanceof DomainError) {
+  if ('code' in error && 'statusCode' in error) {
+    const domain = error as DomainError
     return c.json(
       {
-        statusCode: error.statusCode,
-        code: error.code,
-        message: error.message
+        statusCode: domain.statusCode,
+        code: domain.code,
+        message: domain.message
       },
-      error.statusCode as 400 | 401 | 404 | 409 | 500
+      domain.statusCode as 400 | 401 | 404 | 409 | 500
     )
   }
 

@@ -1,4 +1,4 @@
-import { Montant } from '../../domain/Montant.vo.ts'
+import { amountReconstitute } from '../../domain/Amount.ts'
 import { Reglement } from '../domain/Reglement.entity.ts'
 
 export const toReglement = (row: {
@@ -13,5 +13,5 @@ export const toReglement = (row: {
     row.groupeId,
     row.debtorId,
     row.creditorId,
-    Montant.reconstitute(row.amount)
+    amountReconstitute(row.amount)
   )

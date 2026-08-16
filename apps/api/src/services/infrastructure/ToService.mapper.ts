@@ -1,7 +1,6 @@
 import { Jour } from '../../depenses/domain/Jour.vo.ts'
 import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
-import { Montant } from '../../domain/Montant.vo.ts'
-import { Parts } from '../../domain/Parts.ts'
+import { amountReconstitute } from '../../domain/Amount.ts'
 import { Service } from '../domain/Service.entity.ts'
 
 export const toService = (row: {
@@ -21,14 +20,12 @@ export const toService = (row: {
     row.groupeId,
     Libelle.reconstitute(row.label),
     Jour.reconstitute(row.day),
-    Montant.reconstitute(row.amount),
+    amountReconstitute(row.amount),
     row.providerId,
     participants.map(participant => participant.userId),
-    Parts.reconstitute(
-      parts.map(part => ({
-        userId: part.userId,
-        amount: Montant.reconstitute(part.amount)
-      }))
-    )
+    parts.map(part => ({
+      userId: part.userId,
+      amount: amountReconstitute(part.amount)
+    }))
   )
 }

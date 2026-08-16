@@ -21,7 +21,7 @@ export class PrismaExpenseRepository implements IExpenseRepository {
           create: depense.participantIds.map((userId, ordinal) => ({ userId, ordinal }))
         },
         parts: {
-          create: depense.parts.list.map((part, ordinal) => ({
+          create: depense.parts.map((part, ordinal) => ({
             userId: part.userId,
             amount: part.amount.value,
             ordinal

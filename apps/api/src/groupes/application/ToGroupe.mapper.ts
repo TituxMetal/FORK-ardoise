@@ -1,5 +1,5 @@
 import type { Depense } from '../../depenses/domain/Depense.entity.ts'
-import { soldesOf } from '../../domain/Solde.ts'
+import { balancesOf } from '../../domain/Balance.ts'
 import type { Reglement } from '../../reglements/domain/Reglement.entity.ts'
 import type { Service } from '../../services/domain/Service.entity.ts'
 import type { Groupe } from '../domain/Groupe.entity.ts'
@@ -27,7 +27,7 @@ export const toGroupeDto = (
       amount: depense.amount.value,
       payerId: depense.payerId,
       participantIds: depense.participantIds,
-      parts: depense.parts.list.map(part => ({
+      parts: depense.parts.map(part => ({
         userId: part.userId,
         amount: part.amount.value
       }))
@@ -39,7 +39,7 @@ export const toGroupeDto = (
       amount: service.amount.value,
       providerId: service.providerId,
       participantIds: service.participantIds,
-      parts: service.parts.list.map(part => ({
+      parts: service.parts.map(part => ({
         userId: part.userId,
         amount: part.amount.value
       }))
@@ -50,17 +50,17 @@ export const toGroupeDto = (
       creditorId: reglement.creditorId,
       amount: reglement.amount.value
     })),
-    balances: soldesOf(
+    balances: balancesOf(
       members,
       depenses.map(depense => ({
         payerId: depense.payerId,
         amount: depense.amount.value,
-        parts: depense.parts.list
+        parts: depense.parts
       })),
       services.map(service => ({
         providerId: service.providerId,
         amount: service.amount.value,
-        parts: service.parts.list
+        parts: service.parts
       })),
       reglements.map(reglement => ({
         debtorId: reglement.debtorId,

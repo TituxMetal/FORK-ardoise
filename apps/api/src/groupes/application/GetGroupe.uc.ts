@@ -1,5 +1,5 @@
 import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
-import { NotFound } from '../../domain/NotFound.error.ts'
+import { notFound } from '../../domain/notFound.ts'
 import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import type { IGroupRepository } from '../domain/IGroup.repository.ts'
@@ -16,7 +16,7 @@ export class GetGroupe {
   async execute(userId: string, groupeId: string) {
     const groupe = await this.groupes.findById(groupeId)
     if (!groupe || !groupe.hasMembre(userId)) {
-      throw new NotFound('Groupe introuvable')
+      throw notFound('Groupe introuvable')
     }
     return toGroupeDto(
       groupe,

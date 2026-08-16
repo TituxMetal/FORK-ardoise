@@ -4,8 +4,8 @@ import { z } from 'zod'
 import { Jour } from '../../depenses/domain/Jour.vo.ts'
 import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
 import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
-import { InvalidData } from '../../domain/InvalidData.error.ts'
-import { Montant } from '../../domain/Montant.vo.ts'
+import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
+import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import { CreateService } from '../application/CreateService.uc.ts'
@@ -15,7 +15,7 @@ import type { IServiceRepository } from '../domain/IService.repository.ts'
 const createServiceBody = z.object({
   label: z.string({ error: Libelle.REQUIRED }),
   day: z.string({ error: Jour.REQUIRED }),
-  amount: z.number({ error: Montant.POSITIVE }),
+  amount: z.number({ error: AMOUNT_POSITIVE }),
   providerId: z.string(),
   participantIds: z.array(z.string()).optional()
 })
@@ -35,7 +35,7 @@ export const createServicesRoutes = (
     zValidator('json', createServiceBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
-        throw new InvalidData(issue?.message ?? Libelle.REQUIRED)
+        throw invalidData(issue?.message ?? Libelle.REQUIRED)
       }
     }),
     async c => {

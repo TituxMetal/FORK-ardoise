@@ -21,7 +21,7 @@ export class PrismaServiceRepository implements IServiceRepository {
           create: service.participantIds.map((userId, ordinal) => ({ userId, ordinal }))
         },
         parts: {
-          create: service.parts.list.map((part, ordinal) => ({
+          create: service.parts.map((part, ordinal) => ({
             userId: part.userId,
             amount: part.amount.value,
             ordinal

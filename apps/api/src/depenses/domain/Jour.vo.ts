@@ -1,4 +1,4 @@
-import { InvalidData } from '../../domain/InvalidData.error.ts'
+import { invalidData } from '../../domain/invalidData.ts'
 
 export class Jour {
   static readonly REQUIRED = 'Jour requis'
@@ -8,7 +8,7 @@ export class Jour {
   static from(value: string) {
     const trimmed = value.trim()
     if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-      throw new InvalidData(Jour.REQUIRED)
+      throw invalidData(Jour.REQUIRED)
     }
     return new Jour(trimmed)
   }

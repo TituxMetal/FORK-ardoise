@@ -2,8 +2,8 @@ import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
-import { InvalidData } from '../../domain/InvalidData.error.ts'
-import { Montant } from '../../domain/Montant.vo.ts'
+import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
+import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { CreateReglement } from '../application/CreateReglement.uc.ts'
@@ -13,7 +13,7 @@ import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
 const createReglementBody = z.object({
   debtorId: z.string(),
   creditorId: z.string(),
-  amount: z.number({ error: Montant.POSITIVE })
+  amount: z.number({ error: AMOUNT_POSITIVE })
 })
 
 export const createReglementsRoutes = (
@@ -31,7 +31,7 @@ export const createReglementsRoutes = (
     zValidator('json', createReglementBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
-        throw new InvalidData(issue?.message ?? Montant.POSITIVE)
+        throw invalidData(issue?.message ?? AMOUNT_POSITIVE)
       }
     }),
     async c => {
