@@ -1,15 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
-import { Groupe } from '../domain/Groupe.entity.ts'
-import { GroupeName } from '../domain/GroupeName.vo.ts'
+import type { Groupe } from '../domain/Groupe.entity.ts'
 import type { IGroupeRepository } from '../domain/IGroupe.repository.ts'
-import { Membre } from '../domain/Membre.entity.ts'
-
-const toDomain = (row: { id: string; name: string; membres: { userId: string; name: string }[] }) =>
-  Groupe.reconstitute(
-    row.id,
-    GroupeName.reconstitute(row.name),
-    row.membres.map(membre => Membre.reconstitute(membre.userId, membre.name))
-  )
+import { toGroupe } from './ToGroupe.mapper.ts'
 
 export class PrismaGroupeRepository implements IGroupeRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -35,7 +27,7 @@ export class PrismaGroupeRepository implements IGroupeRepository {
       where: { id },
       include: { membres: true }
     })
-    return row ? toDomain(row) : null
+    return row ? toGroupe(row) : null
   }
 
   async findByUserId(userId: string) {
@@ -43,6 +35,6 @@ export class PrismaGroupeRepository implements IGroupeRepository {
       where: { membres: { some: { userId } } },
       include: { membres: true }
     })
-    return rows.map(toDomain)
+    return rows.map(toGroupe)
   }
 }

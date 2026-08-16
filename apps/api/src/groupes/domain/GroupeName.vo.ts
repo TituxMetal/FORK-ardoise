@@ -1,12 +1,14 @@
 import { InvalidData } from '../../domain/InvalidData.error.ts'
 
 export class GroupeName {
+  static readonly REQUIRED = 'Nom du Groupe requis'
+
   private constructor(readonly value: string) {}
 
   static from(value: string) {
     const trimmed = value.trim()
     if (trimmed.length === 0) {
-      throw new InvalidData('Nom du Groupe requis')
+      throw new InvalidData(GroupeName.REQUIRED)
     }
     return new GroupeName(trimmed)
   }

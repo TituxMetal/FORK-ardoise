@@ -5,10 +5,11 @@ import { InvalidData } from '../../domain/InvalidData.error.ts'
 import { CreateGroupe } from '../application/CreateGroupe.uc.ts'
 import { GetGroupe } from '../application/GetGroupe.uc.ts'
 import { ListGroupes } from '../application/ListGroupes.uc.ts'
+import { GroupeName } from '../domain/GroupeName.vo.ts'
 import type { IGroupeRepository } from '../domain/IGroupe.repository.ts'
 
 const createGroupeBody = z.object({
-  name: z.string({ error: 'Nom du Groupe requis' })
+  name: z.string({ error: GroupeName.REQUIRED })
 })
 
 export const createGroupesRoutes = (groupes: IGroupeRepository) => {
@@ -21,7 +22,7 @@ export const createGroupesRoutes = (groupes: IGroupeRepository) => {
     '/',
     zValidator('json', createGroupeBody, result => {
       if (!result.success) {
-        throw new InvalidData('Nom du Groupe requis')
+        throw new InvalidData(GroupeName.REQUIRED)
       }
     }),
     async c => {
