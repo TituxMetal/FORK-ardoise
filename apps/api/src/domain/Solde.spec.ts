@@ -51,3 +51,38 @@ test('a Dépense in one Groupe does not change Soldes of another', () => {
     { userId: 'eve', name: 'Eve', amount: 0 }
   ])
 })
+
+test('100 cents, 3 Participants, Prestataire participant: same split as the Dépense', () => {
+  const parts = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'lea')
+  const soldes = soldesOf(membres, [], [{ providerId: 'lea', amount: 100, parts: parts.list }])
+
+  expect(soldes).toEqual([
+    { userId: 'lea', name: 'Léa', amount: 66 },
+    { userId: 'bob', name: 'Bob', amount: -33 },
+    { userId: 'camille', name: 'Camille', amount: -33 }
+  ])
+})
+
+test('Pizza then Service in the same Groupe cancel out', () => {
+  const pizza = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'lea')
+  const ordi = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'bob')
+  const soldes = soldesOf(
+    membres,
+    [{ payerId: 'lea', amount: 100, parts: pizza.list }],
+    [{ providerId: 'bob', amount: 100, parts: ordi.list }]
+  )
+
+  expect(soldes).toEqual([
+    { userId: 'lea', name: 'Léa', amount: 33 },
+    { userId: 'bob', name: 'Bob', amount: 33 },
+    { userId: 'camille', name: 'Camille', amount: -66 }
+  ])
+  expect(soldes.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
+})
+
+test('a Service is not a Dépense: only services reconnus credit the Prestataire', () => {
+  const parts = Parts.equal(Montant.fromCents(100), ['lea', 'bob', 'camille'], 'lea')
+  const soldes = soldesOf(membres, [], [{ providerId: 'lea', amount: 100, parts: parts.list }])
+
+  expect(soldes.find(solde => solde.userId === 'lea')?.amount).toBe(66)
+})

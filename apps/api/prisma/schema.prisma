@@ -76,6 +76,7 @@ model Groupe {
   invitationSecret String    @unique
   membres          Membre[]
   depenses         Depense[]
+  services         Service[]
 
   @@map("groupe")
 }
@@ -128,4 +129,40 @@ model DepensePart {
 
   @@id([depenseId, userId])
   @@map("depense_part")
+}
+
+model Service {
+  id           String               @id
+  groupeId     String
+  groupe       Groupe               @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  label        String
+  day          String
+  amount       Int
+  providerId   String
+  participants ServiceParticipant[]
+  parts        ServicePart[]
+
+  @@index([groupeId])
+  @@map("service")
+}
+
+model ServiceParticipant {
+  serviceId String
+  userId    String
+  ordinal   Int
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([serviceId, userId])
+  @@map("service_participant")
+}
+
+model ServicePart {
+  serviceId String
+  userId    String
+  amount    Int
+  ordinal   Int
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([serviceId, userId])
+  @@map("service_part")
 }

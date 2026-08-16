@@ -92,6 +92,42 @@ export const GroupesScreen = ({
     }
   }
 
+  const createService = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!opened) {
+      return
+    }
+    const form = new FormData(event.currentTarget)
+    const selected = form.getAll('participantIds').filter(value => typeof value === 'string')
+    event.currentTarget.reset()
+    try {
+      setOpened(
+        await client.createService(opened.id, {
+          label: field(form, 'label'),
+          day: field(form, 'day'),
+          amount: Math.round(Number(field(form, 'amount')) * 100),
+          providerId: field(form, 'providerId'),
+          participantIds: selected.length > 0 ? selected : undefined
+        })
+      )
+      setError('')
+    } catch {
+      setError('Impossible de constater le Service')
+    }
+  }
+
+  const deleteService = async (serviceId: string) => {
+    if (!opened) {
+      return
+    }
+    try {
+      setOpened(await client.deleteService(opened.id, serviceId))
+      setError('')
+    } catch {
+      setError('Service introuvable')
+    }
+  }
+
   return (
     <section className="space-y-4">
       {error ? (
@@ -141,7 +177,11 @@ export const GroupesScreen = ({
           >
             Copier le lien d’Invitation
           </button>
-          <form className="flex flex-col gap-3" onSubmit={createExpense}>
+          <form
+            className="flex flex-col gap-3"
+            aria-label="Constater une Dépense"
+            onSubmit={createExpense}
+          >
             <h3 className="font-medium">Constater une Dépense</h3>
             <label className="flex flex-col gap-1">
               Libellé
@@ -201,6 +241,70 @@ export const GroupesScreen = ({
               Constater la Dépense
             </button>
           </form>
+          <form
+            className="flex flex-col gap-3"
+            aria-label="Constater un Service"
+            onSubmit={createService}
+          >
+            <h3 className="font-medium">Constater un Service</h3>
+            <label className="flex flex-col gap-1">
+              Libellé
+              <input
+                name="label"
+                required
+                className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              Jour
+              <input
+                name="day"
+                required
+                placeholder="YYYY-MM-DD"
+                className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              Montant
+              <input
+                name="amount"
+                required
+                className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              Prestataire
+              <select
+                name="providerId"
+                required
+                defaultValue={opened.members[0]?.userId}
+                className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
+              >
+                {opened.members.map(membre => (
+                  <option key={membre.userId} value={membre.userId}>
+                    {membre.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <fieldset className="flex flex-col gap-1">
+              <legend>Participants</legend>
+              {opened.members.map(membre => (
+                <label key={membre.userId} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="participantIds"
+                    value={membre.userId}
+                    defaultChecked
+                  />
+                  {membre.name}
+                </label>
+              ))}
+            </fieldset>
+            <button type="submit" className="rounded bg-zinc-100 px-3 py-2 text-zinc-900">
+              Constater le Service
+            </button>
+          </form>
           {opened.expenses.length === 0 ? (
             <p>Aucune Dépense</p>
           ) : (
@@ -221,7 +325,26 @@ export const GroupesScreen = ({
               ))}
             </ul>
           )}
-          <p>Aucun Service</p>
+          {opened.services.length === 0 ? (
+            <p>Aucun Service</p>
+          ) : (
+            <ul className="space-y-2">
+              {opened.services.map(service => (
+                <li key={service.id} className="space-y-1">
+                  <p>{service.label}</p>
+                  <p>{service.day}</p>
+                  <p>{euros(service.amount)}</p>
+                  <button
+                    type="button"
+                    className="rounded bg-zinc-800 px-3 py-2"
+                    onClick={() => void deleteService(service.id)}
+                  >
+                    Supprimer {service.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <p>Aucun Règlement</p>
           <ul>
             {opened.balances.map(solde => (

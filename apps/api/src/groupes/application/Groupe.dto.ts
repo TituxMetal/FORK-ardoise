@@ -24,6 +24,16 @@ export type DepenseDto = {
   parts: PartDto[]
 }
 
+export type ServiceDto = {
+  id: string
+  label: string
+  day: string
+  amount: number
+  providerId: string
+  participantIds: string[]
+  parts: PartDto[]
+}
+
 export type GroupeDto = {
   id: string
   name: string
@@ -32,7 +42,7 @@ export type GroupeDto = {
     secret: string
   }
   expenses: DepenseDto[]
-  services: []
+  services: ServiceDto[]
   settlements: []
   balances: SoldeDto[]
 }

@@ -34,12 +34,20 @@ const depenseSql = readFileSync(
   ),
   'utf8'
 )
+const serviceSql = readFileSync(
+  fileURLToPath(
+    new URL('../../prisma/migrations/20260816061030_service/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
 
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
-  await sqlite.executeMultiple(`${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}`)
+  await sqlite.executeMultiple(
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}`
+  )
   sqlite.close()
   return createApp(createPrismaClient(url))
 }

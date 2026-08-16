@@ -3,6 +3,7 @@ import { Montant } from '../../domain/Montant.vo.ts'
 import { NotFound } from '../../domain/NotFound.error.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
+import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { Depense } from '../domain/Depense.entity.ts'
 import type { IDepenseRepository } from '../domain/IDepense.repository.ts'
 import { Jour } from '../domain/Jour.vo.ts'
@@ -19,7 +20,8 @@ export type CreateDepenseInput = {
 export class CreateDepense {
   constructor(
     private readonly groupes: IGroupeRepository,
-    private readonly depenses: IDepenseRepository
+    private readonly depenses: IDepenseRepository,
+    private readonly services: IServiceRepository
   ) {}
 
   async execute(userId: string, groupeId: string, input: CreateDepenseInput) {
@@ -40,6 +42,10 @@ export class CreateDepense {
       participantIds
     )
     await this.depenses.save(depense)
-    return toGroupeDto(groupe, await this.depenses.findByGroupeId(groupeId))
+    return toGroupeDto(
+      groupe,
+      await this.depenses.findByGroupeId(groupeId),
+      await this.services.findByGroupeId(groupeId)
+    )
   }
 }

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { InvalidData } from '../../domain/InvalidData.error.ts'
 import { Montant } from '../../domain/Montant.vo.ts'
 import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
+import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { CreateDepense } from '../application/CreateDepense.uc.ts'
 import { DeleteDepense } from '../application/DeleteDepense.uc.ts'
 import type { IDepenseRepository } from '../domain/IDepense.repository.ts'
@@ -18,10 +19,14 @@ const createDepenseBody = z.object({
   participantIds: z.array(z.string()).optional()
 })
 
-export const createDepensesRoutes = (groupes: IGroupeRepository, depenses: IDepenseRepository) => {
+export const createDepensesRoutes = (
+  groupes: IGroupeRepository,
+  depenses: IDepenseRepository,
+  services: IServiceRepository
+) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createDepense = new CreateDepense(groupes, depenses)
-  const deleteDepense = new DeleteDepense(groupes, depenses)
+  const createDepense = new CreateDepense(groupes, depenses, services)
+  const deleteDepense = new DeleteDepense(groupes, depenses, services)
 
   app.post(
     '/:groupeId/expenses',
