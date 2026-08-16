@@ -1,5 +1,5 @@
-# Le solde ne traverse pas les groupes
+# Balance does not cross Groups
 
-Un user peut siéger dans plusieurs groupes. On a décidé qu’un solde est la position nette d’un membre _dans un groupe_, jamais une compensation globale.
+A User can sit in several Groups. A Balance is the net position of a Member _in a Group_, never a global offset.
 
-Un barbecue entre potes ne solde pas un resto entre collègues. La compensation multilatérale et le wallet sont un autre produit.
+A barbecue with friends does not clear a restaurant with coworkers. Multilateral netting and a wallet are a different product.

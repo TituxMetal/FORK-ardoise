@@ -1,5 +1,5 @@
-# On rejoint un groupe par lien, pas par annuaire
+# Join by Invite, not a directory
 
-Pour éviter d’ajouter le mauvais Camel, on n’a pas d’annuaire d’users ni de graphe d’amis.
+To avoid adding the wrong Camel, there is no User directory and no friend graph.
 
-Un groupe a un lien secret stable. N’importe quel membre le copie. On devient membre en l’ouvrant, pas en cherchant un nom. Les sièges fantômes sont hors de ce modèle.
+A Group has a stable secret Invite. Any Member copies it. You become a Member by opening it, not by searching a name. Ghost seats are out of this model.

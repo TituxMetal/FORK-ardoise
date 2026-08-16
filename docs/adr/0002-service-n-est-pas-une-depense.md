@@ -1,5 +1,5 @@
-# Service n’est pas une Dépense
+# Service is not an Expense
 
-Léa qui dépanne l’ordi de Bob n’a rien acheté. Appeler ça une dépense est faux dans le langage du domaine.
+Léa fixing Bob's laptop bought nothing. Calling that an Expense is the wrong word.
 
-On garde deux mots et une seule mécanique de parts : la Dépense constate de l’argent sorti, le Service constate un acte valorisé en centimes. L’unité de l’ardoise reste le centime pour que les deux puissent s’annuler dans le même groupe.
+Two words, one Parts mechanic: an Expense records money that left a pocket, a Service records an act valued in cents. The slate unit stays the cent so the two can cancel inside the same Group.

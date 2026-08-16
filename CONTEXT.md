@@ -1,61 +1,64 @@
 # Ardoise
 
-Le produit : les dépenses, les services et les règlements entre potes, organisés en groupes.
+The product: expenses, services and paybacks between friends, organised in groups.
 
 ## Language
 
-**Ardoise**:
-Le produit. Pas un objet du domaine.
-_Avoid_: app, outil, plateforme, notes de frais
+Written terms below are the only names for code, tables, tests, commits, issues and pull requests.
+Speech and grilling may stay French. The UI is French. French synonyms belong in `_Avoid_`.
 
-**Groupe**:
-Un ensemble nommé de membres qui tiennent une ardoise ensemble. Les potes de Bob et ses collègues sont deux groupes.
-_Avoid_: ardoise, soirée, compte, sujet, événement
+**Ardoise**:
+The product. Not a domain object.
+_Avoid_: app, tool, platform, expense report, notes de frais
+
+**Group**:
+A named set of members who keep one slate together. Bob's friends and his coworkers are two Groups.
+_Avoid_: groupe, ardoise, soirée, compte, sujet, événement, event
 
 **User**:
-Une personne qui a une session. Elle peut siéger dans plusieurs groupes.
-_Avoid_: compte, personne
+A person with a session. They can sit in several Groups.
+_Avoid_: compte, account, personne
 
-**Membre**:
-Un user tel qu’il siège dans un groupe.
-_Avoid_: user, pote, participant, siège
+**Member**:
+A User as they sit in a Group.
+_Avoid_: membre, user (when you mean the seat), pote, siège
 
-**Invitation**:
-Un lien secret et stable qui fait d’un user un membre du groupe. N’importe quel membre le copie.
-_Avoid_: ami, annuaire, graphe
+**Invite**:
+A stable secret link that makes a User a Member of the Group. Any Member copies it.
+_Avoid_: invitation, ami, annuaire, graphe, directory, friend
 
-**Dépense**:
-Un montant d’argent réellement sorti, payé par un membre, réparti en parts entre des participants. Libellé et jour obligatoires.
-_Avoid_: note de frais, IOU, dette, événement
+**Expense**:
+An amount of money that actually left someone's pocket, paid by a Member, split into Parts among Participants. Label and day required.
+_Avoid_: dépense, note de frais, IOU, debt, événement, event
 
 **Service**:
-Une valeur en centimes reconnue à un membre pour un acte (temps, compétence), pas pour de l’argent sorti. Même parts qu’une dépense. Libellé et jour obligatoires.
-_Avoid_: dépense, événement, barter
+A value in cents granted to a Member for an act (time, skill), not for money spent. Same Parts as an Expense. Label and day required.
+_Avoid_: dépense, expense (when you mean this), événement, barter
 
 **Participant**:
-Un membre inclus dans le partage d’une dépense ou d’un service. Pas forcément tous les membres du groupe.
-_Avoid_: membre (quand on parle d’une dépense ou d’un service)
+A Member included in the split of an Expense or a Service. Not necessarily every Member of the Group.
+_Avoid_: member (when talking about an Expense or a Service)
 
-**Montant**:
-Une somme d’argent en centimes entiers. Jamais un décimal. Unité de l’ardoise, y compris pour un service.
-_Avoid_: float, euros (comme unité stockée)
+**Amount**:
+A sum of money in whole cents. Never a decimal. Unit of the slate, including for a Service.
+_Avoid_: montant, float, euros (as stored unit)
 
-**Payeur**:
-Le membre qui a sorti l’argent d’une dépense. Pas forcément participant.
-_Avoid_: acheteur
+**Payer**:
+The Member who spent the money of an Expense. Not necessarily a Participant.
+_Avoid_: payeur, acheteur, buyer
 
-**Prestataire**:
-Le membre à qui un service est reconnu. Pas forcément participant.
-_Avoid_: payeur, vendeur
+**Provider**:
+The Member a Service is granted to. Not necessarily a Participant.
+_Avoid_: prestataire, payer, vendeur, seller
 
 **Part**:
-La portion du montant attribuée à un participant. Toujours un partage égal ; le centime restant va au payeur ou au prestataire.
-_Avoid_: quote, pourcentage, part perso
+The portion of the Amount given to a Participant. Always an equal split; leftover cents go to the Payer or the Provider.
+_Avoid_: quote, percentage, part perso, share, split (as the object name)
 
-**Solde**:
-La position nette dérivée d’un membre dans un groupe. Positif : le groupe lui doit. Négatif : il doit au groupe. Jamais saisi à la main. Ne traverse pas un autre groupe.
-_Avoid_: dette, solde global
+**Balance**:
+A Member's derived net position in a Group. Positive: the Group owes them. Negative: they owe the Group. Never typed in. Does not cross another Group.
+_Avoid_: solde, debt, dette, solde global, global balance
 
-**Règlement**:
-Un transfert d’un membre vers un autre, qui réduit ce qui est dû. De l’argent réel qui change de mains.
-_Avoid_: remboursement, paiement, transfert
+**Payback**:
+A transfer from one Member to another that reduces what is owed. Real money changing hands.
+_Avoid_: règlement, settlement, repayment, payment, transfert, remboursement, paiement

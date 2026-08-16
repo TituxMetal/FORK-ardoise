@@ -43,3 +43,11 @@ Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 ### Prisma
 
 Schema, migrate, `migration.sql`, new tables: `docs/agents/prisma.md`.
+
+### Coding standards
+
+Language, files, tests, no `class`: `CODING_STANDARDS.md`. Shape: `docs/architecture.md`. Look and dark theme: `docs/frontend.md`.
+
+### Git workflow
+
+`feature/*` `fix/*` `docs/*` → pull request → Copilot → human rebase-merge. Never commit `main`. SSH remote only. GPG-signed commits only. See `docs/git-workflow.md`.

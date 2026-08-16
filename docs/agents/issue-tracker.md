@@ -2,21 +2,23 @@
 
 Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
 
+Titles are English. The body may quote French UI copy.
+
 ## Ticket ritual
 
-Same three facts on every child ticket. A ticket is not done when the commit exists.
+Same facts on every child ticket. A ticket is not done when the commit exists.
 
 1. **Claim** — first write of the session, before any file change: `gh issue edit <n> --add-assignee @me`. Done when the ticket’s assignee is `@me`.
-2. **Ship on the current branch.** Do not open a branch the user did not name.
-3. **Resolve** — after the commit, all three, in this order:
+2. **Branch** — from up-to-date `main`: `feature/<english-kebab>`, `fix/<english-kebab>`, or `docs/<english-kebab>` (docs-only). Never commit or push `main`. Full workflow: `docs/git-workflow.md`.
+3. **Pull request** — against `main`. Wait for Copilot. Address comments. The human rebase-merges on GitHub. The agent never merges.
+4. **Resolve** — after that merge, all three, in this order:
    - Every acceptance `- [ ]` in the ticket body is `- [x]`. Done when `gh issue view <n> --json body` has zero unchecked boxes.
-   - `gh issue close <n> --comment "…"`. The comment lists what shipped and the commit SHA.
+   - `gh issue close <n> --comment "…"`. The comment lists what shipped and the pull-request number.
    - Done when the ticket is `CLOSED`, has an assignee, has zero unchecked boxes, and has that close comment.
 
 Open tickets that are not being worked stay unassigned, boxes unchecked, no close comment. The parent map (#1) stays open until every child is closed.
 
-A closed child missing any of the three is unfinished work. Finish it before starting another ticket.
-
+A closed child missing any of the four is unfinished work. Finish it before starting another ticket.
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
@@ -39,6 +41,8 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 - **Comment / label / close**: `gh pr comment`, `gh pr edit --add-label`/`--remove-label`, `gh pr close`.
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either — resolve with `gh pr view 42` and fall back to `gh issue view 42`.
+
+Delivery pull requests (this ritual) are not a triage surface. They are how a claimed ticket ships.
 
 ## When a skill says "publish to the issue tracker"
 
