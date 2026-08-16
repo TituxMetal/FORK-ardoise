@@ -39,3 +39,7 @@ Canonical roles map 1:1 to tracker labels (`needs-triage`, `needs-info`, `ready-
 ### Domain docs
 
 Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Prisma
+
+Schema change → Prisma migrate. See `docs/agents/prisma.md`.
