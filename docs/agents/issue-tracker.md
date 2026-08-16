@@ -19,6 +19,7 @@ Same facts on every child ticket. A ticket is not done when the commit exists.
 Open tickets that are not being worked stay unassigned, boxes unchecked, no close comment. The parent map (#1) stays open until every child is closed.
 
 A closed child missing any of the four is unfinished work. Finish it before starting another ticket.
+
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
