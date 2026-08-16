@@ -11,6 +11,7 @@ const emptyGroupe = (id: string, name: string, members: GroupeDto['members']): G
   id,
   name,
   members,
+  invitation: { secret: 'invite-secret' },
   expenses: [],
   services: [],
   settlements: [],
@@ -33,6 +34,9 @@ const memoryClient = () => {
         throw new Error('Groupe introuvable')
       }
       return groupe
+    },
+    join: async () => {
+      throw new Error('Invitation introuvable')
     }
   }
 }
@@ -88,4 +92,22 @@ test('a failed list shows an error instead of throwing', async () => {
   await waitFor(() => {
     expect(screen.getByRole('alert').textContent).toBe('Impossible de lister les Groupes')
   })
+})
+
+test('a Membre copies the Invitation link of the opened Groupe', async () => {
+  const written: string[] = []
+  render(
+    <GroupesScreen
+      client={memoryClient()}
+      copy={async text => {
+        written.push(text)
+      }}
+    />
+  )
+
+  await createNamed('Potes de Bob')
+  await userEvent.click(await screen.findByRole('button', { name: 'Potes de Bob' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Copier le lien d’Invitation' }))
+
+  expect(written).toEqual([`${window.location.origin}/invitations/invite-secret`])
 })

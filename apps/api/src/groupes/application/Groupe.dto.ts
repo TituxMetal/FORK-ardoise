@@ -13,6 +13,9 @@ export type GroupeDto = {
   id: string
   name: string
   members: MembreDto[]
+  invitation: {
+    secret: string
+  }
   expenses: []
   services: []
   settlements: []

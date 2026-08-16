@@ -71,9 +71,10 @@ model Verification {
 }
 
 model Groupe {
-  id      String   @id
-  name    String
-  membres Membre[]
+  id               String   @id
+  name             String
+  invitationSecret String   @unique
+  membres          Membre[]
 
   @@map("groupe")
 }

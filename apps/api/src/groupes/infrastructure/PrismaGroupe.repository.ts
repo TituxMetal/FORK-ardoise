@@ -7,19 +7,48 @@ export class PrismaGroupeRepository implements IGroupeRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async save(groupe: Groupe) {
-    await this.prisma.groupe.create({
-      data: {
-        id: groupe.id,
-        name: groupe.name.value,
-        membres: {
-          create: groupe.membres.map(membre => ({
-            id: crypto.randomUUID(),
-            userId: membre.userId,
-            name: membre.name
-          }))
-        }
-      }
+    const existing = await this.prisma.groupe.findUnique({
+      where: { id: groupe.id },
+      include: { membres: true }
     })
+    if (!existing) {
+      await this.prisma.groupe.create({
+        data: {
+          id: groupe.id,
+          name: groupe.name.value,
+          invitationSecret: groupe.invitationSecret,
+          membres: {
+            create: groupe.membres.map(membre => ({
+              id: crypto.randomUUID(),
+              userId: membre.userId,
+              name: membre.name
+            }))
+          }
+        }
+      })
+      return
+    }
+    const known = new Set(existing.membres.map(membre => membre.userId))
+    const added = groupe.membres.filter(membre => !known.has(membre.userId))
+    if (added.length === 0) {
+      return
+    }
+    await this.prisma.membre.createMany({
+      data: added.map(membre => ({
+        id: crypto.randomUUID(),
+        userId: membre.userId,
+        groupeId: groupe.id,
+        name: membre.name
+      }))
+    })
+  }
+
+  async findByInvitationSecret(secret: string) {
+    const row = await this.prisma.groupe.findUnique({
+      where: { invitationSecret: secret },
+      include: { membres: true }
+    })
+    return row ? toGroupe(row) : null
   }
 
   async findById(id: string) {

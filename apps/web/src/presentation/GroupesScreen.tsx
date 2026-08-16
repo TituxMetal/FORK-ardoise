@@ -13,9 +13,13 @@ const field = (form: FormData, name: string) => {
 
 type Props = {
   client?: GroupesClient
+  copy?: (text: string) => Promise<void>
 }
 
-export const GroupesScreen = ({ client = groupesClient }: Props) => {
+export const GroupesScreen = ({
+  client = groupesClient,
+  copy = text => navigator.clipboard.writeText(text)
+}: Props) => {
   const [groupes, setGroupes] = useState<GroupeSummary[]>([])
   const [opened, setOpened] = useState<GroupeDto | null>(null)
   const [error, setError] = useState('')
@@ -89,6 +93,15 @@ export const GroupesScreen = ({ client = groupesClient }: Props) => {
       {opened ? (
         <article className="space-y-2">
           <h2 className="text-lg font-medium">{opened.name}</h2>
+          <button
+            type="button"
+            className="rounded bg-zinc-100 px-3 py-2 text-zinc-900"
+            onClick={() =>
+              void copy(`${window.location.origin}/invitations/${opened.invitation.secret}`)
+            }
+          >
+            Copier le lien d’Invitation
+          </button>
           <p>Aucune Dépense</p>
           <p>Aucun Service</p>
           <p>Aucun Règlement</p>

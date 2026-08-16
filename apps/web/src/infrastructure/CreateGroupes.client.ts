@@ -13,6 +13,9 @@ export type GroupeDto = {
   id: string
   name: string
   members: MembreDto[]
+  invitation: {
+    secret: string
+  }
   expenses: []
   services: []
   settlements: []
@@ -28,6 +31,7 @@ export type GroupesClient = {
   list: () => Promise<GroupeSummary[]>
   create: (name: string) => Promise<GroupeDto>
   get: (id: string) => Promise<GroupeDto>
+  join: (secret: string) => Promise<GroupeDto>
 }
 
 const request = async <T>(path: string, init?: { method?: string; body?: string }): Promise<T> => {
@@ -50,5 +54,9 @@ export const groupesClient: GroupesClient = {
       method: 'POST',
       body: JSON.stringify({ name })
     }),
-  get: id => request<GroupeDto>(`/api/groups/${id}`)
+  get: id => request<GroupeDto>(`/api/groups/${id}`),
+  join: secret =>
+    request<GroupeDto>(`/api/invitations/${secret}`, {
+      method: 'POST'
+    })
 }

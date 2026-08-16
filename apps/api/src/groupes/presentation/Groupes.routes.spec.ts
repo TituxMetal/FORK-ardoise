@@ -23,12 +23,21 @@ const groupeSql = readFileSync(
   ),
   'utf8'
 )
+const invitationSql = readFileSync(
+  fileURLToPath(
+    new URL(
+      '../../../prisma/migrations/20260816042947_invitation_secret/migration.sql',
+      import.meta.url
+    )
+  ),
+  'utf8'
+)
 
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
-  await sqlite.executeMultiple(`${sessionSql}\n${groupeSql}`)
+  await sqlite.executeMultiple(`${sessionSql}\n${groupeSql}\n${invitationSql}`)
   sqlite.close()
   return createApp(createPrismaClient(url))
 }
@@ -95,7 +104,7 @@ test('reading a Groupe shows an empty ardoise and Soldes at 0', async () => {
   const app = await createTestApp()
   const opened = await signUp(app)
   const created = await createGroupe(app, cookieHeader(opened), 'Potes de Bob')
-  const { id, members } = (await created.json()) as GroupeDto
+  const { id, members, invitation } = (await created.json()) as GroupeDto
 
   const response = await app.request(`/groups/${id}`, {
     headers: { cookie: cookieHeader(opened) }
@@ -106,6 +115,7 @@ test('reading a Groupe shows an empty ardoise and Soldes at 0', async () => {
     id,
     name: 'Potes de Bob',
     members,
+    invitation,
     expenses: [],
     services: [],
     settlements: [],
@@ -185,4 +195,21 @@ test('a User who is not Membre reads a Groupe as 404', async () => {
     code: 'NOT_FOUND',
     message: 'Groupe introuvable'
   })
+})
+
+test('a Membre reads a stable Invitation secret on the Groupe', async () => {
+  const app = await createTestApp()
+  const opened = await signUp(app)
+  const cookie = cookieHeader(opened)
+  const created = await createGroupe(app, cookie, 'Potes de Bob')
+  const { id } = (await created.json()) as GroupeDto
+
+  const first = await app.request(`/groups/${id}`, { headers: { cookie } })
+  const second = await app.request(`/groups/${id}`, { headers: { cookie } })
+
+  expect(first.status).toBe(200)
+  const firstBody = (await first.json()) as GroupeDto
+  const secondBody = (await second.json()) as GroupeDto
+  expect(firstBody.invitation.secret).toMatch(/^[0-9a-f-]{36}$/)
+  expect(secondBody.invitation.secret).toBe(firstBody.invitation.secret)
 })

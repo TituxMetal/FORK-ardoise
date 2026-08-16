@@ -2,6 +2,7 @@ import type { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
 import type { IAuth } from '../application/IAuth.port.ts'
 import { createGroupesRoutes } from '../groupes/presentation/Groupes.routes.ts'
+import { createInvitationsRoutes } from '../groupes/presentation/Invitations.routes.ts'
 import { PrismaGroupeRepository } from '../groupes/infrastructure/PrismaGroupe.repository.ts'
 import { createAuth } from '../infrastructure/CreateAuth.adapter.ts'
 import { createPrismaClient } from '../infrastructure/CreatePrisma.client.ts'
@@ -19,6 +20,8 @@ export const createApp = (
   app.on(['POST', 'GET'], '/auth/*', c => auth.handler(c.req.raw))
   app.use('/groups/*', requireSession(auth))
   app.use('/groups', requireSession(auth))
+  app.use('/invitations/*', requireSession(auth))
   app.route('/groups', createGroupesRoutes(groupes))
+  app.route('/invitations', createInvitationsRoutes(groupes))
   return app
 }

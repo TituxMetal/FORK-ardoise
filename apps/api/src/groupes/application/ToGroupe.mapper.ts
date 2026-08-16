@@ -10,6 +10,7 @@ export const toGroupeDto = (groupe: Groupe): GroupeDto => {
     id: groupe.id,
     name: groupe.name.value,
     members,
+    invitation: { secret: groupe.invitationSecret },
     expenses: [],
     services: [],
     settlements: [],
