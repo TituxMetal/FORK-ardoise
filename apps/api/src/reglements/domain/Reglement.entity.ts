@@ -14,8 +14,8 @@ export class Reglement {
     private readonly _amount: Amount
   ) {}
 
-  static plafond(soldeDebiteur: number, soldeCreancier: number) {
-    return Math.min(-soldeDebiteur, soldeCreancier)
+  static plafond(debtorBalance: number, creditorBalance: number) {
+    return Math.min(-debtorBalance, creditorBalance)
   }
 
   static create(
@@ -23,16 +23,16 @@ export class Reglement {
     debtorId: string,
     creditorId: string,
     amount: Amount,
-    soldeDebiteur: number,
-    soldeCreancier: number
+    debtorBalance: number,
+    creditorBalance: number
   ) {
-    if (soldeDebiteur >= 0) {
+    if (debtorBalance >= 0) {
       throw invalidData(Reglement.DEBTOR_NOT_NEGATIVE)
     }
-    if (soldeCreancier <= 0) {
+    if (creditorBalance <= 0) {
       throw invalidData(Reglement.CREDITOR_NOT_POSITIVE)
     }
-    const plafond = Reglement.plafond(soldeDebiteur, soldeCreancier)
+    const plafond = Reglement.plafond(debtorBalance, creditorBalance)
     if (amount.value > plafond) {
       throw invalidData(Reglement.ABOVE_PLAFOND)
     }
