@@ -1,12 +1,12 @@
 import { Jour } from '../../depenses/domain/Jour.vo.ts'
 import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
-import type { IDepenseRepository } from '../../depenses/domain/IDepense.repository.ts'
+import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
 import { InvalidData } from '../../domain/InvalidData.error.ts'
 import { Montant } from '../../domain/Montant.vo.ts'
 import { NotFound } from '../../domain/NotFound.error.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
-import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
-import type { IReglementRepository } from '../../reglements/domain/IReglement.repository.ts'
+import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
+import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
 import { Service } from '../domain/Service.entity.ts'
 
@@ -20,10 +20,10 @@ export type CreateServiceInput = {
 
 export class CreateService {
   constructor(
-    private readonly groupes: IGroupeRepository,
-    private readonly depenses: IDepenseRepository,
+    private readonly groupes: IGroupRepository,
+    private readonly depenses: IExpenseRepository,
     private readonly services: IServiceRepository,
-    private readonly reglements: IReglementRepository
+    private readonly reglements: IPaybackRepository
   ) {}
 
   async execute(userId: string, groupeId: string, input: CreateServiceInput) {

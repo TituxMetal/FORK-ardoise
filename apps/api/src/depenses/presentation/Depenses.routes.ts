@@ -3,12 +3,12 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { InvalidData } from '../../domain/InvalidData.error.ts'
 import { Montant } from '../../domain/Montant.vo.ts'
-import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
-import type { IReglementRepository } from '../../reglements/domain/IReglement.repository.ts'
+import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
+import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { CreateDepense } from '../application/CreateDepense.uc.ts'
 import { DeleteDepense } from '../application/DeleteDepense.uc.ts'
-import type { IDepenseRepository } from '../domain/IDepense.repository.ts'
+import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
 import { Jour } from '../domain/Jour.vo.ts'
 import { Libelle } from '../domain/Libelle.vo.ts'
 
@@ -21,10 +21,10 @@ const createDepenseBody = z.object({
 })
 
 export const createDepensesRoutes = (
-  groupes: IGroupeRepository,
-  depenses: IDepenseRepository,
+  groupes: IGroupRepository,
+  depenses: IExpenseRepository,
   services: IServiceRepository,
-  reglements: IReglementRepository
+  reglements: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createDepense = new CreateDepense(groupes, depenses, services, reglements)

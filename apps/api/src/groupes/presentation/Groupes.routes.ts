@@ -1,25 +1,25 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import type { IDepenseRepository } from '../../depenses/domain/IDepense.repository.ts'
-import type { IReglementRepository } from '../../reglements/domain/IReglement.repository.ts'
+import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
+import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { InvalidData } from '../../domain/InvalidData.error.ts'
 import { CreateGroupe } from '../application/CreateGroupe.uc.ts'
 import { GetGroupe } from '../application/GetGroupe.uc.ts'
 import { ListGroupes } from '../application/ListGroupes.uc.ts'
 import { GroupeName } from '../domain/GroupeName.vo.ts'
-import type { IGroupeRepository } from '../domain/IGroupe.repository.ts'
+import type { IGroupRepository } from '../domain/IGroup.repository.ts'
 
 const createGroupeBody = z.object({
   name: z.string({ error: GroupeName.REQUIRED })
 })
 
 export const createGroupesRoutes = (
-  groupes: IGroupeRepository,
-  depenses: IDepenseRepository,
+  groupes: IGroupRepository,
+  depenses: IExpenseRepository,
   services: IServiceRepository,
-  reglements: IReglementRepository
+  reglements: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createGroupe = new CreateGroupe(groupes)

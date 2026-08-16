@@ -16,7 +16,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
-  membres       Membre[]
+  membres       Member[]
 
   @@unique([email])
   @@map("user")
@@ -70,72 +70,72 @@ model Verification {
   @@map("verification")
 }
 
-model Groupe {
+model Group {
   id               String      @id
   name             String
   invitationSecret String      @unique
-  membres          Membre[]
-  depenses         Depense[]
+  membres          Member[]
+  depenses         Expense[]
   services         Service[]
-  reglements       Reglement[]
+  reglements       Payback[]
 
-  @@map("groupe")
+  @@map("group")
 }
 
-model Membre {
+model Member {
   id       String @id
   userId   String
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   groupeId String
-  groupe   Groupe @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  groupe   Group  @relation(fields: [groupeId], references: [id], onDelete: Cascade)
   name     String
 
   @@unique([userId, groupeId])
   @@index([userId])
   @@index([groupeId])
-  @@map("membre")
+  @@map("member")
 }
 
-model Depense {
+model Expense {
   id            String                @id
   groupeId      String
-  groupe        Groupe                @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  groupe        Group                 @relation(fields: [groupeId], references: [id], onDelete: Cascade)
   label         String
   day           String
   amount        Int
   payerId       String
-  participants  DepenseParticipant[]
-  parts         DepensePart[]
+  participants  ExpenseParticipant[]
+  parts         ExpensePart[]
 
   @@index([groupeId])
-  @@map("depense")
+  @@map("expense")
 }
 
-model DepenseParticipant {
+model ExpenseParticipant {
   depenseId String
   userId    String
   ordinal   Int
-  depense   Depense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
+  depense   Expense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
 
   @@id([depenseId, userId])
-  @@map("depense_participant")
+  @@map("expense_participant")
 }
 
-model DepensePart {
+model ExpensePart {
   depenseId String
   userId    String
   amount    Int
   ordinal   Int
-  depense   Depense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
+  depense   Expense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
 
   @@id([depenseId, userId])
-  @@map("depense_part")
+  @@map("expense_part")
 }
 
 model Service {
   id           String               @id
   groupeId     String
-  groupe       Groupe               @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  groupe       Group                @relation(fields: [groupeId], references: [id], onDelete: Cascade)
   label        String
   day          String
   amount       Int
@@ -168,14 +168,14 @@ model ServicePart {
   @@map("service_part")
 }
 
-model Reglement {
+model Payback {
   id         String @id
   groupeId   String
-  groupe     Groupe @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  groupe     Group  @relation(fields: [groupeId], references: [id], onDelete: Cascade)
   debtorId   String
   creditorId String
   amount     Int
 
   @@index([groupeId])
-  @@map("reglement")
+  @@map("payback")
 }

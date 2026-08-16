@@ -1,13 +1,13 @@
 import type { PrismaClient } from '@prisma/client'
 import type { Reglement } from '../domain/Reglement.entity.ts'
-import type { IReglementRepository } from '../domain/IReglement.repository.ts'
+import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
 import { toReglement } from './ToReglement.mapper.ts'
 
-export class PrismaReglementRepository implements IReglementRepository {
+export class PrismaPaybackRepository implements IPaybackRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async save(reglement: Reglement) {
-    await this.prisma.reglement.create({
+    await this.prisma.payback.create({
       data: {
         id: reglement.id,
         groupeId: reglement.groupeId,
@@ -19,18 +19,18 @@ export class PrismaReglementRepository implements IReglementRepository {
   }
 
   async findById(id: string) {
-    const row = await this.prisma.reglement.findUnique({ where: { id } })
+    const row = await this.prisma.payback.findUnique({ where: { id } })
     return row ? toReglement(row) : null
   }
 
   async findByGroupeId(groupeId: string) {
-    const rows = await this.prisma.reglement.findMany({
+    const rows = await this.prisma.payback.findMany({
       where: { groupeId }
     })
     return rows.map(toReglement)
   }
 
   async delete(id: string) {
-    await this.prisma.reglement.delete({ where: { id } })
+    await this.prisma.payback.delete({ where: { id } })
   }
 }

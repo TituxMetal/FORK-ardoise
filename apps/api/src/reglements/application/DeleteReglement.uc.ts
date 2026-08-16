@@ -1,16 +1,16 @@
-import type { IDepenseRepository } from '../../depenses/domain/IDepense.repository.ts'
+import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
 import { NotFound } from '../../domain/NotFound.error.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
-import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
+import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import type { IReglementRepository } from '../domain/IReglement.repository.ts'
+import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
 
 export class DeleteReglement {
   constructor(
-    private readonly groupes: IGroupeRepository,
-    private readonly depenses: IDepenseRepository,
+    private readonly groupes: IGroupRepository,
+    private readonly depenses: IExpenseRepository,
     private readonly services: IServiceRepository,
-    private readonly reglements: IReglementRepository
+    private readonly reglements: IPaybackRepository
   ) {}
 
   async execute(userId: string, groupeId: string, reglementId: string) {

@@ -1,7 +1,7 @@
-import type { IGroupeRepository } from '../domain/IGroupe.repository.ts'
+import type { IGroupRepository } from '../domain/IGroup.repository.ts'
 
 export class ListGroupes {
-  constructor(private readonly groupes: IGroupeRepository) {}
+  constructor(private readonly groupes: IGroupRepository) {}
 
   async execute(userId: string) {
     const groupes = await this.groupes.findByUserId(userId)

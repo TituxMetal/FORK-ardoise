@@ -3,11 +3,11 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { Jour } from '../../depenses/domain/Jour.vo.ts'
 import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
-import type { IDepenseRepository } from '../../depenses/domain/IDepense.repository.ts'
+import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
 import { InvalidData } from '../../domain/InvalidData.error.ts'
 import { Montant } from '../../domain/Montant.vo.ts'
-import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
-import type { IReglementRepository } from '../../reglements/domain/IReglement.repository.ts'
+import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
+import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import { CreateService } from '../application/CreateService.uc.ts'
 import { DeleteService } from '../application/DeleteService.uc.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
@@ -21,10 +21,10 @@ const createServiceBody = z.object({
 })
 
 export const createServicesRoutes = (
-  groupes: IGroupeRepository,
-  depenses: IDepenseRepository,
+  groupes: IGroupRepository,
+  depenses: IExpenseRepository,
   services: IServiceRepository,
-  reglements: IReglementRepository
+  reglements: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createService = new CreateService(groupes, depenses, services, reglements)

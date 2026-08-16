@@ -1,18 +1,18 @@
 import type { PrismaClient } from '@prisma/client'
 import type { Groupe } from '../domain/Groupe.entity.ts'
-import type { IGroupeRepository } from '../domain/IGroupe.repository.ts'
+import type { IGroupRepository } from '../domain/IGroup.repository.ts'
 import { toGroupe } from './ToGroupe.mapper.ts'
 
-export class PrismaGroupeRepository implements IGroupeRepository {
+export class PrismaGroupRepository implements IGroupRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async save(groupe: Groupe) {
-    const existing = await this.prisma.groupe.findUnique({
+    const existing = await this.prisma.group.findUnique({
       where: { id: groupe.id },
       include: { membres: true }
     })
     if (!existing) {
-      await this.prisma.groupe.create({
+      await this.prisma.group.create({
         data: {
           id: groupe.id,
           name: groupe.name.value,
@@ -33,7 +33,7 @@ export class PrismaGroupeRepository implements IGroupeRepository {
     if (added.length === 0) {
       return
     }
-    await this.prisma.membre.createMany({
+    await this.prisma.member.createMany({
       data: added.map(membre => ({
         id: crypto.randomUUID(),
         userId: membre.userId,
@@ -44,7 +44,7 @@ export class PrismaGroupeRepository implements IGroupeRepository {
   }
 
   async findByInvitationSecret(secret: string) {
-    const row = await this.prisma.groupe.findUnique({
+    const row = await this.prisma.group.findUnique({
       where: { invitationSecret: secret },
       include: { membres: true }
     })
@@ -52,7 +52,7 @@ export class PrismaGroupeRepository implements IGroupeRepository {
   }
 
   async findById(id: string) {
-    const row = await this.prisma.groupe.findUnique({
+    const row = await this.prisma.group.findUnique({
       where: { id },
       include: { membres: true }
     })
@@ -60,7 +60,7 @@ export class PrismaGroupeRepository implements IGroupeRepository {
   }
 
   async findByUserId(userId: string) {
-    const rows = await this.prisma.groupe.findMany({
+    const rows = await this.prisma.group.findMany({
       where: { membres: { some: { userId } } },
       include: { membres: true }
     })

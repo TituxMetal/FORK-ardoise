@@ -1,14 +1,14 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import type { IDepenseRepository } from '../../depenses/domain/IDepense.repository.ts'
+import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
 import { InvalidData } from '../../domain/InvalidData.error.ts'
 import { Montant } from '../../domain/Montant.vo.ts'
-import type { IGroupeRepository } from '../../groupes/domain/IGroupe.repository.ts'
+import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { CreateReglement } from '../application/CreateReglement.uc.ts'
 import { DeleteReglement } from '../application/DeleteReglement.uc.ts'
-import type { IReglementRepository } from '../domain/IReglement.repository.ts'
+import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
 
 const createReglementBody = z.object({
   debtorId: z.string(),
@@ -17,10 +17,10 @@ const createReglementBody = z.object({
 })
 
 export const createReglementsRoutes = (
-  groupes: IGroupeRepository,
-  depenses: IDepenseRepository,
+  groupes: IGroupRepository,
+  depenses: IExpenseRepository,
   services: IServiceRepository,
-  reglements: IReglementRepository
+  reglements: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createReglement = new CreateReglement(groupes, depenses, services, reglements)

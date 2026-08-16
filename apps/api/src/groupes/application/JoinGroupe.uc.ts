@@ -1,10 +1,10 @@
 import { NotFound } from '../../domain/NotFound.error.ts'
-import type { IGroupeRepository } from '../domain/IGroupe.repository.ts'
+import type { IGroupRepository } from '../domain/IGroup.repository.ts'
 import { Membre } from '../domain/Membre.entity.ts'
 import { toGroupeDto } from './ToGroupe.mapper.ts'
 
 export class JoinGroupe {
-  constructor(private readonly groupes: IGroupeRepository) {}
+  constructor(private readonly groupes: IGroupRepository) {}
 
   async execute(userId: string, userName: string, secret: string) {
     const groupe = await this.groupes.findByInvitationSecret(secret)

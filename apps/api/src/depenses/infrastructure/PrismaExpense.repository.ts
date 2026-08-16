@@ -1,15 +1,15 @@
 import type { PrismaClient } from '@prisma/client'
 import type { Depense } from '../domain/Depense.entity.ts'
-import type { IDepenseRepository } from '../domain/IDepense.repository.ts'
+import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
 import { toDepense } from './ToDepense.mapper.ts'
 
 const include = { participants: true, parts: true } as const
 
-export class PrismaDepenseRepository implements IDepenseRepository {
+export class PrismaExpenseRepository implements IExpenseRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async save(depense: Depense) {
-    await this.prisma.depense.create({
+    await this.prisma.expense.create({
       data: {
         id: depense.id,
         groupeId: depense.groupeId,
@@ -32,12 +32,12 @@ export class PrismaDepenseRepository implements IDepenseRepository {
   }
 
   async findById(id: string) {
-    const row = await this.prisma.depense.findUnique({ where: { id }, include })
+    const row = await this.prisma.expense.findUnique({ where: { id }, include })
     return row ? toDepense(row) : null
   }
 
   async findByGroupeId(groupeId: string) {
-    const rows = await this.prisma.depense.findMany({
+    const rows = await this.prisma.expense.findMany({
       where: { groupeId },
       include,
       orderBy: { day: 'asc' }
@@ -46,6 +46,6 @@ export class PrismaDepenseRepository implements IDepenseRepository {
   }
 
   async delete(id: string) {
-    await this.prisma.depense.delete({ where: { id } })
+    await this.prisma.expense.delete({ where: { id } })
   }
 }

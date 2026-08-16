@@ -1,16 +1,16 @@
-import type { IDepenseRepository } from '../../depenses/domain/IDepense.repository.ts'
+import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
 import { NotFound } from '../../domain/NotFound.error.ts'
-import type { IReglementRepository } from '../../reglements/domain/IReglement.repository.ts'
+import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import type { IGroupeRepository } from '../domain/IGroupe.repository.ts'
+import type { IGroupRepository } from '../domain/IGroup.repository.ts'
 import { toGroupeDto } from './ToGroupe.mapper.ts'
 
 export class GetGroupe {
   constructor(
-    private readonly groupes: IGroupeRepository,
-    private readonly depenses: IDepenseRepository,
+    private readonly groupes: IGroupRepository,
+    private readonly depenses: IExpenseRepository,
     private readonly services: IServiceRepository,
-    private readonly reglements: IReglementRepository
+    private readonly reglements: IPaybackRepository
   ) {}
 
   async execute(userId: string, groupeId: string) {

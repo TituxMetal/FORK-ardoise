@@ -1,8 +1,8 @@
 import type { Reglement } from './Reglement.entity.ts'
 
-export const IReglementRepository = Symbol('IReglementRepository')
+export const IPaybackRepository = Symbol('IPaybackRepository')
 
-export type IReglementRepository = {
+export type IPaybackRepository = {
   save: (reglement: Reglement) => Promise<void>
   findById: (id: string) => Promise<Reglement | null>
   findByGroupeId: (groupeId: string) => Promise<Reglement[]>

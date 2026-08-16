@@ -1,8 +1,8 @@
 import type { Groupe } from './Groupe.entity.ts'
 
-export const IGroupeRepository = Symbol('IGroupeRepository')
+export const IGroupRepository = Symbol('IGroupRepository')
 
-export type IGroupeRepository = {
+export type IGroupRepository = {
   save: (groupe: Groupe) => Promise<void>
   findById: (id: string) => Promise<Groupe | null>
   findByUserId: (userId: string) => Promise<Groupe[]>
