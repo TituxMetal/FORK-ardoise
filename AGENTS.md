@@ -30,7 +30,7 @@ release. Add a tool name to select part of the graph. For example, run
 
 ### Issue tracker
 
-Issues live in GitHub Issues for TituxMetal/ardoise. See `docs/agents/issue-tracker.md`.
+Claim, implement, close, checkboxes, assignee: `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
@@ -42,4 +42,4 @@ Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 
 ### Prisma
 
-Schema change → Prisma migrate. See `docs/agents/prisma.md`.
+Schema, migrate, `migration.sql`, new tables: `docs/agents/prisma.md`.
