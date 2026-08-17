@@ -34,7 +34,7 @@ export type ServiceDto = {
   parts: PartDto[]
 }
 
-export type ReglementDto = {
+export type PaybackDto = {
   id: string
   debtorId: string
   creditorId: string
@@ -50,7 +50,7 @@ export type GroupeDto = {
   }
   expenses: DepenseDto[]
   services: ServiceDto[]
-  settlements: ReglementDto[]
+  paybacks: PaybackDto[]
   balances: BalanceDto[]
 }
 
@@ -75,7 +75,7 @@ export type CreateServiceInput = {
   participantIds?: string[]
 }
 
-export type CreateReglementInput = {
+export type CreatePaybackInput = {
   debtorId: string
   creditorId: string
   amount: number
@@ -90,8 +90,8 @@ export type GroupesClient = {
   deleteExpense: (groupeId: string, expenseId: string) => Promise<GroupeDto>
   createService: (groupeId: string, input: CreateServiceInput) => Promise<GroupeDto>
   deleteService: (groupeId: string, serviceId: string) => Promise<GroupeDto>
-  createSettlement: (groupeId: string, input: CreateReglementInput) => Promise<GroupeDto>
-  deleteSettlement: (groupeId: string, settlementId: string) => Promise<GroupeDto>
+  createPayback: (groupeId: string, input: CreatePaybackInput) => Promise<GroupeDto>
+  deletePayback: (groupeId: string, paybackId: string) => Promise<GroupeDto>
 }
 
 const request = async <T>(path: string, init?: { method?: string; body?: string }): Promise<T> => {
@@ -137,13 +137,13 @@ export const groupesClient: GroupesClient = {
     request<GroupeDto>(`/api/groups/${groupeId}/services/${serviceId}`, {
       method: 'DELETE'
     }),
-  createSettlement: (groupeId, input) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/settlements`, {
+  createPayback: (groupeId, input) =>
+    request<GroupeDto>(`/api/groups/${groupeId}/paybacks`, {
       method: 'POST',
       body: JSON.stringify(input)
     }),
-  deleteSettlement: (groupeId, settlementId) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/settlements/${settlementId}`, {
+  deletePayback: (groupeId, paybackId) =>
+    request<GroupeDto>(`/api/groups/${groupeId}/paybacks/${paybackId}`, {
       method: 'DELETE'
     })
 }

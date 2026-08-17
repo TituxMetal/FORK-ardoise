@@ -6,56 +6,54 @@ import type { IExpenseRepository } from '../../depenses/domain/IExpense.reposito
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import { Reglement } from '../domain/Reglement.entity.ts'
+import { paybackCreate } from '../domain/Payback.entity.ts'
 import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
 
-export type CreateReglementInput = {
+export type CreatePaybackInput = {
   debtorId: string
   creditorId: string
   amount: number
 }
 
-export class CreateReglement {
-  constructor(
-    private readonly groupes: IGroupRepository,
-    private readonly depenses: IExpenseRepository,
-    private readonly services: IServiceRepository,
-    private readonly reglements: IPaybackRepository
-  ) {}
-
-  async execute(userId: string, groupeId: string, input: CreateReglementInput) {
-    const groupe = await this.groupes.findById(groupeId)
+export const createPayback = (
+  groupes: IGroupRepository,
+  depenses: IExpenseRepository,
+  services: IServiceRepository,
+  paybacks: IPaybackRepository
+) => ({
+  execute: async (userId: string, groupeId: string, input: CreatePaybackInput) => {
+    const groupe = await groupes.findById(groupeId)
     if (!groupe || !groupe.hasMembre(userId)) {
       throw notFound('Groupe introuvable')
     }
     if (!groupe.hasMembre(input.debtorId) || !groupe.hasMembre(input.creditorId)) {
       throw invalidData('Membre introuvable')
     }
-    const depenses = await this.depenses.findByGroupeId(groupeId)
-    const services = await this.services.findByGroupeId(groupeId)
-    const existing = await this.reglements.findByGroupeId(groupeId)
+    const expenses = await depenses.findByGroupeId(groupeId)
+    const providedServices = await services.findByGroupeId(groupeId)
+    const existing = await paybacks.findByGroupeId(groupeId)
     const balances = balancesOf(
       groupe.membres.map(membre => ({ userId: membre.userId, name: membre.name })),
-      depenses.map(depense => ({
-        payerId: depense.payerId,
-        amount: depense.amount.value,
-        parts: depense.parts
+      expenses.map(expense => ({
+        payerId: expense.payerId,
+        amount: expense.amount.value,
+        parts: expense.parts
       })),
-      services.map(service => ({
+      providedServices.map(service => ({
         providerId: service.providerId,
         amount: service.amount.value,
         parts: service.parts
       })),
-      existing.map(reglement => ({
-        debtorId: reglement.debtorId,
-        creditorId: reglement.creditorId,
-        amount: reglement.amount.value
+      existing.map(payback => ({
+        debtorId: payback.debtorId,
+        creditorId: payback.creditorId,
+        amount: payback.amount.value
       }))
     )
     const debtorBalance = balances.find(balance => balance.userId === input.debtorId)?.amount ?? 0
     const creditorBalance =
       balances.find(balance => balance.userId === input.creditorId)?.amount ?? 0
-    const reglement = Reglement.create(
+    const payback = paybackCreate(
       groupeId,
       input.debtorId,
       input.creditorId,
@@ -63,7 +61,7 @@ export class CreateReglement {
       debtorBalance,
       creditorBalance
     )
-    await this.reglements.save(reglement)
-    return toGroupeDto(groupe, depenses, services, [...existing, reglement])
+    await paybacks.save(payback)
+    return toGroupeDto(groupe, expenses, providedServices, [...existing, payback])
   }
-}
+})

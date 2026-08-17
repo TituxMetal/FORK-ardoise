@@ -132,7 +132,7 @@ export const GroupesScreen = ({
     }
   }
 
-  const createSettlement = async (event: FormEvent<HTMLFormElement>) => {
+  const createPayback = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!opened) {
       return
@@ -141,7 +141,7 @@ export const GroupesScreen = ({
     event.currentTarget.reset()
     try {
       setOpened(
-        await client.createSettlement(opened.id, {
+        await client.createPayback(opened.id, {
           debtorId: field(form, 'debtorId'),
           creditorId: field(form, 'creditorId'),
           amount: centsFromEuros(field(form, 'amount'))
@@ -153,12 +153,12 @@ export const GroupesScreen = ({
     }
   }
 
-  const deleteSettlement = async (settlementId: string) => {
+  const deletePayback = async (paybackId: string) => {
     if (!opened) {
       return
     }
     try {
-      setOpened(await client.deleteSettlement(opened.id, settlementId))
+      setOpened(await client.deletePayback(opened.id, paybackId))
       setError('')
     } catch {
       setError('Règlement introuvable')
@@ -365,7 +365,7 @@ export const GroupesScreen = ({
           <form
             className="flex flex-col gap-3"
             aria-label="Constater un Règlement"
-            onSubmit={createSettlement}
+            onSubmit={createPayback}
           >
             <h3 className="font-medium">Qui doit quoi</h3>
             <label className="flex flex-col gap-1">
@@ -453,23 +453,22 @@ export const GroupesScreen = ({
               ))}
             </ul>
           )}
-          {opened.settlements.length === 0 ? (
+          {opened.paybacks.length === 0 ? (
             <p>Aucun Règlement</p>
           ) : (
             <ul className="space-y-2">
-              {opened.settlements.map(reglement => (
-                <li key={reglement.id} className="space-y-1">
+              {opened.paybacks.map(payback => (
+                <li key={payback.id} className="space-y-1">
                   <p>
-                    {nameOf(reglement.debtorId)} → {nameOf(reglement.creditorId)}{' '}
-                    {euros(reglement.amount)}
+                    {nameOf(payback.debtorId)} → {nameOf(payback.creditorId)}{' '}
+                    {euros(payback.amount)}
                   </p>
                   <button
                     type="button"
                     className="rounded bg-zinc-800 px-3 py-2"
-                    onClick={() => void deleteSettlement(reglement.id)}
+                    onClick={() => void deletePayback(payback.id)}
                   >
-                    Supprimer le Règlement {nameOf(reglement.debtorId)} →{' '}
-                    {nameOf(reglement.creditorId)}
+                    Supprimer le Règlement {nameOf(payback.debtorId)} → {nameOf(payback.creditorId)}
                   </button>
                 </li>
               ))}

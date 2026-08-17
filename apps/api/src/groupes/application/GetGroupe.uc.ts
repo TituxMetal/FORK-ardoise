@@ -1,6 +1,6 @@
 import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
 import { notFound } from '../../domain/notFound.ts'
-import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
+import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import type { IGroupRepository } from '../domain/IGroup.repository.ts'
 import { toGroupeDto } from './ToGroupe.mapper.ts'
@@ -10,7 +10,7 @@ export class GetGroupe {
     private readonly groupes: IGroupRepository,
     private readonly depenses: IExpenseRepository,
     private readonly services: IServiceRepository,
-    private readonly reglements: IPaybackRepository
+    private readonly paybacks: IPaybackRepository
   ) {}
 
   async execute(userId: string, groupeId: string) {
@@ -22,7 +22,7 @@ export class GetGroupe {
       groupe,
       await this.depenses.findByGroupeId(groupeId),
       await this.services.findByGroupeId(groupeId),
-      await this.reglements.findByGroupeId(groupeId)
+      await this.paybacks.findByGroupeId(groupeId)
     )
   }
 }

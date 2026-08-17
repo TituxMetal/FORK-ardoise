@@ -1,10 +1,10 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, expect, test } from 'vite-plus/test'
+import { afterEach, describe, expect, it } from 'vite-plus/test'
 import type {
   CreateDepenseInput,
-  CreateReglementInput,
+  CreatePaybackInput,
   CreateServiceInput,
   GroupeDto,
   GroupeSummary
@@ -20,7 +20,7 @@ const emptyGroupe = (id: string, name: string, members: GroupeDto['members']): G
   invitation: { secret: 'invite-secret' },
   expenses: [],
   services: [],
-  settlements: [],
+  paybacks: [],
   balances: members.map(membre => ({ ...membre, amount: 0 }))
 })
 
@@ -60,12 +60,12 @@ const soldesFrom = (groupe: GroupeDto) =>
         }
       }
     }
-    for (const reglement of groupe.settlements) {
-      if (reglement.creditorId === membre.userId) {
-        amount -= reglement.amount
+    for (const payback of groupe.paybacks) {
+      if (payback.creditorId === membre.userId) {
+        amount -= payback.amount
       }
-      if (reglement.debtorId === membre.userId) {
-        amount += reglement.amount
+      if (payback.debtorId === membre.userId) {
+        amount += payback.amount
       }
     }
     return { ...membre, amount }
@@ -171,15 +171,15 @@ const memoryClient = () => {
       groupes.set(groupeId, next)
       return next
     },
-    createSettlement: async (groupeId: string, input: CreateReglementInput): Promise<GroupeDto> => {
+    createPayback: async (groupeId: string, input: CreatePaybackInput): Promise<GroupeDto> => {
       const groupe = groupes.get(groupeId)
       if (!groupe) {
         throw new Error('Groupe introuvable')
       }
       const next: GroupeDto = {
         ...groupe,
-        settlements: [
-          ...groupe.settlements,
+        paybacks: [
+          ...groupe.paybacks,
           {
             id: crypto.randomUUID(),
             debtorId: input.debtorId,
@@ -192,14 +192,14 @@ const memoryClient = () => {
       groupes.set(groupeId, next)
       return next
     },
-    deleteSettlement: async (groupeId: string, settlementId: string): Promise<GroupeDto> => {
+    deletePayback: async (groupeId: string, paybackId: string): Promise<GroupeDto> => {
       const groupe = groupes.get(groupeId)
       if (!groupe) {
         throw new Error('Groupe introuvable')
       }
       const next: GroupeDto = {
         ...groupe,
-        settlements: groupe.settlements.filter(reglement => reglement.id !== settlementId)
+        paybacks: groupe.paybacks.filter(payback => payback.id !== paybackId)
       }
       next.balances = soldesFrom(next)
       groupes.set(groupeId, next)
@@ -221,220 +221,224 @@ const openNamed = async (name: string) => {
   await userEvent.click(await screen.findByRole('button', { name }))
 }
 
-test('creating a Groupe lists it and opens an empty ardoise', async () => {
-  const client = memoryClient()
-  render(<GroupesScreen client={client} />)
+describe('GroupesScreen', () => {
+  it('creates a Group, lists it and opens an empty board', async () => {
+    const client = memoryClient()
+    render(<GroupesScreen client={client} />)
 
-  await createNamed('Potes de Bob')
-  const open = await screen.findByRole('button', { name: 'Potes de Bob' })
-  await userEvent.click(open)
+    await createNamed('Potes de Bob')
+    const open = await screen.findByRole('button', { name: 'Potes de Bob' })
+    await userEvent.click(open)
 
-  expect(screen.getByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
-  expect(screen.getByText('Aucune Dépense')).toBeTruthy()
-  expect(screen.getByText('Aucun Service')).toBeTruthy()
-  expect(screen.getByText('Aucun Règlement')).toBeTruthy()
-  expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
-})
-
-test('two Groupes created by the same User stay on two distinct lines', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-
-  await createNamed('Potes de Bob')
-  await createNamed('Collègues')
-
-  expect(
-    (await screen.findAllByRole('button', { name: /Potes de Bob|Collègues/ })).map(
-      button => button.textContent
-    )
-  ).toEqual(['Potes de Bob', 'Collègues'])
-})
-
-test('a failed list shows an error instead of throwing', async () => {
-  render(
-    <GroupesScreen
-      client={{
-        ...memoryClient(),
-        list: async () => {
-          throw new Error('Groupe introuvable')
-        }
-      }}
-    />
-  )
-
-  await waitFor(() => {
-    expect(screen.getByRole('alert').textContent).toBe('Impossible de lister les Groupes')
+    expect(screen.getByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
+    expect(screen.getByText('Aucune Dépense')).toBeTruthy()
+    expect(screen.getByText('Aucun Service')).toBeTruthy()
+    expect(screen.getByText('Aucun Règlement')).toBeTruthy()
+    expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
   })
-})
 
-test('a Membre copies the Invitation link of the opened Groupe', async () => {
-  const written: string[] = []
-  render(
-    <GroupesScreen
-      client={memoryClient()}
-      copy={async text => {
-        written.push(text)
-      }}
-    />
-  )
+  it('keeps two Groups created by the same User on two distinct lines', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
 
-  await createNamed('Potes de Bob')
-  await userEvent.click(await screen.findByRole('button', { name: 'Potes de Bob' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Copier le lien d’Invitation' }))
+    await createNamed('Potes de Bob')
+    await createNamed('Collègues')
 
-  expect(written).toEqual([`${window.location.origin}/invitations/invite-secret`])
-})
+    expect(
+      (await screen.findAllByRole('button', { name: /Potes de Bob|Collègues/ })).map(
+        button => button.textContent
+      )
+    ).toEqual(['Potes de Bob', 'Collègues'])
+  })
 
-test('constater a Dépense lists it and updates Soldes', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
+  it('shows an error instead of throwing when the list fails', async () => {
+    render(
+      <GroupesScreen
+        client={{
+          ...memoryClient(),
+          list: async () => {
+            throw new Error('Groupe introuvable')
+          }
+        }}
+      />
+    )
 
-  const user = userEvent.setup()
-  const form = screen.getByRole('form', { name: 'Constater une Dépense' })
-  await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
-  await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-  await user.type(within(form).getByLabelText('Montant'), '1')
-  await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
-  await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe('Impossible de lister les Groupes')
+    })
+  })
 
-  expect(await screen.findByText('Pizza')).toBeTruthy()
-  expect(screen.getByText('2026-08-15')).toBeTruthy()
-  expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
-  expect(screen.getByText('Bob −0,33 €')).toBeTruthy()
-  expect(screen.getByText('Camille −0,33 €')).toBeTruthy()
-})
+  it('lets a Member copy the Invitation link of the opened Group', async () => {
+    const written: string[] = []
+    render(
+      <GroupesScreen
+        client={memoryClient()}
+        copy={async text => {
+          written.push(text)
+        }}
+      />
+    )
 
-test('any Membre can delete a Dépense from the list', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
+    await createNamed('Potes de Bob')
+    await userEvent.click(await screen.findByRole('button', { name: 'Potes de Bob' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Copier le lien d’Invitation' }))
 
-  const user = userEvent.setup()
-  const form = screen.getByRole('form', { name: 'Constater une Dépense' })
-  await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
-  await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-  await user.type(within(form).getByLabelText('Montant'), '1')
-  await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
-  await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
-  await user.click(await screen.findByRole('button', { name: 'Supprimer Pizza' }))
+    expect(written).toEqual([`${window.location.origin}/invitations/invite-secret`])
+  })
 
-  expect(await screen.findByText('Aucune Dépense')).toBeTruthy()
-  expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
-})
+  it('records an Expense, lists it and updates Balances', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
 
-test('constater a Service lists it apart from Dépenses and updates Soldes', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater une Dépense' })
+    await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
+    await user.type(within(form).getByLabelText('Montant'), '1')
+    await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
+    await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
 
-  const user = userEvent.setup()
-  const form = screen.getByRole('form', { name: 'Constater un Service' })
-  await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
-  await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-  await user.type(within(form).getByLabelText('Montant'), '1')
-  await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
-  await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
+    expect(await screen.findByText('Pizza')).toBeTruthy()
+    expect(screen.getByText('2026-08-15')).toBeTruthy()
+    expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
+    expect(screen.getByText('Bob −0,33 €')).toBeTruthy()
+    expect(screen.getByText('Camille −0,33 €')).toBeTruthy()
+  })
 
-  expect(await screen.findByText('Ordi Bob')).toBeTruthy()
-  expect(screen.getByText('Aucune Dépense')).toBeTruthy()
-  expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
-  expect(screen.getByText('Bob −0,33 €')).toBeTruthy()
-  expect(screen.getByText('Camille −0,33 €')).toBeTruthy()
-})
+  it('lets any Member delete an Expense from the list', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
 
-test('any Membre can delete a Service from the list', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater une Dépense' })
+    await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
+    await user.type(within(form).getByLabelText('Montant'), '1')
+    await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
+    await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
+    await user.click(await screen.findByRole('button', { name: 'Supprimer Pizza' }))
 
-  const user = userEvent.setup()
-  const form = screen.getByRole('form', { name: 'Constater un Service' })
-  await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
-  await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-  await user.type(within(form).getByLabelText('Montant'), '1')
-  await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
-  await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
-  await user.click(await screen.findByRole('button', { name: 'Supprimer Ordi Bob' }))
+    expect(await screen.findByText('Aucune Dépense')).toBeTruthy()
+    expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
+  })
 
-  expect(await screen.findByText('Aucun Service')).toBeTruthy()
-  expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
-})
+  it('records a Service, lists it apart from Expenses and updates Balances', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
 
-const constaterPizza = async () => {
-  const user = userEvent.setup()
-  const form = screen.getByRole('form', { name: 'Constater une Dépense' })
-  await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
-  await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-  await user.type(within(form).getByLabelText('Montant'), '1')
-  await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
-  await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
-}
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Service' })
+    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
+    await user.type(within(form).getByLabelText('Montant'), '1')
+    await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
+    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
 
-test('qui doit quoi lists strictly positive Soldes descending and shows the plafond', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
-  await constaterPizza()
+    expect(await screen.findByText('Ordi Bob')).toBeTruthy()
+    expect(screen.getByText('Aucune Dépense')).toBeTruthy()
+    expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
+    expect(screen.getByText('Bob −0,33 €')).toBeTruthy()
+    expect(screen.getByText('Camille −0,33 €')).toBeTruthy()
+  })
 
-  expect(await screen.findByRole('heading', { name: 'Qui doit quoi' })).toBeTruthy()
-  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
-  const creditors = within(form).getByLabelText('Créancier')
-  expect([...creditors.querySelectorAll('option')].map(option => option.textContent)).toEqual([
-    'Léa'
-  ])
-  expect(within(form).getByText('Plafond 0,33 €')).toBeTruthy()
-})
+  it('lets any Member delete a Service from the list', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
 
-test('a Membre constate a Règlement from the chosen créancier', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
-  await constaterPizza()
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Service' })
+    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
+    await user.type(within(form).getByLabelText('Montant'), '1')
+    await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
+    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
+    await user.click(await screen.findByRole('button', { name: 'Supprimer Ordi Bob' }))
 
-  const user = userEvent.setup()
-  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
-  await user.selectOptions(within(form).getByLabelText('Débiteur'), 'bob')
-  await user.selectOptions(within(form).getByLabelText('Créancier'), 'lea')
-  await user.type(within(form).getByLabelText('Montant'), '0,20')
-  await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
+    expect(await screen.findByText('Aucun Service')).toBeTruthy()
+    expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
+  })
 
-  expect(await screen.findByText('Bob → Léa 0,20 €')).toBeTruthy()
-  expect(screen.getByText('Léa 0,46 €')).toBeTruthy()
-  expect(screen.getByText('Bob −0,13 €')).toBeTruthy()
-})
+  const constaterPizza = async () => {
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater une Dépense' })
+    await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
+    await user.type(within(form).getByLabelText('Montant'), '1')
+    await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
+    await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
+  }
 
-test('any Membre can delete a Règlement from the list', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
-  await constaterPizza()
+  it('lists strictly positive Balances descending in who owes what and shows the cap', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
+    await constaterPizza()
 
-  const user = userEvent.setup()
-  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
-  await user.selectOptions(within(form).getByLabelText('Débiteur'), 'bob')
-  await user.selectOptions(within(form).getByLabelText('Créancier'), 'lea')
-  await user.type(within(form).getByLabelText('Montant'), '0,20')
-  await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
-  await user.click(await screen.findByRole('button', { name: 'Supprimer le Règlement Bob → Léa' }))
+    expect(await screen.findByRole('heading', { name: 'Qui doit quoi' })).toBeTruthy()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    const creditors = within(form).getByLabelText('Créancier')
+    expect([...creditors.querySelectorAll('option')].map(option => option.textContent)).toEqual([
+      'Léa'
+    ])
+    expect(within(form).getByText('Plafond 0,33 €')).toBeTruthy()
+  })
 
-  expect(await screen.findByText('Aucun Règlement')).toBeTruthy()
-  expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
-})
+  it('records a Payback from the chosen creditor', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
+    await constaterPizza()
 
-test('changing débiteur or créancier updates the displayed plafond', async () => {
-  render(<GroupesScreen client={memoryClient()} />)
-  await openNamed('Potes de Bob')
-  await constaterPizza()
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.selectOptions(within(form).getByLabelText('Débiteur'), 'bob')
+    await user.selectOptions(within(form).getByLabelText('Créancier'), 'lea')
+    await user.type(within(form).getByLabelText('Montant'), '0,20')
+    await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
-  const user = userEvent.setup()
-  const service = screen.getByRole('form', { name: 'Constater un Service' })
-  await user.type(within(service).getByLabelText('Libellé'), 'Ordi Bob')
-  await user.type(within(service).getByLabelText('Jour'), '2026-08-16')
-  await user.type(within(service).getByLabelText('Montant'), '0.90')
-  await user.selectOptions(within(service).getByLabelText('Prestataire'), 'bob')
-  await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
+    expect(await screen.findByText('Bob → Léa 0,20 €')).toBeTruthy()
+    expect(screen.getByText('Léa 0,46 €')).toBeTruthy()
+    expect(screen.getByText('Bob −0,13 €')).toBeTruthy()
+  })
 
-  const form = screen.getByRole('form', { name: 'Constater un Règlement' })
-  const creditors = within(form).getByLabelText('Créancier')
-  expect([...creditors.querySelectorAll('option')].map(option => option.textContent)).toEqual([
-    'Léa',
-    'Bob'
-  ])
-  expect(within(form).getByText('Plafond 0,36 €')).toBeTruthy()
+  it('lets any Member delete a Payback from the list', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
+    await constaterPizza()
 
-  await user.selectOptions(within(form).getByLabelText('Créancier'), 'bob')
-  expect(within(form).getByText('Plafond 0,27 €')).toBeTruthy()
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.selectOptions(within(form).getByLabelText('Débiteur'), 'bob')
+    await user.selectOptions(within(form).getByLabelText('Créancier'), 'lea')
+    await user.type(within(form).getByLabelText('Montant'), '0,20')
+    await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
+    await user.click(
+      await screen.findByRole('button', { name: 'Supprimer le Règlement Bob → Léa' })
+    )
+
+    expect(await screen.findByText('Aucun Règlement')).toBeTruthy()
+    expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
+  })
+
+  it('updates the displayed cap when the debtor or the creditor changes', async () => {
+    render(<GroupesScreen client={memoryClient()} />)
+    await openNamed('Potes de Bob')
+    await constaterPizza()
+
+    const user = userEvent.setup()
+    const service = screen.getByRole('form', { name: 'Constater un Service' })
+    await user.type(within(service).getByLabelText('Libellé'), 'Ordi Bob')
+    await user.type(within(service).getByLabelText('Jour'), '2026-08-16')
+    await user.type(within(service).getByLabelText('Montant'), '0.90')
+    await user.selectOptions(within(service).getByLabelText('Prestataire'), 'bob')
+    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
+
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    const creditors = within(form).getByLabelText('Créancier')
+    expect([...creditors.querySelectorAll('option')].map(option => option.textContent)).toEqual([
+      'Léa',
+      'Bob'
+    ])
+    expect(within(form).getByText('Plafond 0,36 €')).toBeTruthy()
+
+    await user.selectOptions(within(form).getByLabelText('Créancier'), 'bob')
+    expect(within(form).getByText('Plafond 0,27 €')).toBeTruthy()
+  })
 })

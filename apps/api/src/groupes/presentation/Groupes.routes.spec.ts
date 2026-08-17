@@ -44,7 +44,7 @@ const serviceSql = readFileSync(
   ),
   'utf8'
 )
-const reglementSql = readFileSync(
+const paybackSql = readFileSync(
   fileURLToPath(
     new URL('../../../prisma/migrations/20260816070637_reglement/migration.sql', import.meta.url)
   ),
@@ -66,7 +66,7 @@ const createTestApp = async () => {
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${reglementSql}\n${renameSql}`
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))
@@ -148,7 +148,7 @@ test('reading a Groupe shows an empty ardoise and Soldes at 0', async () => {
     invitation,
     expenses: [],
     services: [],
-    settlements: [],
+    paybacks: [],
     balances: members.map((membre: { userId: string; name: string }) => ({
       ...membre,
       amount: 0

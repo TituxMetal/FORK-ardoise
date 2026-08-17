@@ -2,7 +2,7 @@ import type { IExpenseRepository } from '../../depenses/domain/IExpense.reposito
 import { notFound } from '../../domain/notFound.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
-import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
+import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
 
 export class DeleteService {
@@ -10,7 +10,7 @@ export class DeleteService {
     private readonly groupes: IGroupRepository,
     private readonly depenses: IExpenseRepository,
     private readonly services: IServiceRepository,
-    private readonly reglements: IPaybackRepository
+    private readonly paybacks: IPaybackRepository
   ) {}
 
   async execute(userId: string, groupeId: string, serviceId: string) {
@@ -27,7 +27,7 @@ export class DeleteService {
       groupe,
       await this.depenses.findByGroupeId(groupeId),
       await this.services.findByGroupeId(groupeId),
-      await this.reglements.findByGroupeId(groupeId)
+      await this.paybacks.findByGroupeId(groupeId)
     )
   }
 }

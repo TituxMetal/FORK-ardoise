@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
-import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
+import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { CreateDepense } from '../application/CreateDepense.uc.ts'
 import { DeleteDepense } from '../application/DeleteDepense.uc.ts'
@@ -24,11 +24,11 @@ export const createDepensesRoutes = (
   groupes: IGroupRepository,
   depenses: IExpenseRepository,
   services: IServiceRepository,
-  reglements: IPaybackRepository
+  paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createDepense = new CreateDepense(groupes, depenses, services, reglements)
-  const deleteDepense = new DeleteDepense(groupes, depenses, services, reglements)
+  const createDepense = new CreateDepense(groupes, depenses, services, paybacks)
+  const deleteDepense = new DeleteDepense(groupes, depenses, services, paybacks)
 
   app.post(
     '/:groupeId/expenses',

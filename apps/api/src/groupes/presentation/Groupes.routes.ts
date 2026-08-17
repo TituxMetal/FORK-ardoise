@@ -2,7 +2,7 @@ import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
-import type { IPaybackRepository } from '../../reglements/domain/IPayback.repository.ts'
+import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import { CreateGroupe } from '../application/CreateGroupe.uc.ts'
@@ -19,12 +19,12 @@ export const createGroupesRoutes = (
   groupes: IGroupRepository,
   depenses: IExpenseRepository,
   services: IServiceRepository,
-  reglements: IPaybackRepository
+  paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createGroupe = new CreateGroupe(groupes)
   const listGroupes = new ListGroupes(groupes)
-  const getGroupe = new GetGroupe(groupes, depenses, services, reglements)
+  const getGroupe = new GetGroupe(groupes, depenses, services, paybacks)
 
   app.post(
     '/',

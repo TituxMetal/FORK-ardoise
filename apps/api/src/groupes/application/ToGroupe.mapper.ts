@@ -1,6 +1,6 @@
 import type { Depense } from '../../depenses/domain/Depense.entity.ts'
 import { balancesOf } from '../../domain/Balance.ts'
-import type { Reglement } from '../../reglements/domain/Reglement.entity.ts'
+import type { Payback } from '../../paybacks/domain/Payback.entity.ts'
 import type { Service } from '../../services/domain/Service.entity.ts'
 import type { Groupe } from '../domain/Groupe.entity.ts'
 import type { GroupeDto } from './Groupe.dto.ts'
@@ -9,7 +9,7 @@ export const toGroupeDto = (
   groupe: Groupe,
   depenses: Depense[] = [],
   services: Service[] = [],
-  reglements: Reglement[] = []
+  paybacks: Payback[] = []
 ): GroupeDto => {
   const members = groupe.membres.map(membre => ({
     userId: membre.userId,
@@ -44,11 +44,11 @@ export const toGroupeDto = (
         amount: part.amount.value
       }))
     })),
-    settlements: reglements.map(reglement => ({
-      id: reglement.id,
-      debtorId: reglement.debtorId,
-      creditorId: reglement.creditorId,
-      amount: reglement.amount.value
+    paybacks: paybacks.map(payback => ({
+      id: payback.id,
+      debtorId: payback.debtorId,
+      creditorId: payback.creditorId,
+      amount: payback.amount.value
     })),
     balances: balancesOf(
       members,
@@ -62,10 +62,10 @@ export const toGroupeDto = (
         amount: service.amount.value,
         parts: service.parts
       })),
-      reglements.map(reglement => ({
-        debtorId: reglement.debtorId,
-        creditorId: reglement.creditorId,
-        amount: reglement.amount.value
+      paybacks.map(payback => ({
+        debtorId: payback.debtorId,
+        creditorId: payback.creditorId,
+        amount: payback.amount.value
       }))
     )
   }

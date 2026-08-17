@@ -3,11 +3,15 @@ import { mkdtempSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect, test } from 'vite-plus/test'
+import { describe, expect, it } from 'vite-plus/test'
 import type { GroupeDto } from '../../groupes/application/Groupe.dto.ts'
 import { createPrismaClient } from '../../infrastructure/CreatePrisma.client.ts'
 import { createApp } from '../../presentation/CreateApp.ts'
-import { Reglement } from '../domain/Reglement.entity.ts'
+import {
+  PAYBACK_ABOVE_CAP,
+  PAYBACK_CREDITOR_NOT_POSITIVE,
+  PAYBACK_DEBTOR_NOT_NEGATIVE
+} from '../domain/Payback.entity.ts'
 
 const sessionSql = readFileSync(
   fileURLToPath(
@@ -45,7 +49,7 @@ const serviceSql = readFileSync(
   ),
   'utf8'
 )
-const reglementSql = readFileSync(
+const paybackSql = readFileSync(
   fileURLToPath(
     new URL('../../../prisma/migrations/20260816070637_reglement/migration.sql', import.meta.url)
   ),
@@ -67,7 +71,7 @@ const createTestApp = async () => {
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${reglementSql}\n${renameSql}`
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))
@@ -147,13 +151,13 @@ const createDepense = (
     body: JSON.stringify(body)
   })
 
-const createReglement = (
+const createPayback = (
   app: ReturnType<typeof createApp>,
   cookie: string,
   groupeId: string,
   body: Record<string, unknown>
 ) =>
-  app.request(`/groups/${groupeId}/settlements`, {
+  app.request(`/groups/${groupeId}/paybacks`, {
     method: 'POST',
     headers: { cookie, 'content-type': 'application/json' },
     body: JSON.stringify(body)
@@ -171,118 +175,120 @@ const pizza = async () => {
   return ardoise
 }
 
-test('a partial Règlement under the cap is real money, not a Dépense', async () => {
-  const { app, groupe, lea, bob, camille } = await pizza()
+describe('paybacks', () => {
+  it('records a partial payback under the cap as real money, not an expense', async () => {
+    const { app, groupe, lea, bob, camille } = await pizza()
 
-  const response = await createReglement(app, bob.cookie, groupe.id, {
-    debtorId: bob.userId,
-    creditorId: lea.userId,
-    amount: 20
-  })
-
-  expect(response.status).toBe(201)
-  const body = (await response.json()) as GroupeDto
-  expect(body.expenses).toHaveLength(1)
-  expect(body.settlements).toEqual([
-    {
-      id: expect.any(String),
+    const response = await createPayback(app, bob.cookie, groupe.id, {
       debtorId: bob.userId,
       creditorId: lea.userId,
       amount: 20
-    }
-  ])
-  expect(body.balances).toEqual([
-    { userId: lea.userId, name: 'Léa', amount: 46 },
-    { userId: bob.userId, name: 'Bob', amount: -13 },
-    { userId: camille.userId, name: 'Camille', amount: -33 }
-  ])
-  expect(body.balances.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
-})
-
-test('any Membre can constater a Règlement at the cap', async () => {
-  const { app, groupe, lea, bob, camille } = await pizza()
-
-  const response = await createReglement(app, camille.cookie, groupe.id, {
-    debtorId: bob.userId,
-    creditorId: lea.userId,
-    amount: 33
-  })
-
-  expect(response.status).toBe(201)
-  const body = (await response.json()) as GroupeDto
-  expect(body.settlements[0]?.amount).toBe(33)
-  expect(body.balances).toEqual([
-    { userId: lea.userId, name: 'Léa', amount: 33 },
-    { userId: bob.userId, name: 'Bob', amount: 0 },
-    { userId: camille.userId, name: 'Camille', amount: -33 }
-  ])
-})
-
-test('above the cap, a non-négatif débiteur or a non-positif créancier is 400', async () => {
-  const { app, groupe, lea, bob, camille } = await pizza()
-  const refusals = [
-    {
-      body: { debtorId: bob.userId, creditorId: lea.userId, amount: 34 },
-      message: Reglement.ABOVE_CAP
-    },
-    {
-      body: { debtorId: lea.userId, creditorId: bob.userId, amount: 10 },
-      message: Reglement.DEBTOR_NOT_NEGATIVE
-    },
-    {
-      body: { debtorId: bob.userId, creditorId: camille.userId, amount: 10 },
-      message: Reglement.CREDITOR_NOT_POSITIVE
-    },
-    {
-      body: { debtorId: 'inconnu', creditorId: lea.userId, amount: 10 },
-      message: 'Membre introuvable'
-    }
-  ]
-
-  for (const refusal of refusals) {
-    const response = await createReglement(app, lea.cookie, groupe.id, refusal.body)
-    expect(response.status).toBe(400)
-    expect(await response.json()).toEqual({
-      statusCode: 400,
-      code: 'INVALID_DATA',
-      message: refusal.message
     })
-  }
 
-  const listed = await app.request(`/groups/${groupe.id}`, { headers: { cookie: lea.cookie } })
-  expect(((await listed.json()) as GroupeDto).settlements).toEqual([])
-})
-
-test('any Membre can delete a Règlement; a second delete is 404', async () => {
-  const { app, groupe, lea, bob, camille } = await pizza()
-  const created = await createReglement(app, lea.cookie, groupe.id, {
-    debtorId: bob.userId,
-    creditorId: lea.userId,
-    amount: 20
+    expect(response.status).toBe(201)
+    const body = (await response.json()) as GroupeDto
+    expect(body.expenses).toHaveLength(1)
+    expect(body.paybacks).toEqual([
+      {
+        id: expect.any(String),
+        debtorId: bob.userId,
+        creditorId: lea.userId,
+        amount: 20
+      }
+    ])
+    expect(body.balances).toEqual([
+      { userId: lea.userId, name: 'Léa', amount: 46 },
+      { userId: bob.userId, name: 'Bob', amount: -13 },
+      { userId: camille.userId, name: 'Camille', amount: -33 }
+    ])
+    expect(body.balances.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
   })
-  const { settlements } = (await created.json()) as GroupeDto
 
-  const deleted = await app.request(`/groups/${groupe.id}/settlements/${settlements[0]!.id}`, {
-    method: 'DELETE',
-    headers: { cookie: camille.cookie }
-  })
-  expect(deleted.status).toBe(200)
-  const after = (await deleted.json()) as GroupeDto
-  expect(after.settlements).toEqual([])
-  expect(after.balances).toEqual([
-    { userId: lea.userId, name: 'Léa', amount: 66 },
-    { userId: bob.userId, name: 'Bob', amount: -33 },
-    { userId: camille.userId, name: 'Camille', amount: -33 }
-  ])
+  it('lets any member record a payback at the cap', async () => {
+    const { app, groupe, lea, bob, camille } = await pizza()
 
-  const second = await app.request(`/groups/${groupe.id}/settlements/${settlements[0]!.id}`, {
-    method: 'DELETE',
-    headers: { cookie: lea.cookie }
+    const response = await createPayback(app, camille.cookie, groupe.id, {
+      debtorId: bob.userId,
+      creditorId: lea.userId,
+      amount: 33
+    })
+
+    expect(response.status).toBe(201)
+    const body = (await response.json()) as GroupeDto
+    expect(body.paybacks[0]?.amount).toBe(33)
+    expect(body.balances).toEqual([
+      { userId: lea.userId, name: 'Léa', amount: 33 },
+      { userId: bob.userId, name: 'Bob', amount: 0 },
+      { userId: camille.userId, name: 'Camille', amount: -33 }
+    ])
   })
-  expect(second.status).toBe(404)
-  expect(await second.json()).toEqual({
-    statusCode: 404,
-    code: 'NOT_FOUND',
-    message: 'Règlement introuvable'
+
+  it('refuses a payback above the cap, a non-negative debtor or a non-positive creditor', async () => {
+    const { app, groupe, lea, bob, camille } = await pizza()
+    const refusals = [
+      {
+        body: { debtorId: bob.userId, creditorId: lea.userId, amount: 34 },
+        message: PAYBACK_ABOVE_CAP
+      },
+      {
+        body: { debtorId: lea.userId, creditorId: bob.userId, amount: 10 },
+        message: PAYBACK_DEBTOR_NOT_NEGATIVE
+      },
+      {
+        body: { debtorId: bob.userId, creditorId: camille.userId, amount: 10 },
+        message: PAYBACK_CREDITOR_NOT_POSITIVE
+      },
+      {
+        body: { debtorId: 'inconnu', creditorId: lea.userId, amount: 10 },
+        message: 'Membre introuvable'
+      }
+    ]
+
+    for (const refusal of refusals) {
+      const response = await createPayback(app, lea.cookie, groupe.id, refusal.body)
+      expect(response.status).toBe(400)
+      expect(await response.json()).toEqual({
+        statusCode: 400,
+        code: 'INVALID_DATA',
+        message: refusal.message
+      })
+    }
+
+    const listed = await app.request(`/groups/${groupe.id}`, { headers: { cookie: lea.cookie } })
+    expect(((await listed.json()) as GroupeDto).paybacks).toEqual([])
+  })
+
+  it('lets any member delete a payback; a second delete is 404', async () => {
+    const { app, groupe, lea, bob, camille } = await pizza()
+    const created = await createPayback(app, lea.cookie, groupe.id, {
+      debtorId: bob.userId,
+      creditorId: lea.userId,
+      amount: 20
+    })
+    const { paybacks } = (await created.json()) as GroupeDto
+
+    const deleted = await app.request(`/groups/${groupe.id}/paybacks/${paybacks[0]!.id}`, {
+      method: 'DELETE',
+      headers: { cookie: camille.cookie }
+    })
+    expect(deleted.status).toBe(200)
+    const after = (await deleted.json()) as GroupeDto
+    expect(after.paybacks).toEqual([])
+    expect(after.balances).toEqual([
+      { userId: lea.userId, name: 'Léa', amount: 66 },
+      { userId: bob.userId, name: 'Bob', amount: -33 },
+      { userId: camille.userId, name: 'Camille', amount: -33 }
+    ])
+
+    const second = await app.request(`/groups/${groupe.id}/paybacks/${paybacks[0]!.id}`, {
+      method: 'DELETE',
+      headers: { cookie: lea.cookie }
+    })
+    expect(second.status).toBe(404)
+    expect(await second.json()).toEqual({
+      statusCode: 404,
+      code: 'NOT_FOUND',
+      message: 'Règlement introuvable'
+    })
   })
 })

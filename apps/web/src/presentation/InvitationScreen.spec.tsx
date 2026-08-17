@@ -1,6 +1,6 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, expect, test } from 'vite-plus/test'
+import { afterEach, describe, expect, it } from 'vite-plus/test'
 import type { GroupeDto, GroupesClient } from '../infrastructure/CreateGroupes.client.ts'
 import { InvitationScreen } from './InvitationScreen.tsx'
 
@@ -16,7 +16,7 @@ const groupe: GroupeDto = {
   invitation: { secret: 'invite-secret' },
   expenses: [],
   services: [],
-  settlements: [],
+  paybacks: [],
   balances: [
     { userId: 'lea', name: 'Léa', amount: 0 },
     { userId: 'bob', name: 'Bob', amount: 0 }
@@ -36,32 +36,36 @@ const joiningClient = (joined: string[]) =>
     deleteExpense: async () => groupe,
     createService: async () => groupe,
     deleteService: async () => groupe,
-    createSettlement: async () => groupe,
-    deleteSettlement: async () => groupe
+    createPayback: async () => groupe,
+    deletePayback: async () => groupe
   }) satisfies GroupesClient
 
-test('a User with a session who opens the Invitation becomes Membre', async () => {
-  const joined: string[] = []
-  render(
-    <InvitationScreen
-      secret="invite-secret"
-      session={{ name: 'Bob' }}
-      client={joiningClient(joined)}
-    />
-  )
+describe('InvitationScreen', () => {
+  it('adds a User with a session who opens the Invitation as a Member', async () => {
+    const joined: string[] = []
+    render(
+      <InvitationScreen
+        secret="invite-secret"
+        session={{ name: 'Bob' }}
+        client={joiningClient(joined)}
+      />
+    )
 
-  expect(await screen.findByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
-  expect(screen.getByText('Bob')).toBeTruthy()
-  expect(joined).toEqual(['invite-secret'])
-})
-
-test('opening the Invitation without a session does not write', async () => {
-  const joined: string[] = []
-  render(<InvitationScreen secret="invite-secret" session={null} client={joiningClient(joined)} />)
-
-  await waitFor(() => {
-    expect(screen.getByRole('heading', { name: 'Invitation' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
+    expect(screen.getByText('Bob')).toBeTruthy()
+    expect(joined).toEqual(['invite-secret'])
   })
-  expect(joined).toEqual([])
-  expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
+
+  it('does not join when opening the Invitation without a session', async () => {
+    const joined: string[] = []
+    render(
+      <InvitationScreen secret="invite-secret" session={null} client={joiningClient(joined)} />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Invitation' })).toBeTruthy()
+    })
+    expect(joined).toEqual([])
+    expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
+  })
 })

@@ -1,14 +1,14 @@
 import { amountReconstitute } from '../../domain/Amount.ts'
-import { Reglement } from '../domain/Reglement.entity.ts'
+import { paybackReconstitute } from '../domain/Payback.entity.ts'
 
-export const toReglement = (row: {
+export const toPayback = (row: {
   id: string
   groupeId: string
   debtorId: string
   creditorId: string
   amount: number
 }) =>
-  Reglement.reconstitute(
+  paybackReconstitute(
     row.id,
     row.groupeId,
     row.debtorId,

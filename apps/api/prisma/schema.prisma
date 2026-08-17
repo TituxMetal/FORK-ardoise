@@ -77,7 +77,7 @@ model Group {
   membres          Member[]
   depenses         Expense[]
   services         Service[]
-  reglements       Payback[]
+  paybacks         Payback[]
 
   @@map("group")
 }

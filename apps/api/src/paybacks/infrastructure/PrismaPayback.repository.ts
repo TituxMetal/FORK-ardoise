@@ -1,33 +1,33 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Reglement } from '../domain/Reglement.entity.ts'
+import type { Payback } from '../domain/Payback.entity.ts'
 import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
-import { toReglement } from './ToReglement.mapper.ts'
+import { toPayback } from './ToPayback.mapper.ts'
 
 export class PrismaPaybackRepository implements IPaybackRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async save(reglement: Reglement) {
+  async save(payback: Payback) {
     await this.prisma.payback.create({
       data: {
-        id: reglement.id,
-        groupeId: reglement.groupeId,
-        debtorId: reglement.debtorId,
-        creditorId: reglement.creditorId,
-        amount: reglement.amount.value
+        id: payback.id,
+        groupeId: payback.groupeId,
+        debtorId: payback.debtorId,
+        creditorId: payback.creditorId,
+        amount: payback.amount.value
       }
     })
   }
 
   async findById(id: string) {
     const row = await this.prisma.payback.findUnique({ where: { id } })
-    return row ? toReglement(row) : null
+    return row ? toPayback(row) : null
   }
 
   async findByGroupeId(groupeId: string) {
     const rows = await this.prisma.payback.findMany({
       where: { groupeId }
     })
-    return rows.map(toReglement)
+    return rows.map(toPayback)
   }
 
   async delete(id: string) {
