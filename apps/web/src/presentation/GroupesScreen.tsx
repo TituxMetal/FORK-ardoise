@@ -417,17 +417,17 @@ export const GroupesScreen = ({
             <p>Aucune Dépense</p>
           ) : (
             <ul className="space-y-2">
-              {opened.expenses.map(depense => (
-                <li key={depense.id} className="space-y-1">
-                  <p>{depense.label}</p>
-                  <p>{depense.day}</p>
-                  <p>{euros(depense.amount)}</p>
+              {opened.expenses.map(expense => (
+                <li key={expense.id} className="space-y-1">
+                  <p>{expense.label}</p>
+                  <p>{expense.day}</p>
+                  <p>{euros(expense.amount)}</p>
                   <button
                     type="button"
                     className="rounded bg-zinc-800 px-3 py-2"
-                    onClick={() => void deleteExpense(depense.id)}
+                    onClick={() => void deleteExpense(expense.id)}
                   >
-                    Supprimer {depense.label}
+                    Supprimer {expense.label}
                   </button>
                 </li>
               ))}

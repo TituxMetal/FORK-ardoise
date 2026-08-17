@@ -1,9 +1,9 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { Jour } from '../../depenses/domain/Jour.vo.ts'
-import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
-import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
+import { DAY_REQUIRED } from '../../expenses/domain/Day.vo.ts'
+import { LABEL_REQUIRED } from '../../expenses/domain/Label.vo.ts'
+import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
@@ -13,8 +13,8 @@ import { DeleteService } from '../application/DeleteService.uc.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
 
 const createServiceBody = z.object({
-  label: z.string({ error: Libelle.REQUIRED }),
-  day: z.string({ error: Jour.REQUIRED }),
+  label: z.string({ error: LABEL_REQUIRED }),
+  day: z.string({ error: DAY_REQUIRED }),
   amount: z.number({ error: AMOUNT_POSITIVE }),
   providerId: z.string(),
   participantIds: z.array(z.string()).optional()
@@ -22,20 +22,20 @@ const createServiceBody = z.object({
 
 export const createServicesRoutes = (
   groupes: IGroupRepository,
-  depenses: IExpenseRepository,
+  expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createService = new CreateService(groupes, depenses, services, paybacks)
-  const deleteService = new DeleteService(groupes, depenses, services, paybacks)
+  const createService = new CreateService(groupes, expenses, services, paybacks)
+  const deleteService = new DeleteService(groupes, expenses, services, paybacks)
 
   app.post(
     '/:groupeId/services',
     zValidator('json', createServiceBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
-        throw invalidData(issue?.message ?? Libelle.REQUIRED)
+        throw invalidData(issue?.message ?? LABEL_REQUIRED)
       }
     }),
     async c => {

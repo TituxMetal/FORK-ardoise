@@ -14,7 +14,7 @@ export type PartDto = {
   amount: number
 }
 
-export type DepenseDto = {
+export type ExpenseDto = {
   id: string
   label: string
   day: string
@@ -48,7 +48,7 @@ export type GroupeDto = {
   invitation: {
     secret: string
   }
-  expenses: DepenseDto[]
+  expenses: ExpenseDto[]
   services: ServiceDto[]
   paybacks: PaybackDto[]
   balances: BalanceDto[]

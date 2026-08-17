@@ -1,6 +1,6 @@
-import { Jour } from '../../depenses/domain/Jour.vo.ts'
-import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
-import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
+import { dayFrom } from '../../expenses/domain/Day.vo.ts'
+import { labelFrom } from '../../expenses/domain/Label.vo.ts'
+import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { amountFromCents } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import { notFound } from '../../domain/notFound.ts'
@@ -21,7 +21,7 @@ export type CreateServiceInput = {
 export class CreateService {
   constructor(
     private readonly groupes: IGroupRepository,
-    private readonly depenses: IExpenseRepository,
+    private readonly expenses: IExpenseRepository,
     private readonly services: IServiceRepository,
     private readonly paybacks: IPaybackRepository
   ) {}
@@ -37,8 +37,8 @@ export class CreateService {
     }
     const service = Service.create(
       groupeId,
-      Libelle.from(input.label),
-      Jour.from(input.day),
+      labelFrom(input.label),
+      dayFrom(input.day),
       amountFromCents(input.amount),
       input.providerId,
       participantIds
@@ -46,7 +46,7 @@ export class CreateService {
     await this.services.save(service)
     return toGroupeDto(
       groupe,
-      await this.depenses.findByGroupeId(groupeId),
+      await this.expenses.findByGroupeId(groupeId),
       await this.services.findByGroupeId(groupeId),
       await this.paybacks.findByGroupeId(groupeId)
     )

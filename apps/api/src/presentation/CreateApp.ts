@@ -1,8 +1,8 @@
 import type { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
 import type { IAuth } from '../application/IAuth.port.ts'
-import { PrismaExpenseRepository } from '../depenses/infrastructure/PrismaExpense.repository.ts'
-import { createDepensesRoutes } from '../depenses/presentation/Depenses.routes.ts'
+import { PrismaExpenseRepository } from '../expenses/infrastructure/PrismaExpense.repository.ts'
+import { createExpensesRoutes } from '../expenses/presentation/Expenses.routes.ts'
 import { PrismaGroupRepository } from '../groupes/infrastructure/PrismaGroup.repository.ts'
 import { createGroupesRoutes } from '../groupes/presentation/Groupes.routes.ts'
 import { createInvitationsRoutes } from '../groupes/presentation/Invitations.routes.ts'
@@ -21,7 +21,7 @@ export const createApp = (
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const groupes = new PrismaGroupRepository(prisma)
-  const depenses = new PrismaExpenseRepository(prisma)
+  const expenses = new PrismaExpenseRepository(prisma)
   const services = new PrismaServiceRepository(prisma)
   const paybacks = new PrismaPaybackRepository(prisma)
   app.onError(mapException)
@@ -30,10 +30,10 @@ export const createApp = (
   app.use('/groups/*', requireSession(auth))
   app.use('/groups', requireSession(auth))
   app.use('/invitations/*', requireSession(auth))
-  app.route('/groups', createGroupesRoutes(groupes, depenses, services, paybacks))
-  app.route('/groups', createDepensesRoutes(groupes, depenses, services, paybacks))
-  app.route('/groups', createServicesRoutes(groupes, depenses, services, paybacks))
-  app.route('/groups', createPaybacksRoutes(groupes, depenses, services, paybacks))
+  app.route('/groups', createGroupesRoutes(groupes, expenses, services, paybacks))
+  app.route('/groups', createExpensesRoutes(groupes, expenses, services, paybacks))
+  app.route('/groups', createServicesRoutes(groupes, expenses, services, paybacks))
+  app.route('/groups', createPaybacksRoutes(groupes, expenses, services, paybacks))
   app.route('/invitations', createInvitationsRoutes(groupes))
   return app
 }

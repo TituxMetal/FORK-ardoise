@@ -5,12 +5,12 @@ import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import { Depense } from '../domain/Depense.entity.ts'
+import { dayFrom } from '../domain/Day.vo.ts'
+import { expenseCreate } from '../domain/Expense.entity.ts'
 import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
-import { Jour } from '../domain/Jour.vo.ts'
-import { Libelle } from '../domain/Libelle.vo.ts'
+import { labelFrom } from '../domain/Label.vo.ts'
 
-export type CreateDepenseInput = {
+export type CreateExpenseInput = {
   label: string
   day: string
   amount: number
@@ -18,16 +18,14 @@ export type CreateDepenseInput = {
   participantIds?: string[]
 }
 
-export class CreateDepense {
-  constructor(
-    private readonly groupes: IGroupRepository,
-    private readonly depenses: IExpenseRepository,
-    private readonly services: IServiceRepository,
-    private readonly paybacks: IPaybackRepository
-  ) {}
-
-  async execute(userId: string, groupeId: string, input: CreateDepenseInput) {
-    const groupe = await this.groupes.findById(groupeId)
+export const createExpense = (
+  groupes: IGroupRepository,
+  expenses: IExpenseRepository,
+  services: IServiceRepository,
+  paybacks: IPaybackRepository
+) => ({
+  execute: async (userId: string, groupeId: string, input: CreateExpenseInput) => {
+    const groupe = await groupes.findById(groupeId)
     if (!groupe || !groupe.hasMembre(userId)) {
       throw notFound('Groupe introuvable')
     }
@@ -35,20 +33,20 @@ export class CreateDepense {
     if (!groupe.hasMembre(input.payerId) || participantIds.some(id => !groupe.hasMembre(id))) {
       throw invalidData('Membre introuvable')
     }
-    const depense = Depense.create(
+    const expense = expenseCreate(
       groupeId,
-      Libelle.from(input.label),
-      Jour.from(input.day),
+      labelFrom(input.label),
+      dayFrom(input.day),
       amountFromCents(input.amount),
       input.payerId,
       participantIds
     )
-    await this.depenses.save(depense)
+    await expenses.save(expense)
     return toGroupeDto(
       groupe,
-      await this.depenses.findByGroupeId(groupeId),
-      await this.services.findByGroupeId(groupeId),
-      await this.paybacks.findByGroupeId(groupeId)
+      await expenses.findByGroupeId(groupeId),
+      await services.findByGroupeId(groupeId),
+      await paybacks.findByGroupeId(groupeId)
     )
   }
-}
+})

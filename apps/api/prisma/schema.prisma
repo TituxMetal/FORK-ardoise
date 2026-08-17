@@ -75,7 +75,7 @@ model Group {
   name             String
   invitationSecret String      @unique
   membres          Member[]
-  depenses         Expense[]
+  expenses         Expense[]
   services         Service[]
   paybacks         Payback[]
 

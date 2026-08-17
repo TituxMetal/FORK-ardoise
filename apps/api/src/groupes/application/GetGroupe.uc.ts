@@ -1,4 +1,4 @@
-import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
+import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { notFound } from '../../domain/notFound.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
@@ -8,7 +8,7 @@ import { toGroupeDto } from './ToGroupe.mapper.ts'
 export class GetGroupe {
   constructor(
     private readonly groupes: IGroupRepository,
-    private readonly depenses: IExpenseRepository,
+    private readonly expenses: IExpenseRepository,
     private readonly services: IServiceRepository,
     private readonly paybacks: IPaybackRepository
   ) {}
@@ -20,7 +20,7 @@ export class GetGroupe {
     }
     return toGroupeDto(
       groupe,
-      await this.depenses.findByGroupeId(groupeId),
+      await this.expenses.findByGroupeId(groupeId),
       await this.services.findByGroupeId(groupeId),
       await this.paybacks.findByGroupeId(groupeId)
     )

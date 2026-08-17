@@ -1,7 +1,7 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
+import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
@@ -18,13 +18,13 @@ const createPaybackBody = z.object({
 
 export const createPaybacksRoutes = (
   groupes: IGroupRepository,
-  depenses: IExpenseRepository,
+  expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createPaybackUseCase = createPayback(groupes, depenses, services, paybacks)
-  const deletePaybackUseCase = deletePayback(groupes, depenses, services, paybacks)
+  const createPaybackUseCase = createPayback(groupes, expenses, services, paybacks)
+  const deletePaybackUseCase = deletePayback(groupes, expenses, services, paybacks)
 
   app.post(
     '/:groupeId/paybacks',

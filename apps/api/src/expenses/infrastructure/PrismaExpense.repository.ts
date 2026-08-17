@@ -1,27 +1,27 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Depense } from '../domain/Depense.entity.ts'
+import type { Expense } from '../domain/Expense.entity.ts'
 import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
-import { toDepense } from './ToDepense.mapper.ts'
+import { toExpense } from './ToExpense.mapper.ts'
 
 const include = { participants: true, parts: true } as const
 
 export class PrismaExpenseRepository implements IExpenseRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async save(depense: Depense) {
+  async save(expense: Expense) {
     await this.prisma.expense.create({
       data: {
-        id: depense.id,
-        groupeId: depense.groupeId,
-        label: depense.label.value,
-        day: depense.day.value,
-        amount: depense.amount.value,
-        payerId: depense.payerId,
+        id: expense.id,
+        groupeId: expense.groupeId,
+        label: expense.label.value,
+        day: expense.day.value,
+        amount: expense.amount.value,
+        payerId: expense.payerId,
         participants: {
-          create: depense.participantIds.map((userId, ordinal) => ({ userId, ordinal }))
+          create: expense.participantIds.map((userId, ordinal) => ({ userId, ordinal }))
         },
         parts: {
-          create: depense.parts.map((part, ordinal) => ({
+          create: expense.parts.map((part, ordinal) => ({
             userId: part.userId,
             amount: part.amount.value,
             ordinal
@@ -33,7 +33,7 @@ export class PrismaExpenseRepository implements IExpenseRepository {
 
   async findById(id: string) {
     const row = await this.prisma.expense.findUnique({ where: { id }, include })
-    return row ? toDepense(row) : null
+    return row ? toExpense(row) : null
   }
 
   async findByGroupeId(groupeId: string) {
@@ -42,7 +42,7 @@ export class PrismaExpenseRepository implements IExpenseRepository {
       include,
       orderBy: { day: 'asc' }
     })
-    return rows.map(toDepense)
+    return rows.map(toExpense)
   }
 
   async delete(id: string) {

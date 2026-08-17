@@ -32,7 +32,7 @@ const invitationSql = readFileSync(
   ),
   'utf8'
 )
-const depenseSql = readFileSync(
+const expenseSql = readFileSync(
   fileURLToPath(
     new URL('../../../prisma/migrations/20260816052720_depense/migration.sql', import.meta.url)
   ),
@@ -66,7 +66,7 @@ const createTestApp = async () => {
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))

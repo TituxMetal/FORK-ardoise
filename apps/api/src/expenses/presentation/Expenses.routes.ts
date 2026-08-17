@@ -6,40 +6,40 @@ import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import { CreateDepense } from '../application/CreateDepense.uc.ts'
-import { DeleteDepense } from '../application/DeleteDepense.uc.ts'
+import { createExpense } from '../application/CreateExpense.uc.ts'
+import { deleteExpense } from '../application/DeleteExpense.uc.ts'
+import { DAY_REQUIRED } from '../domain/Day.vo.ts'
 import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
-import { Jour } from '../domain/Jour.vo.ts'
-import { Libelle } from '../domain/Libelle.vo.ts'
+import { LABEL_REQUIRED } from '../domain/Label.vo.ts'
 
-const createDepenseBody = z.object({
-  label: z.string({ error: Libelle.REQUIRED }),
-  day: z.string({ error: Jour.REQUIRED }),
+const createExpenseBody = z.object({
+  label: z.string({ error: LABEL_REQUIRED }),
+  day: z.string({ error: DAY_REQUIRED }),
   amount: z.number({ error: AMOUNT_POSITIVE }),
   payerId: z.string(),
   participantIds: z.array(z.string()).optional()
 })
 
-export const createDepensesRoutes = (
+export const createExpensesRoutes = (
   groupes: IGroupRepository,
-  depenses: IExpenseRepository,
+  expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createDepense = new CreateDepense(groupes, depenses, services, paybacks)
-  const deleteDepense = new DeleteDepense(groupes, depenses, services, paybacks)
+  const createExpenseUseCase = createExpense(groupes, expenses, services, paybacks)
+  const deleteExpenseUseCase = deleteExpense(groupes, expenses, services, paybacks)
 
   app.post(
     '/:groupeId/expenses',
-    zValidator('json', createDepenseBody, result => {
+    zValidator('json', createExpenseBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
-        throw invalidData(issue?.message ?? Libelle.REQUIRED)
+        throw invalidData(issue?.message ?? LABEL_REQUIRED)
       }
     }),
     async c => {
-      const groupe = await createDepense.execute(
+      const groupe = await createExpenseUseCase.execute(
         c.get('userId'),
         c.req.param('groupeId'),
         c.req.valid('json')
@@ -49,7 +49,13 @@ export const createDepensesRoutes = (
   )
 
   app.delete('/:groupeId/expenses/:id', async c =>
-    c.json(await deleteDepense.execute(c.get('userId'), c.req.param('groupeId'), c.req.param('id')))
+    c.json(
+      await deleteExpenseUseCase.execute(
+        c.get('userId'),
+        c.req.param('groupeId'),
+        c.req.param('id')
+      )
+    )
   )
 
   return app

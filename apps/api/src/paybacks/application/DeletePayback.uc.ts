@@ -1,4 +1,4 @@
-import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
+import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { notFound } from '../../domain/notFound.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
@@ -7,7 +7,7 @@ import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
 
 export const deletePayback = (
   groupes: IGroupRepository,
-  depenses: IExpenseRepository,
+  expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
@@ -23,7 +23,7 @@ export const deletePayback = (
     await paybacks.delete(paybackId)
     return toGroupeDto(
       groupe,
-      await depenses.findByGroupeId(groupeId),
+      await expenses.findByGroupeId(groupeId),
       await services.findByGroupeId(groupeId),
       await paybacks.findByGroupeId(groupeId)
     )

@@ -1,5 +1,5 @@
-import { Jour } from '../../depenses/domain/Jour.vo.ts'
-import { Libelle } from '../../depenses/domain/Libelle.vo.ts'
+import type { Day } from '../../expenses/domain/Day.vo.ts'
+import type { Label } from '../../expenses/domain/Label.vo.ts'
 import type { Amount } from '../../domain/Amount.ts'
 import { equalParts, type Part } from '../../domain/Part.ts'
 
@@ -7,8 +7,8 @@ export class Service {
   private constructor(
     private readonly _id: string,
     private readonly _groupeId: string,
-    private readonly _label: Libelle,
-    private readonly _day: Jour,
+    private readonly _label: Label,
+    private readonly _day: Day,
     private readonly _amount: Amount,
     private readonly _providerId: string,
     private readonly _participantIds: string[],
@@ -17,8 +17,8 @@ export class Service {
 
   static create(
     groupeId: string,
-    label: Libelle,
-    day: Jour,
+    label: Label,
+    day: Day,
     amount: Amount,
     providerId: string,
     participantIds: string[]
@@ -38,8 +38,8 @@ export class Service {
   static reconstitute(
     id: string,
     groupeId: string,
-    label: Libelle,
-    day: Jour,
+    label: Label,
+    day: Day,
     amount: Amount,
     providerId: string,
     participantIds: string[],

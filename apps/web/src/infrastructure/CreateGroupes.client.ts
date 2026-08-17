@@ -14,7 +14,7 @@ export type PartDto = {
   amount: number
 }
 
-export type DepenseDto = {
+export type ExpenseDto = {
   id: string
   label: string
   day: string
@@ -48,7 +48,7 @@ export type GroupeDto = {
   invitation: {
     secret: string
   }
-  expenses: DepenseDto[]
+  expenses: ExpenseDto[]
   services: ServiceDto[]
   paybacks: PaybackDto[]
   balances: BalanceDto[]
@@ -59,7 +59,7 @@ export type GroupeSummary = {
   name: string
 }
 
-export type CreateDepenseInput = {
+export type CreateExpenseInput = {
   label: string
   day: string
   amount: number
@@ -86,7 +86,7 @@ export type GroupesClient = {
   create: (name: string) => Promise<GroupeDto>
   get: (id: string) => Promise<GroupeDto>
   join: (secret: string) => Promise<GroupeDto>
-  createExpense: (groupeId: string, input: CreateDepenseInput) => Promise<GroupeDto>
+  createExpense: (groupeId: string, input: CreateExpenseInput) => Promise<GroupeDto>
   deleteExpense: (groupeId: string, expenseId: string) => Promise<GroupeDto>
   createService: (groupeId: string, input: CreateServiceInput) => Promise<GroupeDto>
   deleteService: (groupeId: string, serviceId: string) => Promise<GroupeDto>

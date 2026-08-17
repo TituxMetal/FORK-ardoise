@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
 import type {
-  CreateDepenseInput,
+  CreateExpenseInput,
   CreatePaybackInput,
   CreateServiceInput,
   GroupeDto,
@@ -40,11 +40,11 @@ const equalParts = (amount: number, participantIds: string[], creditedId: string
 const soldesFrom = (groupe: GroupeDto) =>
   groupe.members.map(membre => {
     let amount = 0
-    for (const depense of groupe.expenses) {
-      if (depense.payerId === membre.userId) {
-        amount += depense.amount
+    for (const expense of groupe.expenses) {
+      if (expense.payerId === membre.userId) {
+        amount += expense.amount
       }
-      for (const part of depense.parts) {
+      for (const part of expense.parts) {
         if (part.userId === membre.userId) {
           amount -= part.amount
         }
@@ -95,7 +95,7 @@ const memoryClient = () => {
     join: async () => {
       throw new Error('Invitation introuvable')
     },
-    createExpense: async (groupeId: string, input: CreateDepenseInput): Promise<GroupeDto> => {
+    createExpense: async (groupeId: string, input: CreateExpenseInput): Promise<GroupeDto> => {
       const groupe = groupes.get(groupeId)
       if (!groupe) {
         throw new Error('Groupe introuvable')
@@ -127,7 +127,7 @@ const memoryClient = () => {
       }
       const next: GroupeDto = {
         ...groupe,
-        expenses: groupe.expenses.filter(depense => depense.id !== expenseId)
+        expenses: groupe.expenses.filter(expense => expense.id !== expenseId)
       }
       next.balances = soldesFrom(next)
       groupes.set(groupeId, next)

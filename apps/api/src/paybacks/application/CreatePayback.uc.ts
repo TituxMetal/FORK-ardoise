@@ -2,7 +2,7 @@ import { amountFromCents } from '../../domain/Amount.ts'
 import { balancesOf } from '../../domain/Balance.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import { notFound } from '../../domain/notFound.ts'
-import type { IExpenseRepository } from '../../depenses/domain/IExpense.repository.ts'
+import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
@@ -17,7 +17,7 @@ export type CreatePaybackInput = {
 
 export const createPayback = (
   groupes: IGroupRepository,
-  depenses: IExpenseRepository,
+  expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
@@ -29,12 +29,12 @@ export const createPayback = (
     if (!groupe.hasMembre(input.debtorId) || !groupe.hasMembre(input.creditorId)) {
       throw invalidData('Membre introuvable')
     }
-    const expenses = await depenses.findByGroupeId(groupeId)
+    const groupExpenses = await expenses.findByGroupeId(groupeId)
     const providedServices = await services.findByGroupeId(groupeId)
     const existing = await paybacks.findByGroupeId(groupeId)
     const balances = balancesOf(
       groupe.membres.map(membre => ({ userId: membre.userId, name: membre.name })),
-      expenses.map(expense => ({
+      groupExpenses.map(expense => ({
         payerId: expense.payerId,
         amount: expense.amount.value,
         parts: expense.parts
@@ -62,6 +62,6 @@ export const createPayback = (
       creditorBalance
     )
     await paybacks.save(payback)
-    return toGroupeDto(groupe, expenses, providedServices, [...existing, payback])
+    return toGroupeDto(groupe, groupExpenses, providedServices, [...existing, payback])
   }
 })

@@ -32,7 +32,7 @@ const invitationSql = readFileSync(
   ),
   'utf8'
 )
-const depenseSql = readFileSync(
+const expenseSql = readFileSync(
   fileURLToPath(
     new URL('../../../prisma/migrations/20260816052720_depense/migration.sql', import.meta.url)
   ),
@@ -66,7 +66,7 @@ const createTestApp = async () => {
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))
@@ -146,7 +146,7 @@ const createService = (
     body: JSON.stringify(body)
   })
 
-const createDepense = (
+const createExpense = (
   app: ReturnType<typeof createApp>,
   cookie: string,
   groupeId: string,
@@ -235,7 +235,7 @@ test('Pizza then Service in the same Groupe cancel out', async () => {
   const { app, groupe, lea, bob, camille } = await openArdoise()
   const participants = [lea.userId, bob.userId, camille.userId]
 
-  await createDepense(app, lea.cookie, groupe.id, {
+  await createExpense(app, lea.cookie, groupe.id, {
     label: 'Pizza',
     day: '2026-08-15',
     amount: 100,

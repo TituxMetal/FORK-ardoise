@@ -1,9 +1,9 @@
 import { amountReconstitute } from '../../domain/Amount.ts'
-import { Depense } from '../domain/Depense.entity.ts'
-import { Jour } from '../domain/Jour.vo.ts'
-import { Libelle } from '../domain/Libelle.vo.ts'
+import { dayReconstitute } from '../domain/Day.vo.ts'
+import { expenseReconstitute } from '../domain/Expense.entity.ts'
+import { labelReconstitute } from '../domain/Label.vo.ts'
 
-export const toDepense = (row: {
+export const toExpense = (row: {
   id: string
   groupeId: string
   label: string
@@ -15,11 +15,11 @@ export const toDepense = (row: {
 }) => {
   const participants = [...row.participants].sort((a, b) => a.ordinal - b.ordinal)
   const parts = [...row.parts].sort((a, b) => a.ordinal - b.ordinal)
-  return Depense.reconstitute(
+  return expenseReconstitute(
     row.id,
     row.groupeId,
-    Libelle.reconstitute(row.label),
-    Jour.reconstitute(row.day),
+    labelReconstitute(row.label),
+    dayReconstitute(row.day),
     amountReconstitute(row.amount),
     row.payerId,
     participants.map(participant => participant.userId),

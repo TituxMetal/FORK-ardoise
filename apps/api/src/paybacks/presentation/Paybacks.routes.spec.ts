@@ -37,7 +37,7 @@ const invitationSql = readFileSync(
   ),
   'utf8'
 )
-const depenseSql = readFileSync(
+const expenseSql = readFileSync(
   fileURLToPath(
     new URL('../../../prisma/migrations/20260816052720_depense/migration.sql', import.meta.url)
   ),
@@ -71,7 +71,7 @@ const createTestApp = async () => {
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${depenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))
@@ -139,7 +139,7 @@ const openArdoise = async () => {
   }
 }
 
-const createDepense = (
+const createExpense = (
   app: ReturnType<typeof createApp>,
   cookie: string,
   groupeId: string,
@@ -165,7 +165,7 @@ const createPayback = (
 
 const pizza = async () => {
   const ardoise = await openArdoise()
-  await createDepense(ardoise.app, ardoise.lea.cookie, ardoise.groupe.id, {
+  await createExpense(ardoise.app, ardoise.lea.cookie, ardoise.groupe.id, {
     label: 'Pizza',
     day: '2026-08-15',
     amount: 100,

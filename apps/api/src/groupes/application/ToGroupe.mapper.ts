@@ -1,4 +1,4 @@
-import type { Depense } from '../../depenses/domain/Depense.entity.ts'
+import type { Expense } from '../../expenses/domain/Expense.entity.ts'
 import { balancesOf } from '../../domain/Balance.ts'
 import type { Payback } from '../../paybacks/domain/Payback.entity.ts'
 import type { Service } from '../../services/domain/Service.entity.ts'
@@ -7,7 +7,7 @@ import type { GroupeDto } from './Groupe.dto.ts'
 
 export const toGroupeDto = (
   groupe: Groupe,
-  depenses: Depense[] = [],
+  expenses: Expense[] = [],
   services: Service[] = [],
   paybacks: Payback[] = []
 ): GroupeDto => {
@@ -20,14 +20,14 @@ export const toGroupeDto = (
     name: groupe.name.value,
     members,
     invitation: { secret: groupe.invitationSecret },
-    expenses: depenses.map(depense => ({
-      id: depense.id,
-      label: depense.label.value,
-      day: depense.day.value,
-      amount: depense.amount.value,
-      payerId: depense.payerId,
-      participantIds: depense.participantIds,
-      parts: depense.parts.map(part => ({
+    expenses: expenses.map(expense => ({
+      id: expense.id,
+      label: expense.label.value,
+      day: expense.day.value,
+      amount: expense.amount.value,
+      payerId: expense.payerId,
+      participantIds: expense.participantIds,
+      parts: expense.parts.map(part => ({
         userId: part.userId,
         amount: part.amount.value
       }))
@@ -52,10 +52,10 @@ export const toGroupeDto = (
     })),
     balances: balancesOf(
       members,
-      depenses.map(depense => ({
-        payerId: depense.payerId,
-        amount: depense.amount.value,
-        parts: depense.parts
+      expenses.map(expense => ({
+        payerId: expense.payerId,
+        amount: expense.amount.value,
+        parts: expense.parts
       })),
       services.map(service => ({
         providerId: service.providerId,
