@@ -6,7 +6,7 @@ import { createExpensesRoutes } from '../expenses/presentation/Expenses.routes.t
 import { PrismaGroupRepository } from '../groupes/infrastructure/PrismaGroup.repository.ts'
 import { createGroupesRoutes } from '../groupes/presentation/Groupes.routes.ts'
 import { createInvitationsRoutes } from '../groupes/presentation/Invitations.routes.ts'
-import { PrismaServiceRepository } from '../services/infrastructure/PrismaService.repository.ts'
+import { prismaServiceRepository } from '../services/infrastructure/PrismaService.repository.ts'
 import { createServicesRoutes } from '../services/presentation/Services.routes.ts'
 import { PrismaPaybackRepository } from '../paybacks/infrastructure/PrismaPayback.repository.ts'
 import { createPaybacksRoutes } from '../paybacks/presentation/Paybacks.routes.ts'
@@ -22,7 +22,7 @@ export const createApp = (
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const groupes = new PrismaGroupRepository(prisma)
   const expenses = prismaExpenseRepository(prisma)
-  const services = new PrismaServiceRepository(prisma)
+  const services = prismaServiceRepository(prisma)
   const paybacks = new PrismaPaybackRepository(prisma)
   app.onError(mapException)
   app.get('/ping', c => c.body(null, 200))

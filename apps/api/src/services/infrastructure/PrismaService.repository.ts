@@ -5,11 +5,9 @@ import { toService } from './ToService.mapper.ts'
 
 const include = { participants: true, parts: true } as const
 
-export class PrismaServiceRepository implements IServiceRepository {
-  constructor(private readonly prisma: PrismaClient) {}
-
+export const prismaServiceRepository = (prisma: PrismaClient): IServiceRepository => ({
   async save(service: Service) {
-    await this.prisma.service.create({
+    await prisma.service.create({
       data: {
         id: service.id,
         groupeId: service.groupeId,
@@ -29,23 +27,23 @@ export class PrismaServiceRepository implements IServiceRepository {
         }
       }
     })
-  }
+  },
 
   async findById(id: string) {
-    const row = await this.prisma.service.findUnique({ where: { id }, include })
+    const row = await prisma.service.findUnique({ where: { id }, include })
     return row ? toService(row) : null
-  }
+  },
 
   async findByGroupeId(groupeId: string) {
-    const rows = await this.prisma.service.findMany({
+    const rows = await prisma.service.findMany({
       where: { groupeId },
       include,
       orderBy: { day: 'asc' }
     })
     return rows.map(toService)
-  }
+  },
 
   async delete(id: string) {
-    await this.prisma.service.delete({ where: { id } })
+    await prisma.service.delete({ where: { id } })
   }
-}
+})
