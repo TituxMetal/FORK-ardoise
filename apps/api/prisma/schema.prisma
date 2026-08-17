@@ -112,23 +112,23 @@ model Expense {
 }
 
 model ExpenseParticipant {
-  depenseId String
+  expenseId String
   userId    String
   ordinal   Int
-  depense   Expense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
-  @@id([depenseId, userId])
+  @@id([expenseId, userId])
   @@map("expense_participant")
 }
 
 model ExpensePart {
-  depenseId String
+  expenseId String
   userId    String
   amount    Int
   ordinal   Int
-  depense   Expense @relation(fields: [depenseId], references: [id], onDelete: Cascade)
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
-  @@id([depenseId, userId])
+  @@id([expenseId, userId])
   @@map("expense_part")
 }
 
