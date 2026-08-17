@@ -8,8 +8,8 @@ import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
-import { CreateService } from '../application/CreateService.uc.ts'
-import { DeleteService } from '../application/DeleteService.uc.ts'
+import { createService } from '../application/CreateService.uc.ts'
+import { deleteService } from '../application/DeleteService.uc.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
 
 const createServiceBody = z.object({
@@ -27,8 +27,8 @@ export const createServicesRoutes = (
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createService = new CreateService(groupes, expenses, services, paybacks)
-  const deleteService = new DeleteService(groupes, expenses, services, paybacks)
+  const createServiceUseCase = createService(groupes, expenses, services, paybacks)
+  const deleteServiceUseCase = deleteService(groupes, expenses, services, paybacks)
 
   app.post(
     '/:groupeId/services',
@@ -39,7 +39,7 @@ export const createServicesRoutes = (
       }
     }),
     async c => {
-      const groupe = await createService.execute(
+      const groupe = await createServiceUseCase.execute(
         c.get('userId'),
         c.req.param('groupeId'),
         c.req.valid('json')
@@ -49,7 +49,13 @@ export const createServicesRoutes = (
   )
 
   app.delete('/:groupeId/services/:id', async c =>
-    c.json(await deleteService.execute(c.get('userId'), c.req.param('groupeId'), c.req.param('id')))
+    c.json(
+      await deleteServiceUseCase.execute(
+        c.get('userId'),
+        c.req.param('groupeId'),
+        c.req.param('id')
+      )
+    )
   )
 
   return app

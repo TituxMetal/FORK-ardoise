@@ -5,11 +5,9 @@ import { toExpense } from './ToExpense.mapper.ts'
 
 const include = { participants: true, parts: true } as const
 
-export class PrismaExpenseRepository implements IExpenseRepository {
-  constructor(private readonly prisma: PrismaClient) {}
-
+export const prismaExpenseRepository = (prisma: PrismaClient): IExpenseRepository => ({
   async save(expense: Expense) {
-    await this.prisma.expense.create({
+    await prisma.expense.create({
       data: {
         id: expense.id,
         groupeId: expense.groupeId,
@@ -29,23 +27,23 @@ export class PrismaExpenseRepository implements IExpenseRepository {
         }
       }
     })
-  }
+  },
 
   async findById(id: string) {
-    const row = await this.prisma.expense.findUnique({ where: { id }, include })
+    const row = await prisma.expense.findUnique({ where: { id }, include })
     return row ? toExpense(row) : null
-  }
+  },
 
   async findByGroupeId(groupeId: string) {
-    const rows = await this.prisma.expense.findMany({
+    const rows = await prisma.expense.findMany({
       where: { groupeId },
       include,
       orderBy: { day: 'asc' }
     })
     return rows.map(toExpense)
-  }
+  },
 
   async delete(id: string) {
-    await this.prisma.expense.delete({ where: { id } })
+    await prisma.expense.delete({ where: { id } })
   }
-}
+})

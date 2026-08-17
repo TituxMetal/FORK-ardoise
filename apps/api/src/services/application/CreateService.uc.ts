@@ -7,8 +7,8 @@ import { notFound } from '../../domain/notFound.ts'
 import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
 import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
+import { serviceCreate } from '../domain/Service.entity.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
-import { Service } from '../domain/Service.entity.ts'
 
 export type CreateServiceInput = {
   label: string
@@ -18,16 +18,14 @@ export type CreateServiceInput = {
   participantIds?: string[]
 }
 
-export class CreateService {
-  constructor(
-    private readonly groupes: IGroupRepository,
-    private readonly expenses: IExpenseRepository,
-    private readonly services: IServiceRepository,
-    private readonly paybacks: IPaybackRepository
-  ) {}
-
-  async execute(userId: string, groupeId: string, input: CreateServiceInput) {
-    const groupe = await this.groupes.findById(groupeId)
+export const createService = (
+  groupes: IGroupRepository,
+  expenses: IExpenseRepository,
+  services: IServiceRepository,
+  paybacks: IPaybackRepository
+) => ({
+  execute: async (userId: string, groupeId: string, input: CreateServiceInput) => {
+    const groupe = await groupes.findById(groupeId)
     if (!groupe || !groupe.hasMembre(userId)) {
       throw notFound('Groupe introuvable')
     }
@@ -35,7 +33,7 @@ export class CreateService {
     if (!groupe.hasMembre(input.providerId) || participantIds.some(id => !groupe.hasMembre(id))) {
       throw invalidData('Membre introuvable')
     }
-    const service = Service.create(
+    const service = serviceCreate(
       groupeId,
       labelFrom(input.label),
       dayFrom(input.day),
@@ -43,12 +41,12 @@ export class CreateService {
       input.providerId,
       participantIds
     )
-    await this.services.save(service)
+    await services.save(service)
     return toGroupeDto(
       groupe,
-      await this.expenses.findByGroupeId(groupeId),
-      await this.services.findByGroupeId(groupeId),
-      await this.paybacks.findByGroupeId(groupeId)
+      await expenses.findByGroupeId(groupeId),
+      await services.findByGroupeId(groupeId),
+      await paybacks.findByGroupeId(groupeId)
     )
   }
-}
+})

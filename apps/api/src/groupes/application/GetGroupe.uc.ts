@@ -5,24 +5,22 @@ import type { IServiceRepository } from '../../services/domain/IService.reposito
 import type { IGroupRepository } from '../domain/IGroup.repository.ts'
 import { toGroupeDto } from './ToGroupe.mapper.ts'
 
-export class GetGroupe {
-  constructor(
-    private readonly groupes: IGroupRepository,
-    private readonly expenses: IExpenseRepository,
-    private readonly services: IServiceRepository,
-    private readonly paybacks: IPaybackRepository
-  ) {}
-
-  async execute(userId: string, groupeId: string) {
-    const groupe = await this.groupes.findById(groupeId)
+export const getGroupe = (
+  groupes: IGroupRepository,
+  expenses: IExpenseRepository,
+  services: IServiceRepository,
+  paybacks: IPaybackRepository
+) => ({
+  execute: async (userId: string, groupeId: string) => {
+    const groupe = await groupes.findById(groupeId)
     if (!groupe || !groupe.hasMembre(userId)) {
       throw notFound('Groupe introuvable')
     }
     return toGroupeDto(
       groupe,
-      await this.expenses.findByGroupeId(groupeId),
-      await this.services.findByGroupeId(groupeId),
-      await this.paybacks.findByGroupeId(groupeId)
+      await expenses.findByGroupeId(groupeId),
+      await services.findByGroupeId(groupeId),
+      await paybacks.findByGroupeId(groupeId)
     )
   }
-}
+})

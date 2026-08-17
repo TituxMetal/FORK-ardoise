@@ -6,7 +6,7 @@ import type { IPaybackRepository } from '../../paybacks/domain/IPayback.reposito
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import { CreateGroupe } from '../application/CreateGroupe.uc.ts'
-import { GetGroupe } from '../application/GetGroupe.uc.ts'
+import { getGroupe } from '../application/GetGroupe.uc.ts'
 import { ListGroupes } from '../application/ListGroupes.uc.ts'
 import { GroupeName } from '../domain/GroupeName.vo.ts'
 import type { IGroupRepository } from '../domain/IGroup.repository.ts'
@@ -24,7 +24,7 @@ export const createGroupesRoutes = (
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createGroupe = new CreateGroupe(groupes)
   const listGroupes = new ListGroupes(groupes)
-  const getGroupe = new GetGroupe(groupes, expenses, services, paybacks)
+  const getGroupeUseCase = getGroupe(groupes, expenses, services, paybacks)
 
   app.post(
     '/',
@@ -42,7 +42,9 @@ export const createGroupesRoutes = (
 
   app.get('/', async c => c.json(await listGroupes.execute(c.get('userId'))))
 
-  app.get('/:id', async c => c.json(await getGroupe.execute(c.get('userId'), c.req.param('id'))))
+  app.get('/:id', async c =>
+    c.json(await getGroupeUseCase.execute(c.get('userId'), c.req.param('id')))
+  )
 
   return app
 }

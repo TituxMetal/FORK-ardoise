@@ -5,29 +5,27 @@ import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
 
-export class DeleteService {
-  constructor(
-    private readonly groupes: IGroupRepository,
-    private readonly expenses: IExpenseRepository,
-    private readonly services: IServiceRepository,
-    private readonly paybacks: IPaybackRepository
-  ) {}
-
-  async execute(userId: string, groupeId: string, serviceId: string) {
-    const groupe = await this.groupes.findById(groupeId)
+export const deleteService = (
+  groupes: IGroupRepository,
+  expenses: IExpenseRepository,
+  services: IServiceRepository,
+  paybacks: IPaybackRepository
+) => ({
+  execute: async (userId: string, groupeId: string, serviceId: string) => {
+    const groupe = await groupes.findById(groupeId)
     if (!groupe || !groupe.hasMembre(userId)) {
       throw notFound('Groupe introuvable')
     }
-    const service = await this.services.findById(serviceId)
+    const service = await services.findById(serviceId)
     if (!service || service.groupeId !== groupeId) {
       throw notFound('Service introuvable')
     }
-    await this.services.delete(serviceId)
+    await services.delete(serviceId)
     return toGroupeDto(
       groupe,
-      await this.expenses.findByGroupeId(groupeId),
-      await this.services.findByGroupeId(groupeId),
-      await this.paybacks.findByGroupeId(groupeId)
+      await expenses.findByGroupeId(groupeId),
+      await services.findByGroupeId(groupeId),
+      await paybacks.findByGroupeId(groupeId)
     )
   }
-}
+})
