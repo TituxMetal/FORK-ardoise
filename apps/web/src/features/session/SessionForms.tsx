@@ -1,10 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { authClient } from '../infrastructure/CreateAuth.client.ts'
-
-const field = (form: FormData, name: string) => {
-  const value = form.get(name)
-  return typeof value === 'string' ? value : ''
-}
+import { authClient } from '../../lib/authClient.ts'
+import { field } from '../../lib/forms.ts'
 
 export const SessionForms = () => {
   const [error, setError] = useState('')

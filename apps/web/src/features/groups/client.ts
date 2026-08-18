@@ -86,12 +86,12 @@ export type GroupsClient = {
   create: (name: string) => Promise<GroupDto>
   get: (id: string) => Promise<GroupDto>
   join: (secret: string) => Promise<GroupDto>
-  createExpense: (groupeId: string, input: CreateExpenseInput) => Promise<GroupDto>
-  deleteExpense: (groupeId: string, expenseId: string) => Promise<GroupDto>
-  createService: (groupeId: string, input: CreateServiceInput) => Promise<GroupDto>
-  deleteService: (groupeId: string, serviceId: string) => Promise<GroupDto>
-  createPayback: (groupeId: string, input: CreatePaybackInput) => Promise<GroupDto>
-  deletePayback: (groupeId: string, paybackId: string) => Promise<GroupDto>
+  createExpense: (groupId: string, input: CreateExpenseInput) => Promise<GroupDto>
+  deleteExpense: (groupId: string, expenseId: string) => Promise<GroupDto>
+  createService: (groupId: string, input: CreateServiceInput) => Promise<GroupDto>
+  deleteService: (groupId: string, serviceId: string) => Promise<GroupDto>
+  createPayback: (groupId: string, input: CreatePaybackInput) => Promise<GroupDto>
+  deletePayback: (groupId: string, paybackId: string) => Promise<GroupDto>
 }
 
 const request = async <T>(path: string, init?: { method?: string; body?: string }): Promise<T> => {
@@ -119,31 +119,31 @@ export const groupsClient: GroupsClient = {
     request<GroupDto>(`/api/invites/${secret}`, {
       method: 'POST'
     }),
-  createExpense: (groupeId, input) =>
-    request<GroupDto>(`/api/groups/${groupeId}/expenses`, {
+  createExpense: (groupId, input) =>
+    request<GroupDto>(`/api/groups/${groupId}/expenses`, {
       method: 'POST',
       body: JSON.stringify(input)
     }),
-  deleteExpense: (groupeId, expenseId) =>
-    request<GroupDto>(`/api/groups/${groupeId}/expenses/${expenseId}`, {
+  deleteExpense: (groupId, expenseId) =>
+    request<GroupDto>(`/api/groups/${groupId}/expenses/${expenseId}`, {
       method: 'DELETE'
     }),
-  createService: (groupeId, input) =>
-    request<GroupDto>(`/api/groups/${groupeId}/services`, {
+  createService: (groupId, input) =>
+    request<GroupDto>(`/api/groups/${groupId}/services`, {
       method: 'POST',
       body: JSON.stringify(input)
     }),
-  deleteService: (groupeId, serviceId) =>
-    request<GroupDto>(`/api/groups/${groupeId}/services/${serviceId}`, {
+  deleteService: (groupId, serviceId) =>
+    request<GroupDto>(`/api/groups/${groupId}/services/${serviceId}`, {
       method: 'DELETE'
     }),
-  createPayback: (groupeId, input) =>
-    request<GroupDto>(`/api/groups/${groupeId}/paybacks`, {
+  createPayback: (groupId, input) =>
+    request<GroupDto>(`/api/groups/${groupId}/paybacks`, {
       method: 'POST',
       body: JSON.stringify(input)
     }),
-  deletePayback: (groupeId, paybackId) =>
-    request<GroupDto>(`/api/groups/${groupeId}/paybacks/${paybackId}`, {
+  deletePayback: (groupId, paybackId) =>
+    request<GroupDto>(`/api/groups/${groupId}/paybacks/${paybackId}`, {
       method: 'DELETE'
     })
 }

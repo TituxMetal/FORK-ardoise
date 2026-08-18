@@ -1,23 +1,14 @@
 import { useEffect, useState } from 'react'
-import { authClient } from '../infrastructure/CreateAuth.client.ts'
-import {
-  groupsClient,
-  type GroupDto,
-  type GroupsClient
-} from '../infrastructure/CreateGroups.client.ts'
-import { SessionForms } from './SessionForms.tsx'
-
-type SessionUser = {
-  name: string
-}
+import { groupsClient, type GroupDto, type GroupsClient } from '../features/groups/client.ts'
+import { SessionForms } from '../features/session/SessionForms.tsx'
 
 type Props = {
   secret: string
-  session: SessionUser | null
+  session: { name: string } | null
   client?: GroupsClient
 }
 
-export const InviteScreen = ({ secret, session, client = groupsClient }: Props) => {
+export const InvitePage = ({ secret, session, client = groupsClient }: Props) => {
   const sessionName = session?.name
   const [group, setGroup] = useState<GroupDto | null>(null)
   const [error, setError] = useState('')
@@ -64,12 +55,4 @@ export const InviteScreen = ({ secret, session, client = groupsClient }: Props) 
       </ul>
     </article>
   )
-}
-
-export const InvitePage = ({ secret }: { secret: string }) => {
-  const { data, isPending } = authClient.useSession()
-  if (isPending) {
-    return <p>Chargement…</p>
-  }
-  return <InviteScreen secret={secret} session={data ? { name: data.user.name } : null} />
 }

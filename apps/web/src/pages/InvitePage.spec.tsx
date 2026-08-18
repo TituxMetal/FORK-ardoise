@@ -1,8 +1,8 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-import type { GroupDto, GroupsClient } from '../infrastructure/CreateGroups.client.ts'
-import { InviteScreen } from './InviteScreen.tsx'
+import type { GroupDto, GroupsClient } from '../features/groups/client.ts'
+import { InvitePage } from './InvitePage.tsx'
 
 afterEach(cleanup)
 
@@ -40,15 +40,11 @@ const joiningClient = (joined: string[]) =>
     deletePayback: async () => group
   }) satisfies GroupsClient
 
-describe('InviteScreen', () => {
+describe('InvitePage', () => {
   it('adds a User with a session who opens the Invite as a Member', async () => {
     const joined: string[] = []
     render(
-      <InviteScreen
-        secret="invite-secret"
-        session={{ name: 'Bob' }}
-        client={joiningClient(joined)}
-      />
+      <InvitePage secret="invite-secret" session={{ name: 'Bob' }} client={joiningClient(joined)} />
     )
 
     expect(await screen.findByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
@@ -58,7 +54,7 @@ describe('InviteScreen', () => {
 
   it('does not join when opening the Invite without a session', async () => {
     const joined: string[] = []
-    render(<InviteScreen secret="invite-secret" session={null} client={joiningClient(joined)} />)
+    render(<InvitePage secret="invite-secret" session={null} client={joiningClient(joined)} />)
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Invitation' })).toBeTruthy()

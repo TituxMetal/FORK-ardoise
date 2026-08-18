@@ -1,79 +1,49 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import {
-  groupsClient,
-  type GroupDto,
-  type GroupsClient,
-  type GroupSummary
-} from '../infrastructure/CreateGroups.client.ts'
-
-const field = (form: FormData, name: string) => {
-  const value = form.get(name)
-  return typeof value === 'string' ? value : ''
-}
-
-const euros = (cents: number) =>
-  `${cents < 0 ? '−' : ''}${(Math.abs(cents) / 100).toFixed(2).replace('.', ',')} €`
-
-const centsFromEuros = (value: string) => Math.round(Number(value.replace(',', '.')) * 100)
+import { groupsClient, type GroupDto, type GroupsClient } from '../features/groups/client.ts'
+import { centsFromEuros, euros } from '../lib/amounts.ts'
+import { field } from '../lib/forms.ts'
+import { Link } from '../lib/router.tsx'
 
 type Props = {
+  id: string
   client?: GroupsClient
   copy?: (text: string) => Promise<void>
 }
 
-export const GroupsScreen = ({
+export const GroupPage = ({
+  id,
   client = groupsClient,
   copy = text => navigator.clipboard.writeText(text)
 }: Props) => {
-  const [groups, setGroups] = useState<GroupSummary[]>([])
-  const [opened, setOpened] = useState<GroupDto | null>(null)
+  const [group, setGroup] = useState<GroupDto | null>(null)
   const [error, setError] = useState('')
   const [debtorId, setDebtorId] = useState('')
   const [creditorId, setCreditorId] = useState('')
 
   useEffect(() => {
     void client
-      .list()
-      .then(setGroups)
-      .catch(() => setError('Impossible de lister les Groupes'))
-  }, [client])
-
-  const create = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const name = field(new FormData(event.currentTarget), 'name')
-    event.currentTarget.reset()
-    try {
-      await client.create(name)
-      setError('')
-      setGroups(await client.list())
-    } catch {
-      setError('Impossible de créer le Groupe')
-    }
-  }
-
-  const open = async (id: string) => {
-    try {
-      setOpened(await client.get(id))
-      setError('')
-    } catch {
-      setError('Groupe introuvable')
-    }
-  }
+      .get(id)
+      .then(fetched => {
+        setGroup(fetched)
+        setError('')
+      })
+      .catch(() => setError('Groupe introuvable'))
+  }, [client, id])
 
   const createExpense = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!opened) {
+    if (!group) {
       return
     }
     const form = new FormData(event.currentTarget)
     const selected = form.getAll('participantIds').filter(value => typeof value === 'string')
     event.currentTarget.reset()
     try {
-      setOpened(
-        await client.createExpense(opened.id, {
+      setGroup(
+        await client.createExpense(group.id, {
           label: field(form, 'label'),
           day: field(form, 'day'),
-          amount: Math.round(Number(field(form, 'amount')) * 100),
+          amount: centsFromEuros(field(form, 'amount')),
           payerId: field(form, 'payerId'),
           participantIds: selected.length > 0 ? selected : undefined
         })
@@ -85,11 +55,11 @@ export const GroupsScreen = ({
   }
 
   const deleteExpense = async (expenseId: string) => {
-    if (!opened) {
+    if (!group) {
       return
     }
     try {
-      setOpened(await client.deleteExpense(opened.id, expenseId))
+      setGroup(await client.deleteExpense(group.id, expenseId))
       setError('')
     } catch {
       setError('Dépense introuvable')
@@ -98,18 +68,18 @@ export const GroupsScreen = ({
 
   const createService = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!opened) {
+    if (!group) {
       return
     }
     const form = new FormData(event.currentTarget)
     const selected = form.getAll('participantIds').filter(value => typeof value === 'string')
     event.currentTarget.reset()
     try {
-      setOpened(
-        await client.createService(opened.id, {
+      setGroup(
+        await client.createService(group.id, {
           label: field(form, 'label'),
           day: field(form, 'day'),
-          amount: Math.round(Number(field(form, 'amount')) * 100),
+          amount: centsFromEuros(field(form, 'amount')),
           providerId: field(form, 'providerId'),
           participantIds: selected.length > 0 ? selected : undefined
         })
@@ -121,11 +91,11 @@ export const GroupsScreen = ({
   }
 
   const deleteService = async (serviceId: string) => {
-    if (!opened) {
+    if (!group) {
       return
     }
     try {
-      setOpened(await client.deleteService(opened.id, serviceId))
+      setGroup(await client.deleteService(group.id, serviceId))
       setError('')
     } catch {
       setError('Service introuvable')
@@ -134,14 +104,14 @@ export const GroupsScreen = ({
 
   const createPayback = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!opened) {
+    if (!group) {
       return
     }
     const form = new FormData(event.currentTarget)
     event.currentTarget.reset()
     try {
-      setOpened(
-        await client.createPayback(opened.id, {
+      setGroup(
+        await client.createPayback(group.id, {
           debtorId: field(form, 'debtorId'),
           creditorId: field(form, 'creditorId'),
           amount: centsFromEuros(field(form, 'amount'))
@@ -154,11 +124,11 @@ export const GroupsScreen = ({
   }
 
   const deletePayback = async (paybackId: string) => {
-    if (!opened) {
+    if (!group) {
       return
     }
     try {
-      setOpened(await client.deletePayback(opened.id, paybackId))
+      setGroup(await client.deletePayback(group.id, paybackId))
       setError('')
     } catch {
       setError('Règlement introuvable')
@@ -166,71 +136,44 @@ export const GroupsScreen = ({
   }
 
   const creditors =
-    opened?.balances
+    group?.balances
       .filter(balance => balance.amount > 0)
       .slice()
       .sort((a, b) => b.amount - a.amount) ?? []
-  const selectedDebtorId = opened?.members.some(member => member.userId === debtorId)
+  const selectedDebtorId = group?.members.some(member => member.userId === debtorId)
     ? debtorId
-    : (opened?.balances.find(balance => balance.amount < 0)?.userId ??
-      opened?.members[0]?.userId ??
+    : (group?.balances.find(balance => balance.amount < 0)?.userId ??
+      group?.members[0]?.userId ??
       '')
   const selectedCreditorId = creditors.some(balance => balance.userId === creditorId)
     ? creditorId
     : (creditors[0]?.userId ?? '')
   const nameOf = (userId: string) =>
-    opened?.members.find(member => member.userId === userId)?.name ?? userId
-  const cap = opened
+    group?.members.find(member => member.userId === userId)?.name ?? userId
+  const cap = group
     ? Math.min(
-        -(opened.balances.find(balance => balance.userId === selectedDebtorId)?.amount ?? 0),
-        opened.balances.find(balance => balance.userId === selectedCreditorId)?.amount ?? 0
+        -(group.balances.find(balance => balance.userId === selectedDebtorId)?.amount ?? 0),
+        group.balances.find(balance => balance.userId === selectedCreditorId)?.amount ?? 0
       )
     : 0
 
   return (
     <section className="space-y-4">
+      <Link to="/" className="inline-block rounded bg-zinc-800 px-3 py-2">
+        ← Retour aux Groupes
+      </Link>
       {error ? (
         <p className="text-red-400" role="alert">
           {error}
         </p>
       ) : null}
-      <form className="flex flex-col gap-3" onSubmit={create}>
-        <h2 className="text-lg font-medium">Créer un Groupe</h2>
-        <label className="flex flex-col gap-1">
-          Nom
-          <input
-            name="name"
-            required
-            className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
-          />
-        </label>
-        <button type="submit" className="rounded bg-zinc-100 px-3 py-2 text-zinc-900">
-          Créer le Groupe
-        </button>
-      </form>
-      <div className="space-y-2">
-        <h2 className="text-lg font-medium">Mes Groupes</h2>
-        <ul className="space-y-1">
-          {groups.map(group => (
-            <li key={group.id}>
-              <button
-                type="button"
-                className="rounded bg-zinc-800 px-3 py-2"
-                onClick={() => void open(group.id)}
-              >
-                {group.name}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      {opened ? (
+      {group ? (
         <article className="space-y-4">
-          <h2 className="text-lg font-medium">{opened.name}</h2>
+          <h2 className="text-lg font-medium">{group.name}</h2>
           <button
             type="button"
             className="rounded bg-zinc-100 px-3 py-2 text-zinc-900"
-            onClick={() => void copy(`${window.location.origin}/invites/${opened.invite.secret}`)}
+            onClick={() => void copy(`${window.location.origin}/invites/${group.invite.secret}`)}
           >
             Copier le lien d’Invitation
           </button>
@@ -270,10 +213,10 @@ export const GroupsScreen = ({
               <select
                 name="payerId"
                 required
-                defaultValue={opened.members[0]?.userId}
+                defaultValue={group.members[0]?.userId}
                 className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
               >
-                {opened.members.map(member => (
+                {group.members.map(member => (
                   <option key={member.userId} value={member.userId}>
                     {member.name}
                   </option>
@@ -282,7 +225,7 @@ export const GroupsScreen = ({
             </label>
             <fieldset className="flex flex-col gap-1">
               <legend>Participants</legend>
-              {opened.members.map(member => (
+              {group.members.map(member => (
                 <label key={member.userId} className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -334,10 +277,10 @@ export const GroupsScreen = ({
               <select
                 name="providerId"
                 required
-                defaultValue={opened.members[0]?.userId}
+                defaultValue={group.members[0]?.userId}
                 className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
               >
-                {opened.members.map(member => (
+                {group.members.map(member => (
                   <option key={member.userId} value={member.userId}>
                     {member.name}
                   </option>
@@ -346,7 +289,7 @@ export const GroupsScreen = ({
             </label>
             <fieldset className="flex flex-col gap-1">
               <legend>Participants</legend>
-              {opened.members.map(member => (
+              {group.members.map(member => (
                 <label key={member.userId} className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -377,7 +320,7 @@ export const GroupsScreen = ({
                 onChange={event => setDebtorId(event.target.value)}
                 className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
               >
-                {opened.members.map(member => (
+                {group.members.map(member => (
                   <option key={member.userId} value={member.userId}>
                     {member.name}
                   </option>
@@ -413,11 +356,11 @@ export const GroupsScreen = ({
               Constater le Règlement
             </button>
           </form>
-          {opened.expenses.length === 0 ? (
+          {group.expenses.length === 0 ? (
             <p>Aucune Dépense</p>
           ) : (
             <ul className="space-y-2">
-              {opened.expenses.map(expense => (
+              {group.expenses.map(expense => (
                 <li key={expense.id} className="space-y-1">
                   <p>{expense.label}</p>
                   <p>{expense.day}</p>
@@ -433,11 +376,11 @@ export const GroupsScreen = ({
               ))}
             </ul>
           )}
-          {opened.services.length === 0 ? (
+          {group.services.length === 0 ? (
             <p>Aucun Service</p>
           ) : (
             <ul className="space-y-2">
-              {opened.services.map(service => (
+              {group.services.map(service => (
                 <li key={service.id} className="space-y-1">
                   <p>{service.label}</p>
                   <p>{service.day}</p>
@@ -453,11 +396,11 @@ export const GroupsScreen = ({
               ))}
             </ul>
           )}
-          {opened.paybacks.length === 0 ? (
+          {group.paybacks.length === 0 ? (
             <p>Aucun Règlement</p>
           ) : (
             <ul className="space-y-2">
-              {opened.paybacks.map(payback => (
+              {group.paybacks.map(payback => (
                 <li key={payback.id} className="space-y-1">
                   <p>
                     {nameOf(payback.debtorId)} → {nameOf(payback.creditorId)}{' '}
@@ -475,14 +418,16 @@ export const GroupsScreen = ({
             </ul>
           )}
           <ul>
-            {opened.balances.map(balance => (
+            {group.balances.map(balance => (
               <li key={balance.userId}>
                 {balance.name} {euros(balance.amount)}
               </li>
             ))}
           </ul>
         </article>
-      ) : null}
+      ) : (
+        <p>Chargement…</p>
+      )}
     </section>
   )
 }
