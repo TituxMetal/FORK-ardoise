@@ -4,7 +4,7 @@ import { z } from 'zod'
 import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
-import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
+import type { IGroupRepository } from '../../groups/domain/IGroup.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { createPayback } from '../application/CreatePayback.uc.ts'
 import { deletePayback } from '../application/DeletePayback.uc.ts'
@@ -17,14 +17,14 @@ const createPaybackBody = z.object({
 })
 
 export const createPaybacksRoutes = (
-  groupes: IGroupRepository,
+  groups: IGroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createPaybackUseCase = createPayback(groupes, expenses, services, paybacks)
-  const deletePaybackUseCase = deletePayback(groupes, expenses, services, paybacks)
+  const createPaybackUseCase = createPayback(groups, expenses, services, paybacks)
+  const deletePaybackUseCase = deletePayback(groups, expenses, services, paybacks)
 
   app.post(
     '/:groupeId/paybacks',
@@ -35,12 +35,12 @@ export const createPaybacksRoutes = (
       }
     }),
     async c => {
-      const groupe = await createPaybackUseCase.execute(
+      const group = await createPaybackUseCase.execute(
         c.get('userId'),
         c.req.param('groupeId'),
         c.req.valid('json')
       )
-      return c.json(groupe, 201)
+      return c.json(group, 201)
     }
   )
 

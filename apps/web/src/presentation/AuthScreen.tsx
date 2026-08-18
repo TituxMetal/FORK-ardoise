@@ -1,5 +1,5 @@
 import { authClient } from '../infrastructure/CreateAuth.client.ts'
-import { GroupesScreen } from './GroupesScreen.tsx'
+import { GroupsScreen } from './GroupsScreen.tsx'
 import { SessionForms } from './SessionForms.tsx'
 
 export const AuthScreen = () => {
@@ -24,7 +24,7 @@ export const AuthScreen = () => {
         >
           Fermer la session
         </button>
-        <GroupesScreen />
+        <GroupsScreen />
       </section>
     )
   }

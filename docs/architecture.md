@@ -47,7 +47,7 @@ apps/web/src/
   lib/            router, clients, shared helpers
 ```
 
-Real routes. `GroupesScreen.tsx` holding every form is the shape we leave.
+Real routes. `GroupsScreen.tsx` holding every form is the shape we leave.
 
 ## Tests
 

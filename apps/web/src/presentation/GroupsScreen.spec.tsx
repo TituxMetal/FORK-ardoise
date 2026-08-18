@@ -6,105 +6,105 @@ import type {
   CreateExpenseInput,
   CreatePaybackInput,
   CreateServiceInput,
-  GroupeDto,
-  GroupeSummary
-} from '../infrastructure/CreateGroupes.client.ts'
-import { GroupesScreen } from './GroupesScreen.tsx'
+  GroupDto,
+  GroupSummary
+} from '../infrastructure/CreateGroups.client.ts'
+import { GroupsScreen } from './GroupsScreen.tsx'
 
 afterEach(cleanup)
 
-const emptyGroupe = (id: string, name: string, members: GroupeDto['members']): GroupeDto => ({
+const emptyGroup = (id: string, name: string, members: GroupDto['members']): GroupDto => ({
   id,
   name,
   members,
-  invitation: { secret: 'invite-secret' },
+  invite: { secret: 'invite-secret' },
   expenses: [],
   services: [],
   paybacks: [],
-  balances: members.map(membre => ({ ...membre, amount: 0 }))
+  balances: members.map(member => ({ ...member, amount: 0 }))
 })
 
 const equalParts = (amount: number, participantIds: string[], creditedId: string) => {
-  const partEntiere = Math.floor(amount / participantIds.length)
-  const reste = amount - partEntiere * participantIds.length
+  const wholePart = Math.floor(amount / participantIds.length)
+  const remainder = amount - wholePart * participantIds.length
   const parts = participantIds.map(userId => ({
     userId,
-    amount: userId === creditedId ? partEntiere + reste : partEntiere
+    amount: userId === creditedId ? wholePart + remainder : wholePart
   }))
-  if (!participantIds.includes(creditedId) && reste > 0) {
-    parts.push({ userId: creditedId, amount: reste })
+  if (!participantIds.includes(creditedId) && remainder > 0) {
+    parts.push({ userId: creditedId, amount: remainder })
   }
   return parts
 }
 
-const soldesFrom = (groupe: GroupeDto) =>
-  groupe.members.map(membre => {
+const balancesFrom = (group: GroupDto) =>
+  group.members.map(member => {
     let amount = 0
-    for (const expense of groupe.expenses) {
-      if (expense.payerId === membre.userId) {
+    for (const expense of group.expenses) {
+      if (expense.payerId === member.userId) {
         amount += expense.amount
       }
       for (const part of expense.parts) {
-        if (part.userId === membre.userId) {
+        if (part.userId === member.userId) {
           amount -= part.amount
         }
       }
     }
-    for (const service of groupe.services) {
-      if (service.providerId === membre.userId) {
+    for (const service of group.services) {
+      if (service.providerId === member.userId) {
         amount += service.amount
       }
       for (const part of service.parts) {
-        if (part.userId === membre.userId) {
+        if (part.userId === member.userId) {
           amount -= part.amount
         }
       }
     }
-    for (const payback of groupe.paybacks) {
-      if (payback.creditorId === membre.userId) {
+    for (const payback of group.paybacks) {
+      if (payback.creditorId === member.userId) {
         amount -= payback.amount
       }
-      if (payback.debtorId === membre.userId) {
+      if (payback.debtorId === member.userId) {
         amount += payback.amount
       }
     }
-    return { ...membre, amount }
+    return { ...member, amount }
   })
 
 const memoryClient = () => {
-  const groupes = new Map<string, GroupeDto>()
+  const groups = new Map<string, GroupDto>()
   return {
-    list: async (): Promise<GroupeSummary[]> =>
-      [...groupes.values()].map(groupe => ({ id: groupe.id, name: groupe.name })),
-    create: async (name: string): Promise<GroupeDto> => {
-      const groupe = emptyGroupe(crypto.randomUUID(), name, [
+    list: async (): Promise<GroupSummary[]> =>
+      [...groups.values()].map(group => ({ id: group.id, name: group.name })),
+    create: async (name: string): Promise<GroupDto> => {
+      const group = emptyGroup(crypto.randomUUID(), name, [
         { userId: 'lea', name: 'Léa' },
         { userId: 'bob', name: 'Bob' },
         { userId: 'camille', name: 'Camille' }
       ])
-      groupes.set(groupe.id, groupe)
-      return groupe
+      groups.set(group.id, group)
+      return group
     },
-    get: async (id: string): Promise<GroupeDto> => {
-      const groupe = groupes.get(id)
-      if (!groupe) {
+    get: async (id: string): Promise<GroupDto> => {
+      const group = groups.get(id)
+      if (!group) {
         throw new Error('Groupe introuvable')
       }
-      return groupe
+      return group
     },
     join: async () => {
       throw new Error('Invitation introuvable')
     },
-    createExpense: async (groupeId: string, input: CreateExpenseInput): Promise<GroupeDto> => {
-      const groupe = groupes.get(groupeId)
-      if (!groupe) {
+    createExpense: async (groupeId: string, input: CreateExpenseInput): Promise<GroupDto> => {
+      const group = groups.get(groupeId)
+      if (!group) {
         throw new Error('Groupe introuvable')
       }
-      const participantIds = input.participantIds ?? groupe.members.map(membre => membre.userId)
-      const next: GroupeDto = {
-        ...groupe,
+      const participantIds = input.participantIds ?? group.members.map(member => member.userId)
+      const next: GroupDto = {
+        ...group,
         expenses: [
-          ...groupe.expenses,
+          ...group.expenses,
           {
             id: crypto.randomUUID(),
             label: input.label,
@@ -116,33 +116,33 @@ const memoryClient = () => {
           }
         ]
       }
-      next.balances = soldesFrom(next)
-      groupes.set(groupeId, next)
+      next.balances = balancesFrom(next)
+      groups.set(groupeId, next)
       return next
     },
-    deleteExpense: async (groupeId: string, expenseId: string): Promise<GroupeDto> => {
-      const groupe = groupes.get(groupeId)
-      if (!groupe) {
+    deleteExpense: async (groupeId: string, expenseId: string): Promise<GroupDto> => {
+      const group = groups.get(groupeId)
+      if (!group) {
         throw new Error('Groupe introuvable')
       }
-      const next: GroupeDto = {
-        ...groupe,
-        expenses: groupe.expenses.filter(expense => expense.id !== expenseId)
+      const next: GroupDto = {
+        ...group,
+        expenses: group.expenses.filter(expense => expense.id !== expenseId)
       }
-      next.balances = soldesFrom(next)
-      groupes.set(groupeId, next)
+      next.balances = balancesFrom(next)
+      groups.set(groupeId, next)
       return next
     },
-    createService: async (groupeId: string, input: CreateServiceInput): Promise<GroupeDto> => {
-      const groupe = groupes.get(groupeId)
-      if (!groupe) {
+    createService: async (groupeId: string, input: CreateServiceInput): Promise<GroupDto> => {
+      const group = groups.get(groupeId)
+      if (!group) {
         throw new Error('Groupe introuvable')
       }
-      const participantIds = input.participantIds ?? groupe.members.map(membre => membre.userId)
-      const next: GroupeDto = {
-        ...groupe,
+      const participantIds = input.participantIds ?? group.members.map(member => member.userId)
+      const next: GroupDto = {
+        ...group,
         services: [
-          ...groupe.services,
+          ...group.services,
           {
             id: crypto.randomUUID(),
             label: input.label,
@@ -154,32 +154,32 @@ const memoryClient = () => {
           }
         ]
       }
-      next.balances = soldesFrom(next)
-      groupes.set(groupeId, next)
+      next.balances = balancesFrom(next)
+      groups.set(groupeId, next)
       return next
     },
-    deleteService: async (groupeId: string, serviceId: string): Promise<GroupeDto> => {
-      const groupe = groupes.get(groupeId)
-      if (!groupe) {
+    deleteService: async (groupeId: string, serviceId: string): Promise<GroupDto> => {
+      const group = groups.get(groupeId)
+      if (!group) {
         throw new Error('Groupe introuvable')
       }
-      const next: GroupeDto = {
-        ...groupe,
-        services: groupe.services.filter(service => service.id !== serviceId)
+      const next: GroupDto = {
+        ...group,
+        services: group.services.filter(service => service.id !== serviceId)
       }
-      next.balances = soldesFrom(next)
-      groupes.set(groupeId, next)
+      next.balances = balancesFrom(next)
+      groups.set(groupeId, next)
       return next
     },
-    createPayback: async (groupeId: string, input: CreatePaybackInput): Promise<GroupeDto> => {
-      const groupe = groupes.get(groupeId)
-      if (!groupe) {
+    createPayback: async (groupeId: string, input: CreatePaybackInput): Promise<GroupDto> => {
+      const group = groups.get(groupeId)
+      if (!group) {
         throw new Error('Groupe introuvable')
       }
-      const next: GroupeDto = {
-        ...groupe,
+      const next: GroupDto = {
+        ...group,
         paybacks: [
-          ...groupe.paybacks,
+          ...group.paybacks,
           {
             id: crypto.randomUUID(),
             debtorId: input.debtorId,
@@ -188,21 +188,21 @@ const memoryClient = () => {
           }
         ]
       }
-      next.balances = soldesFrom(next)
-      groupes.set(groupeId, next)
+      next.balances = balancesFrom(next)
+      groups.set(groupeId, next)
       return next
     },
-    deletePayback: async (groupeId: string, paybackId: string): Promise<GroupeDto> => {
-      const groupe = groupes.get(groupeId)
-      if (!groupe) {
+    deletePayback: async (groupeId: string, paybackId: string): Promise<GroupDto> => {
+      const group = groups.get(groupeId)
+      if (!group) {
         throw new Error('Groupe introuvable')
       }
-      const next: GroupeDto = {
-        ...groupe,
-        paybacks: groupe.paybacks.filter(payback => payback.id !== paybackId)
+      const next: GroupDto = {
+        ...group,
+        paybacks: group.paybacks.filter(payback => payback.id !== paybackId)
       }
-      next.balances = soldesFrom(next)
-      groupes.set(groupeId, next)
+      next.balances = balancesFrom(next)
+      groups.set(groupeId, next)
       return next
     }
   }
@@ -221,10 +221,10 @@ const openNamed = async (name: string) => {
   await userEvent.click(await screen.findByRole('button', { name }))
 }
 
-describe('GroupesScreen', () => {
+describe('GroupsScreen', () => {
   it('creates a Group, lists it and opens an empty board', async () => {
     const client = memoryClient()
-    render(<GroupesScreen client={client} />)
+    render(<GroupsScreen client={client} />)
 
     await createNamed('Potes de Bob')
     const open = await screen.findByRole('button', { name: 'Potes de Bob' })
@@ -238,7 +238,7 @@ describe('GroupesScreen', () => {
   })
 
   it('keeps two Groups created by the same User on two distinct lines', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
 
     await createNamed('Potes de Bob')
     await createNamed('Collègues')
@@ -252,7 +252,7 @@ describe('GroupesScreen', () => {
 
   it('shows an error instead of throwing when the list fails', async () => {
     render(
-      <GroupesScreen
+      <GroupsScreen
         client={{
           ...memoryClient(),
           list: async () => {
@@ -267,10 +267,10 @@ describe('GroupesScreen', () => {
     })
   })
 
-  it('lets a Member copy the Invitation link of the opened Group', async () => {
+  it('lets a Member copy the Invite link of the opened Group', async () => {
     const written: string[] = []
     render(
-      <GroupesScreen
+      <GroupsScreen
         client={memoryClient()}
         copy={async text => {
           written.push(text)
@@ -282,11 +282,11 @@ describe('GroupesScreen', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Potes de Bob' }))
     await userEvent.click(screen.getByRole('button', { name: 'Copier le lien d’Invitation' }))
 
-    expect(written).toEqual([`${window.location.origin}/invitations/invite-secret`])
+    expect(written).toEqual([`${window.location.origin}/invites/invite-secret`])
   })
 
   it('records an Expense, lists it and updates Balances', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
 
     const user = userEvent.setup()
@@ -305,7 +305,7 @@ describe('GroupesScreen', () => {
   })
 
   it('lets any Member delete an Expense from the list', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
 
     const user = userEvent.setup()
@@ -322,7 +322,7 @@ describe('GroupesScreen', () => {
   })
 
   it('records a Service, lists it apart from Expenses and updates Balances', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
 
     const user = userEvent.setup()
@@ -341,7 +341,7 @@ describe('GroupesScreen', () => {
   })
 
   it('lets any Member delete a Service from the list', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
 
     const user = userEvent.setup()
@@ -357,7 +357,7 @@ describe('GroupesScreen', () => {
     expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
   })
 
-  const constaterPizza = async () => {
+  const recordPizza = async () => {
     const user = userEvent.setup()
     const form = screen.getByRole('form', { name: 'Constater une Dépense' })
     await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
@@ -368,9 +368,9 @@ describe('GroupesScreen', () => {
   }
 
   it('lists strictly positive Balances descending in who owes what and shows the cap', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
-    await constaterPizza()
+    await recordPizza()
 
     expect(await screen.findByRole('heading', { name: 'Qui doit quoi' })).toBeTruthy()
     const form = screen.getByRole('form', { name: 'Constater un Règlement' })
@@ -382,9 +382,9 @@ describe('GroupesScreen', () => {
   })
 
   it('records a Payback from the chosen creditor', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
-    await constaterPizza()
+    await recordPizza()
 
     const user = userEvent.setup()
     const form = screen.getByRole('form', { name: 'Constater un Règlement' })
@@ -399,9 +399,9 @@ describe('GroupesScreen', () => {
   })
 
   it('lets any Member delete a Payback from the list', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
-    await constaterPizza()
+    await recordPizza()
 
     const user = userEvent.setup()
     const form = screen.getByRole('form', { name: 'Constater un Règlement' })
@@ -418,9 +418,9 @@ describe('GroupesScreen', () => {
   })
 
   it('updates the displayed cap when the debtor or the creditor changes', async () => {
-    render(<GroupesScreen client={memoryClient()} />)
+    render(<GroupsScreen client={memoryClient()} />)
     await openNamed('Potes de Bob')
-    await constaterPizza()
+    await recordPizza()
 
     const user = userEvent.setup()
     const service = screen.getByRole('form', { name: 'Constater un Service' })

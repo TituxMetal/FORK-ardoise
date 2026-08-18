@@ -1,19 +1,20 @@
 import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
 import { notFound } from '../../domain/notFound.ts'
-import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
-import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
+import { toGroupDto } from '../../groups/application/ToGroup.mapper.ts'
+import { groupHasMember } from '../../groups/domain/Group.entity.ts'
+import type { IGroupRepository } from '../../groups/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
 
 export const deleteService = (
-  groupes: IGroupRepository,
+  groups: IGroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
   execute: async (userId: string, groupeId: string, serviceId: string) => {
-    const groupe = await groupes.findById(groupeId)
-    if (!groupe || !groupe.hasMembre(userId)) {
+    const group = await groups.findById(groupeId)
+    if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
     const service = await services.findById(serviceId)
@@ -21,8 +22,8 @@ export const deleteService = (
       throw notFound('Service introuvable')
     }
     await services.delete(serviceId)
-    return toGroupeDto(
-      groupe,
+    return toGroupDto(
+      group,
       await expenses.findByGroupeId(groupeId),
       await services.findByGroupeId(groupeId),
       await paybacks.findByGroupeId(groupeId)

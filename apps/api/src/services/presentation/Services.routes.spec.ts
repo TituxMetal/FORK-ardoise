@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
-import type { GroupeDto } from '../../groupes/application/Groupe.dto.ts'
+import type { GroupDto } from '../../groups/application/Group.dto.ts'
 import { createPrismaClient } from '../../infrastructure/CreatePrisma.client.ts'
 import { createApp } from '../../presentation/CreateApp.ts'
 
@@ -71,12 +71,22 @@ const expenseColumnSql = readFileSync(
   'utf8'
 )
 
+const inviteSecretSql = readFileSync(
+  fileURLToPath(
+    new URL(
+      '../../../prisma/migrations/20260818000000_invite_secret/migration.sql',
+      import.meta.url
+    )
+  ),
+  'utf8'
+)
+
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}`
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))
@@ -100,7 +110,7 @@ const sessionCookie = (response: Response) =>
 
 const cookieHeader = (response: Response) => sessionCookie(response)?.split(';')[0] ?? ''
 
-const createGroupe = (app: ReturnType<typeof createApp>, cookie: string, name: string) =>
+const createGroup = (app: ReturnType<typeof createApp>, cookie: string, name: string) =>
   app.request('/groups', {
     method: 'POST',
     headers: { cookie, 'content-type': 'application/json' },
@@ -120,27 +130,27 @@ const openArdoise = async () => {
     password: 'password1234',
     name: 'Camille'
   })
-  const created = await createGroupe(app, cookieHeader(leaRes), 'Potes de Bob')
-  const createdBody = (await created.json()) as GroupeDto
-  await app.request(`/invitations/${createdBody.invitation.secret}`, {
+  const created = await createGroup(app, cookieHeader(leaRes), 'Potes de Bob')
+  const createdBody = (await created.json()) as GroupDto
+  await app.request(`/invites/${createdBody.invite.secret}`, {
     method: 'POST',
     headers: { cookie: cookieHeader(bobRes) }
   })
-  await app.request(`/invitations/${createdBody.invitation.secret}`, {
+  await app.request(`/invites/${createdBody.invite.secret}`, {
     method: 'POST',
     headers: { cookie: cookieHeader(camilleRes) }
   })
   const opened = await app.request(`/groups/${createdBody.id}`, {
     headers: { cookie: cookieHeader(leaRes) }
   })
-  const groupe = (await opened.json()) as GroupeDto
-  const membre = (name: string) => groupe.members.find(item => item.name === name)!
+  const group = (await opened.json()) as GroupDto
+  const member = (name: string) => group.members.find(item => item.name === name)!
   return {
     app,
-    groupe,
-    lea: { cookie: cookieHeader(leaRes), ...membre('Léa') },
-    bob: { cookie: cookieHeader(bobRes), ...membre('Bob') },
-    camille: { cookie: cookieHeader(camilleRes), ...membre('Camille') }
+    group,
+    lea: { cookie: cookieHeader(leaRes), ...member('Léa') },
+    bob: { cookie: cookieHeader(bobRes), ...member('Bob') },
+    camille: { cookie: cookieHeader(camilleRes), ...member('Camille') }
   }
 }
 
@@ -170,9 +180,9 @@ const createExpense = (
 
 describe('services', () => {
   it('creates a Service that splits equally and is not an Expense', async () => {
-    const { app, groupe, lea, bob, camille } = await openArdoise()
+    const { app, group, lea, bob, camille } = await openArdoise()
 
-    const response = await createService(app, lea.cookie, groupe.id, {
+    const response = await createService(app, lea.cookie, group.id, {
       label: 'Ordi Bob',
       day: '2026-08-15',
       amount: 100,
@@ -181,7 +191,7 @@ describe('services', () => {
     })
 
     expect(response.status).toBe(201)
-    const body = (await response.json()) as GroupeDto
+    const body = (await response.json()) as GroupDto
     expect(body.expenses).toEqual([])
     expect(body.services).toEqual([
       {
@@ -206,9 +216,9 @@ describe('services', () => {
   })
 
   it('keeps the remainder with the Provider outside Participants and Balances sum to 0', async () => {
-    const { app, groupe, lea, bob, camille } = await openArdoise()
+    const { app, group, lea, bob, camille } = await openArdoise()
 
-    const response = await createService(app, bob.cookie, groupe.id, {
+    const response = await createService(app, bob.cookie, group.id, {
       label: 'Ordi Bob',
       day: '2026-08-15',
       amount: 100,
@@ -217,7 +227,7 @@ describe('services', () => {
     })
 
     expect(response.status).toBe(201)
-    const body = (await response.json()) as GroupeDto
+    const body = (await response.json()) as GroupDto
     expect(body.services[0]?.parts).toEqual([
       { userId: bob.userId, amount: 50 },
       { userId: camille.userId, amount: 50 }
@@ -227,9 +237,9 @@ describe('services', () => {
   })
 
   it('defaults omitted Participants to every Member', async () => {
-    const { app, groupe, lea } = await openArdoise()
+    const { app, group, lea } = await openArdoise()
 
-    const response = await createService(app, lea.cookie, groupe.id, {
+    const response = await createService(app, lea.cookie, group.id, {
       label: 'Ordi Bob',
       day: '2026-08-15',
       amount: 90,
@@ -237,23 +247,23 @@ describe('services', () => {
     })
 
     expect(response.status).toBe(201)
-    const body = (await response.json()) as GroupeDto
-    expect(body.services[0]?.participantIds).toEqual(groupe.members.map(membre => membre.userId))
+    const body = (await response.json()) as GroupDto
+    expect(body.services[0]?.participantIds).toEqual(group.members.map(member => member.userId))
     expect(body.services[0]?.parts.map(part => part.amount)).toEqual([30, 30, 30])
   })
 
   it('an Expense then a Service in the same Group cancel out', async () => {
-    const { app, groupe, lea, bob, camille } = await openArdoise()
+    const { app, group, lea, bob, camille } = await openArdoise()
     const participants = [lea.userId, bob.userId, camille.userId]
 
-    await createExpense(app, lea.cookie, groupe.id, {
+    await createExpense(app, lea.cookie, group.id, {
       label: 'Pizza',
       day: '2026-08-15',
       amount: 100,
       payerId: lea.userId,
       participantIds: participants
     })
-    const response = await createService(app, lea.cookie, groupe.id, {
+    const response = await createService(app, lea.cookie, group.id, {
       label: 'Ordi Bob',
       day: '2026-08-15',
       amount: 100,
@@ -262,7 +272,7 @@ describe('services', () => {
     })
 
     expect(response.status).toBe(201)
-    const body = (await response.json()) as GroupeDto
+    const body = (await response.json()) as GroupDto
     expect(body.expenses).toHaveLength(1)
     expect(body.services).toHaveLength(1)
     expect(body.balances).toEqual([
@@ -273,26 +283,26 @@ describe('services', () => {
   })
 
   it('any Member can delete a Service; a second delete is 404', async () => {
-    const { app, groupe, lea, bob, camille } = await openArdoise()
-    const created = await createService(app, lea.cookie, groupe.id, {
+    const { app, group, lea, bob, camille } = await openArdoise()
+    const created = await createService(app, lea.cookie, group.id, {
       label: 'Ordi Bob',
       day: '2026-08-15',
       amount: 100,
       providerId: lea.userId,
       participantIds: [lea.userId, bob.userId, camille.userId]
     })
-    const { services } = (await created.json()) as GroupeDto
+    const { services } = (await created.json()) as GroupDto
 
-    const deleted = await app.request(`/groups/${groupe.id}/services/${services[0]!.id}`, {
+    const deleted = await app.request(`/groups/${group.id}/services/${services[0]!.id}`, {
       method: 'DELETE',
       headers: { cookie: bob.cookie }
     })
     expect(deleted.status).toBe(200)
-    const after = (await deleted.json()) as GroupeDto
+    const after = (await deleted.json()) as GroupDto
     expect(after.services).toEqual([])
     expect(after.balances.every(solde => solde.amount === 0)).toBe(true)
 
-    const second = await app.request(`/groups/${groupe.id}/services/${services[0]!.id}`, {
+    const second = await app.request(`/groups/${group.id}/services/${services[0]!.id}`, {
       method: 'DELETE',
       headers: { cookie: lea.cookie }
     })
@@ -305,7 +315,7 @@ describe('services', () => {
   })
 
   it('rejects a missing label, a missing day, a non-positive Amount or empty Participants with 400', async () => {
-    const { app, groupe, lea, bob } = await openArdoise()
+    const { app, group, lea, bob } = await openArdoise()
     const cookie = lea.cookie
     const refusals = [
       {
@@ -349,7 +359,7 @@ describe('services', () => {
     ]
 
     for (const refusal of refusals) {
-      const response = await createService(app, cookie, groupe.id, refusal.body)
+      const response = await createService(app, cookie, group.id, refusal.body)
       expect(response.status).toBe(400)
       expect(await response.json()).toEqual({
         statusCode: 400,
@@ -358,7 +368,7 @@ describe('services', () => {
       })
     }
 
-    const listed = await app.request(`/groups/${groupe.id}`, { headers: { cookie: bob.cookie } })
-    expect(((await listed.json()) as GroupeDto).services).toEqual([])
+    const listed = await app.request(`/groups/${group.id}`, { headers: { cookie: bob.cookie } })
+    expect(((await listed.json()) as GroupDto).services).toEqual([])
   })
 })

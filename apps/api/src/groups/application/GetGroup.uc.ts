@@ -2,25 +2,26 @@ import type { IExpenseRepository } from '../../expenses/domain/IExpense.reposito
 import { notFound } from '../../domain/notFound.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
+import { groupHasMember } from '../domain/Group.entity.ts'
 import type { IGroupRepository } from '../domain/IGroup.repository.ts'
-import { toGroupeDto } from './ToGroupe.mapper.ts'
+import { toGroupDto } from './ToGroup.mapper.ts'
 
-export const getGroupe = (
-  groupes: IGroupRepository,
+export const getGroup = (
+  groups: IGroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
-  execute: async (userId: string, groupeId: string) => {
-    const groupe = await groupes.findById(groupeId)
-    if (!groupe || !groupe.hasMembre(userId)) {
+  execute: async (userId: string, groupId: string) => {
+    const group = await groups.findById(groupId)
+    if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
-    return toGroupeDto(
-      groupe,
-      await expenses.findByGroupeId(groupeId),
-      await services.findByGroupeId(groupeId),
-      await paybacks.findByGroupeId(groupeId)
+    return toGroupDto(
+      group,
+      await expenses.findByGroupeId(groupId),
+      await services.findByGroupeId(groupId),
+      await paybacks.findByGroupeId(groupId)
     )
   }
 })

@@ -1,16 +1,16 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { DAY_REQUIRED } from '../domain/Day.vo.ts'
+import { LABEL_REQUIRED } from '../domain/Label.vo.ts'
+import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
 import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
-import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
+import type { IGroupRepository } from '../../groups/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
 import { createExpense } from '../application/CreateExpense.uc.ts'
 import { deleteExpense } from '../application/DeleteExpense.uc.ts'
-import { DAY_REQUIRED } from '../domain/Day.vo.ts'
-import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
-import { LABEL_REQUIRED } from '../domain/Label.vo.ts'
 
 const createExpenseBody = z.object({
   label: z.string({ error: LABEL_REQUIRED }),
@@ -21,14 +21,14 @@ const createExpenseBody = z.object({
 })
 
 export const createExpensesRoutes = (
-  groupes: IGroupRepository,
+  groups: IGroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const createExpenseUseCase = createExpense(groupes, expenses, services, paybacks)
-  const deleteExpenseUseCase = deleteExpense(groupes, expenses, services, paybacks)
+  const createExpenseUseCase = createExpense(groups, expenses, services, paybacks)
+  const deleteExpenseUseCase = deleteExpense(groups, expenses, services, paybacks)
 
   app.post(
     '/:groupeId/expenses',
@@ -39,12 +39,12 @@ export const createExpensesRoutes = (
       }
     }),
     async c => {
-      const groupe = await createExpenseUseCase.execute(
+      const group = await createExpenseUseCase.execute(
         c.get('userId'),
         c.req.param('groupeId'),
         c.req.valid('json')
       )
-      return c.json(groupe, 201)
+      return c.json(group, 201)
     }
   )
 

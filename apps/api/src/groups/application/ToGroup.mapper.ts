@@ -2,24 +2,24 @@ import type { Expense } from '../../expenses/domain/Expense.entity.ts'
 import { balancesOf } from '../../domain/Balance.ts'
 import type { Payback } from '../../paybacks/domain/Payback.entity.ts'
 import type { Service } from '../../services/domain/Service.entity.ts'
-import type { Groupe } from '../domain/Groupe.entity.ts'
-import type { GroupeDto } from './Groupe.dto.ts'
+import type { Group } from '../domain/Group.entity.ts'
+import type { GroupDto } from './Group.dto.ts'
 
-export const toGroupeDto = (
-  groupe: Groupe,
+export const toGroupDto = (
+  group: Group,
   expenses: Expense[] = [],
   services: Service[] = [],
   paybacks: Payback[] = []
-): GroupeDto => {
-  const members = groupe.membres.map(membre => ({
-    userId: membre.userId,
-    name: membre.name
+): GroupDto => {
+  const members = group.members.map(member => ({
+    userId: member.userId,
+    name: member.name
   }))
   return {
-    id: groupe.id,
-    name: groupe.name.value,
+    id: group.id,
+    name: group.name.value,
     members,
-    invitation: { secret: groupe.invitationSecret },
+    invite: { secret: group.inviteSecret },
     expenses: expenses.map(expense => ({
       id: expense.id,
       label: expense.label.value,

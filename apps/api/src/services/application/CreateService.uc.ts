@@ -4,8 +4,9 @@ import type { IExpenseRepository } from '../../expenses/domain/IExpense.reposito
 import { amountFromCents } from '../../domain/Amount.ts'
 import { invalidData } from '../../domain/invalidData.ts'
 import { notFound } from '../../domain/notFound.ts'
-import { toGroupeDto } from '../../groupes/application/ToGroupe.mapper.ts'
-import type { IGroupRepository } from '../../groupes/domain/IGroup.repository.ts'
+import { toGroupDto } from '../../groups/application/ToGroup.mapper.ts'
+import { groupHasMember } from '../../groups/domain/Group.entity.ts'
+import type { IGroupRepository } from '../../groups/domain/IGroup.repository.ts'
 import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
 import { serviceCreate } from '../domain/Service.entity.ts'
 import type { IServiceRepository } from '../domain/IService.repository.ts'
@@ -19,18 +20,21 @@ export type CreateServiceInput = {
 }
 
 export const createService = (
-  groupes: IGroupRepository,
+  groups: IGroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
   execute: async (userId: string, groupeId: string, input: CreateServiceInput) => {
-    const groupe = await groupes.findById(groupeId)
-    if (!groupe || !groupe.hasMembre(userId)) {
+    const group = await groups.findById(groupeId)
+    if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
-    const participantIds = input.participantIds ?? groupe.membres.map(membre => membre.userId)
-    if (!groupe.hasMembre(input.providerId) || participantIds.some(id => !groupe.hasMembre(id))) {
+    const participantIds = input.participantIds ?? group.members.map(member => member.userId)
+    if (
+      !groupHasMember(group, input.providerId) ||
+      participantIds.some(id => !groupHasMember(group, id))
+    ) {
       throw invalidData('Membre introuvable')
     }
     const service = serviceCreate(
@@ -42,8 +46,8 @@ export const createService = (
       participantIds
     )
     await services.save(service)
-    return toGroupeDto(
-      groupe,
+    return toGroupDto(
+      group,
       await expenses.findByGroupeId(groupeId),
       await services.findByGroupeId(groupeId),
       await paybacks.findByGroupeId(groupeId)

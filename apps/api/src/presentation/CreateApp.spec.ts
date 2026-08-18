@@ -64,12 +64,19 @@ const expenseColumnSql = readFileSync(
   'utf8'
 )
 
+const inviteSecretSql = readFileSync(
+  fileURLToPath(
+    new URL('../../prisma/migrations/20260818000000_invite_secret/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}`
+    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))

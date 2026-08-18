@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { authClient } from '../infrastructure/CreateAuth.client.ts'
 import {
-  groupesClient,
-  type GroupeDto,
-  type GroupesClient
-} from '../infrastructure/CreateGroupes.client.ts'
+  groupsClient,
+  type GroupDto,
+  type GroupsClient
+} from '../infrastructure/CreateGroups.client.ts'
 import { SessionForms } from './SessionForms.tsx'
 
 type SessionUser = {
@@ -14,12 +14,12 @@ type SessionUser = {
 type Props = {
   secret: string
   session: SessionUser | null
-  client?: GroupesClient
+  client?: GroupsClient
 }
 
-export const InvitationScreen = ({ secret, session, client = groupesClient }: Props) => {
+export const InviteScreen = ({ secret, session, client = groupsClient }: Props) => {
   const sessionName = session?.name
-  const [groupe, setGroupe] = useState<GroupeDto | null>(null)
+  const [group, setGroup] = useState<GroupDto | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export const InvitationScreen = ({ secret, session, client = groupesClient }: Pr
     }
     void client
       .join(secret)
-      .then(setGroupe)
+      .then(setGroup)
       .catch(() => setError('Invitation introuvable'))
   }, [client, secret, sessionName])
 
@@ -50,26 +50,26 @@ export const InvitationScreen = ({ secret, session, client = groupesClient }: Pr
     )
   }
 
-  if (!groupe) {
+  if (!group) {
     return <p>Chargement…</p>
   }
 
   return (
     <article className="space-y-2">
-      <h2 className="text-lg font-medium">{groupe.name}</h2>
+      <h2 className="text-lg font-medium">{group.name}</h2>
       <ul>
-        {groupe.members.map(membre => (
-          <li key={membre.userId}>{membre.name}</li>
+        {group.members.map(member => (
+          <li key={member.userId}>{member.name}</li>
         ))}
       </ul>
     </article>
   )
 }
 
-export const InvitationPage = ({ secret }: { secret: string }) => {
+export const InvitePage = ({ secret }: { secret: string }) => {
   const { data, isPending } = authClient.useSession()
   if (isPending) {
     return <p>Chargement…</p>
   }
-  return <InvitationScreen secret={secret} session={data ? { name: data.user.name } : null} />
+  return <InviteScreen secret={secret} session={data ? { name: data.user.name } : null} />
 }

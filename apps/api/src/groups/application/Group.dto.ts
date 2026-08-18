@@ -1,4 +1,4 @@
-export type MembreDto = {
+export type MemberDto = {
   userId: string
   name: string
 }
@@ -41,11 +41,11 @@ export type PaybackDto = {
   amount: number
 }
 
-export type GroupeDto = {
+export type GroupDto = {
   id: string
   name: string
-  members: MembreDto[]
-  invitation: {
+  members: MemberDto[]
+  invite: {
     secret: string
   }
   expenses: ExpenseDto[]

@@ -3,9 +3,9 @@ import { Hono } from 'hono'
 import type { IAuth } from '../application/IAuth.port.ts'
 import { prismaExpenseRepository } from '../expenses/infrastructure/PrismaExpense.repository.ts'
 import { createExpensesRoutes } from '../expenses/presentation/Expenses.routes.ts'
-import { PrismaGroupRepository } from '../groupes/infrastructure/PrismaGroup.repository.ts'
-import { createGroupesRoutes } from '../groupes/presentation/Groupes.routes.ts'
-import { createInvitationsRoutes } from '../groupes/presentation/Invitations.routes.ts'
+import { prismaGroupRepository } from '../groups/infrastructure/PrismaGroup.repository.ts'
+import { createGroupsRoutes } from '../groups/presentation/Groups.routes.ts'
+import { createInvitesRoutes } from '../groups/presentation/Invites.routes.ts'
 import { prismaServiceRepository } from '../services/infrastructure/PrismaService.repository.ts'
 import { createServicesRoutes } from '../services/presentation/Services.routes.ts'
 import { PrismaPaybackRepository } from '../paybacks/infrastructure/PrismaPayback.repository.ts'
@@ -20,7 +20,7 @@ export const createApp = (
   auth: IAuth = createAuth(prisma)
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const groupes = new PrismaGroupRepository(prisma)
+  const groups = prismaGroupRepository(prisma)
   const expenses = prismaExpenseRepository(prisma)
   const services = prismaServiceRepository(prisma)
   const paybacks = new PrismaPaybackRepository(prisma)
@@ -29,11 +29,11 @@ export const createApp = (
   app.on(['POST', 'GET'], '/auth/*', c => auth.handler(c.req.raw))
   app.use('/groups/*', requireSession(auth))
   app.use('/groups', requireSession(auth))
-  app.use('/invitations/*', requireSession(auth))
-  app.route('/groups', createGroupesRoutes(groupes, expenses, services, paybacks))
-  app.route('/groups', createExpensesRoutes(groupes, expenses, services, paybacks))
-  app.route('/groups', createServicesRoutes(groupes, expenses, services, paybacks))
-  app.route('/groups', createPaybacksRoutes(groupes, expenses, services, paybacks))
-  app.route('/invitations', createInvitationsRoutes(groupes))
+  app.use('/invites/*', requireSession(auth))
+  app.route('/groups', createGroupsRoutes(groups, expenses, services, paybacks))
+  app.route('/groups', createExpensesRoutes(groups, expenses, services, paybacks))
+  app.route('/groups', createServicesRoutes(groups, expenses, services, paybacks))
+  app.route('/groups', createPaybacksRoutes(groups, expenses, services, paybacks))
+  app.route('/invites', createInvitesRoutes(groups))
   return app
 }

@@ -16,7 +16,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
-  membres       Member[]
+  members       Member[]
 
   @@unique([email])
   @@map("user")
@@ -71,13 +71,13 @@ model Verification {
 }
 
 model Group {
-  id               String      @id
-  name             String
-  invitationSecret String      @unique
-  membres          Member[]
-  expenses         Expense[]
-  services         Service[]
-  paybacks         Payback[]
+  id           String      @id
+  name         String
+  inviteSecret String      @unique
+  members      Member[]
+  expenses     Expense[]
+  services     Service[]
+  paybacks     Payback[]
 
   @@map("group")
 }

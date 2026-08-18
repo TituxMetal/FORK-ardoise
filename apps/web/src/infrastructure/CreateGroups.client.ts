@@ -1,4 +1,4 @@
-export type MembreDto = {
+export type MemberDto = {
   userId: string
   name: string
 }
@@ -41,11 +41,11 @@ export type PaybackDto = {
   amount: number
 }
 
-export type GroupeDto = {
+export type GroupDto = {
   id: string
   name: string
-  members: MembreDto[]
-  invitation: {
+  members: MemberDto[]
+  invite: {
     secret: string
   }
   expenses: ExpenseDto[]
@@ -54,7 +54,7 @@ export type GroupeDto = {
   balances: BalanceDto[]
 }
 
-export type GroupeSummary = {
+export type GroupSummary = {
   id: string
   name: string
 }
@@ -81,17 +81,17 @@ export type CreatePaybackInput = {
   amount: number
 }
 
-export type GroupesClient = {
-  list: () => Promise<GroupeSummary[]>
-  create: (name: string) => Promise<GroupeDto>
-  get: (id: string) => Promise<GroupeDto>
-  join: (secret: string) => Promise<GroupeDto>
-  createExpense: (groupeId: string, input: CreateExpenseInput) => Promise<GroupeDto>
-  deleteExpense: (groupeId: string, expenseId: string) => Promise<GroupeDto>
-  createService: (groupeId: string, input: CreateServiceInput) => Promise<GroupeDto>
-  deleteService: (groupeId: string, serviceId: string) => Promise<GroupeDto>
-  createPayback: (groupeId: string, input: CreatePaybackInput) => Promise<GroupeDto>
-  deletePayback: (groupeId: string, paybackId: string) => Promise<GroupeDto>
+export type GroupsClient = {
+  list: () => Promise<GroupSummary[]>
+  create: (name: string) => Promise<GroupDto>
+  get: (id: string) => Promise<GroupDto>
+  join: (secret: string) => Promise<GroupDto>
+  createExpense: (groupeId: string, input: CreateExpenseInput) => Promise<GroupDto>
+  deleteExpense: (groupeId: string, expenseId: string) => Promise<GroupDto>
+  createService: (groupeId: string, input: CreateServiceInput) => Promise<GroupDto>
+  deleteService: (groupeId: string, serviceId: string) => Promise<GroupDto>
+  createPayback: (groupeId: string, input: CreatePaybackInput) => Promise<GroupDto>
+  deletePayback: (groupeId: string, paybackId: string) => Promise<GroupDto>
 }
 
 const request = async <T>(path: string, init?: { method?: string; body?: string }): Promise<T> => {
@@ -107,43 +107,43 @@ const request = async <T>(path: string, init?: { method?: string; body?: string 
   return response.json() as Promise<T>
 }
 
-export const groupesClient: GroupesClient = {
-  list: () => request<GroupeSummary[]>('/api/groups'),
+export const groupsClient: GroupsClient = {
+  list: () => request<GroupSummary[]>('/api/groups'),
   create: name =>
-    request<GroupeDto>('/api/groups', {
+    request<GroupDto>('/api/groups', {
       method: 'POST',
       body: JSON.stringify({ name })
     }),
-  get: id => request<GroupeDto>(`/api/groups/${id}`),
+  get: id => request<GroupDto>(`/api/groups/${id}`),
   join: secret =>
-    request<GroupeDto>(`/api/invitations/${secret}`, {
+    request<GroupDto>(`/api/invites/${secret}`, {
       method: 'POST'
     }),
   createExpense: (groupeId, input) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/expenses`, {
+    request<GroupDto>(`/api/groups/${groupeId}/expenses`, {
       method: 'POST',
       body: JSON.stringify(input)
     }),
   deleteExpense: (groupeId, expenseId) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/expenses/${expenseId}`, {
+    request<GroupDto>(`/api/groups/${groupeId}/expenses/${expenseId}`, {
       method: 'DELETE'
     }),
   createService: (groupeId, input) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/services`, {
+    request<GroupDto>(`/api/groups/${groupeId}/services`, {
       method: 'POST',
       body: JSON.stringify(input)
     }),
   deleteService: (groupeId, serviceId) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/services/${serviceId}`, {
+    request<GroupDto>(`/api/groups/${groupeId}/services/${serviceId}`, {
       method: 'DELETE'
     }),
   createPayback: (groupeId, input) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/paybacks`, {
+    request<GroupDto>(`/api/groups/${groupeId}/paybacks`, {
       method: 'POST',
       body: JSON.stringify(input)
     }),
   deletePayback: (groupeId, paybackId) =>
-    request<GroupeDto>(`/api/groups/${groupeId}/paybacks/${paybackId}`, {
+    request<GroupDto>(`/api/groups/${groupeId}/paybacks/${paybackId}`, {
       method: 'DELETE'
     })
 }

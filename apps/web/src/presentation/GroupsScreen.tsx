@@ -1,10 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import {
-  groupesClient,
-  type GroupeDto,
-  type GroupesClient,
-  type GroupeSummary
-} from '../infrastructure/CreateGroupes.client.ts'
+  groupsClient,
+  type GroupDto,
+  type GroupsClient,
+  type GroupSummary
+} from '../infrastructure/CreateGroups.client.ts'
 
 const field = (form: FormData, name: string) => {
   const value = form.get(name)
@@ -17,16 +17,16 @@ const euros = (cents: number) =>
 const centsFromEuros = (value: string) => Math.round(Number(value.replace(',', '.')) * 100)
 
 type Props = {
-  client?: GroupesClient
+  client?: GroupsClient
   copy?: (text: string) => Promise<void>
 }
 
-export const GroupesScreen = ({
-  client = groupesClient,
+export const GroupsScreen = ({
+  client = groupsClient,
   copy = text => navigator.clipboard.writeText(text)
 }: Props) => {
-  const [groupes, setGroupes] = useState<GroupeSummary[]>([])
-  const [opened, setOpened] = useState<GroupeDto | null>(null)
+  const [groups, setGroups] = useState<GroupSummary[]>([])
+  const [opened, setOpened] = useState<GroupDto | null>(null)
   const [error, setError] = useState('')
   const [debtorId, setDebtorId] = useState('')
   const [creditorId, setCreditorId] = useState('')
@@ -34,7 +34,7 @@ export const GroupesScreen = ({
   useEffect(() => {
     void client
       .list()
-      .then(setGroupes)
+      .then(setGroups)
       .catch(() => setError('Impossible de lister les Groupes'))
   }, [client])
 
@@ -45,7 +45,7 @@ export const GroupesScreen = ({
     try {
       await client.create(name)
       setError('')
-      setGroupes(await client.list())
+      setGroups(await client.list())
     } catch {
       setError('Impossible de créer le Groupe')
     }
@@ -167,21 +167,23 @@ export const GroupesScreen = ({
 
   const creditors =
     opened?.balances
-      .filter(solde => solde.amount > 0)
+      .filter(balance => balance.amount > 0)
       .slice()
       .sort((a, b) => b.amount - a.amount) ?? []
-  const selectedDebtorId = opened?.members.some(membre => membre.userId === debtorId)
+  const selectedDebtorId = opened?.members.some(member => member.userId === debtorId)
     ? debtorId
-    : (opened?.balances.find(solde => solde.amount < 0)?.userId ?? opened?.members[0]?.userId ?? '')
-  const selectedCreditorId = creditors.some(solde => solde.userId === creditorId)
+    : (opened?.balances.find(balance => balance.amount < 0)?.userId ??
+      opened?.members[0]?.userId ??
+      '')
+  const selectedCreditorId = creditors.some(balance => balance.userId === creditorId)
     ? creditorId
     : (creditors[0]?.userId ?? '')
   const nameOf = (userId: string) =>
-    opened?.members.find(membre => membre.userId === userId)?.name ?? userId
-  const plafond = opened
+    opened?.members.find(member => member.userId === userId)?.name ?? userId
+  const cap = opened
     ? Math.min(
-        -(opened.balances.find(solde => solde.userId === selectedDebtorId)?.amount ?? 0),
-        opened.balances.find(solde => solde.userId === selectedCreditorId)?.amount ?? 0
+        -(opened.balances.find(balance => balance.userId === selectedDebtorId)?.amount ?? 0),
+        opened.balances.find(balance => balance.userId === selectedCreditorId)?.amount ?? 0
       )
     : 0
 
@@ -209,14 +211,14 @@ export const GroupesScreen = ({
       <div className="space-y-2">
         <h2 className="text-lg font-medium">Mes Groupes</h2>
         <ul className="space-y-1">
-          {groupes.map(groupe => (
-            <li key={groupe.id}>
+          {groups.map(group => (
+            <li key={group.id}>
               <button
                 type="button"
                 className="rounded bg-zinc-800 px-3 py-2"
-                onClick={() => void open(groupe.id)}
+                onClick={() => void open(group.id)}
               >
-                {groupe.name}
+                {group.name}
               </button>
             </li>
           ))}
@@ -228,9 +230,7 @@ export const GroupesScreen = ({
           <button
             type="button"
             className="rounded bg-zinc-100 px-3 py-2 text-zinc-900"
-            onClick={() =>
-              void copy(`${window.location.origin}/invitations/${opened.invitation.secret}`)
-            }
+            onClick={() => void copy(`${window.location.origin}/invites/${opened.invite.secret}`)}
           >
             Copier le lien d’Invitation
           </button>
@@ -273,24 +273,24 @@ export const GroupesScreen = ({
                 defaultValue={opened.members[0]?.userId}
                 className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
               >
-                {opened.members.map(membre => (
-                  <option key={membre.userId} value={membre.userId}>
-                    {membre.name}
+                {opened.members.map(member => (
+                  <option key={member.userId} value={member.userId}>
+                    {member.name}
                   </option>
                 ))}
               </select>
             </label>
             <fieldset className="flex flex-col gap-1">
               <legend>Participants</legend>
-              {opened.members.map(membre => (
-                <label key={membre.userId} className="flex items-center gap-2">
+              {opened.members.map(member => (
+                <label key={member.userId} className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     name="participantIds"
-                    value={membre.userId}
+                    value={member.userId}
                     defaultChecked
                   />
-                  {membre.name}
+                  {member.name}
                 </label>
               ))}
             </fieldset>
@@ -337,24 +337,24 @@ export const GroupesScreen = ({
                 defaultValue={opened.members[0]?.userId}
                 className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
               >
-                {opened.members.map(membre => (
-                  <option key={membre.userId} value={membre.userId}>
-                    {membre.name}
+                {opened.members.map(member => (
+                  <option key={member.userId} value={member.userId}>
+                    {member.name}
                   </option>
                 ))}
               </select>
             </label>
             <fieldset className="flex flex-col gap-1">
               <legend>Participants</legend>
-              {opened.members.map(membre => (
-                <label key={membre.userId} className="flex items-center gap-2">
+              {opened.members.map(member => (
+                <label key={member.userId} className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     name="participantIds"
-                    value={membre.userId}
+                    value={member.userId}
                     defaultChecked
                   />
-                  {membre.name}
+                  {member.name}
                 </label>
               ))}
             </fieldset>
@@ -377,9 +377,9 @@ export const GroupesScreen = ({
                 onChange={event => setDebtorId(event.target.value)}
                 className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
               >
-                {opened.members.map(membre => (
-                  <option key={membre.userId} value={membre.userId}>
-                    {membre.name}
+                {opened.members.map(member => (
+                  <option key={member.userId} value={member.userId}>
+                    {member.name}
                   </option>
                 ))}
               </select>
@@ -393,14 +393,14 @@ export const GroupesScreen = ({
                 onChange={event => setCreditorId(event.target.value)}
                 className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
               >
-                {creditors.map(solde => (
-                  <option key={solde.userId} value={solde.userId}>
-                    {solde.name}
+                {creditors.map(balance => (
+                  <option key={balance.userId} value={balance.userId}>
+                    {balance.name}
                   </option>
                 ))}
               </select>
             </label>
-            <p>Plafond {euros(plafond)}</p>
+            <p>Plafond {euros(cap)}</p>
             <label className="flex flex-col gap-1">
               Montant
               <input
@@ -475,9 +475,9 @@ export const GroupesScreen = ({
             </ul>
           )}
           <ul>
-            {opened.balances.map(solde => (
-              <li key={solde.userId}>
-                {solde.name} {euros(solde.amount)}
+            {opened.balances.map(balance => (
+              <li key={balance.userId}>
+                {balance.name} {euros(balance.amount)}
               </li>
             ))}
           </ul>
