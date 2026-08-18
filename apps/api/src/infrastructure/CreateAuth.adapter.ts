@@ -12,7 +12,7 @@ export const createAuth = (prisma: PrismaClient): IAuth => {
     emailAndPassword: {
       enabled: true
     },
-    trustedOrigins: ['http://localhost:5173']
+    trustedOrigins: ['http://localhost:1337']
   })
 
   return {

@@ -8,14 +8,14 @@ export default defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:1337',
     trace: 'on-first-retry'
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     command: 'vp dev',
     cwd: 'apps/web',
-    url: 'http://localhost:5173',
+    url: 'http://localhost:1337',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000
   }

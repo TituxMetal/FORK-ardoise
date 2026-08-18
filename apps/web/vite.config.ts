@@ -6,6 +6,8 @@ import { startApi } from './StartApi.plugin.ts'
 export default defineConfig({
   plugins: [react(), tailwindcss(), startApi()],
   server: {
+    port: 1337,
+    strictPort: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

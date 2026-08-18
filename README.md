@@ -9,7 +9,7 @@ bun install
 vp dev
 ```
 
-`vp dev` lance le web (Vite) et l’api (Hono). Le web proxifie `/api` vers l’api.
+`vp dev` lance le web (Vite, http://localhost:1337) et l’api (Hono, http://localhost:3000). Le web proxifie `/api` vers l’api.
 
 ```bash
 vp test
