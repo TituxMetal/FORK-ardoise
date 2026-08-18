@@ -4,13 +4,13 @@ import {
   captureInviteWrites,
   copyInvite,
   createGroup,
+  joinInvite,
   signUp,
   uniqueEmail,
   waitForApi
 } from './helpers.ts'
 
 let ownerPage: Page
-let guestPage: Page
 let inviteUrl = ''
 
 test.describe('core journey', () => {
@@ -34,13 +34,9 @@ test.describe('core journey', () => {
   })
 
   test('joins the Group from another session via the Invite link', async ({ browser }) => {
-    guestPage = await browser.newPage()
-    await guestPage.goto(inviteUrl)
-    await expect(guestPage.getByRole('heading', { name: 'Invitation' })).toBeVisible()
+    const guestPage = await browser.newPage()
+    await joinInvite(guestPage, inviteUrl, 'Bob', uniqueEmail('bob'), 'Potes de Bob')
 
-    await signUp(guestPage, 'Bob', uniqueEmail('bob'))
-
-    await expect(guestPage.getByRole('heading', { name: 'Potes de Bob' })).toBeVisible()
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Alice' })).toBeVisible()
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Bob' })).toBeVisible()
   })

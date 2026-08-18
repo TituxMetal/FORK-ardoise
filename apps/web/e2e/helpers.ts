@@ -58,6 +58,19 @@ export const copyInvite = async (page: Page) => {
   )
 }
 
+export const joinInvite = async (
+  page: Page,
+  inviteUrl: string,
+  name: string,
+  email: string,
+  groupName: string
+) => {
+  await page.goto(inviteUrl)
+  await expect(page.getByRole('heading', { name: 'Invitation' })).toBeVisible()
+  await signUp(page, name, email)
+  await expect(page.getByRole('heading', { name: groupName })).toBeVisible()
+}
+
 export const addExpense = async (page: Page, label: string, amount: string) => {
   const form = page.getByRole('form', { name: 'Constater une Dépense' })
   await form.getByLabel('Libellé').fill(label)

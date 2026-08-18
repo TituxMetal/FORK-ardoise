@@ -4,6 +4,7 @@ import {
   captureInviteWrites,
   copyInvite,
   createGroup,
+  joinInvite,
   signUp,
   uniqueEmail,
   waitForApi
@@ -23,9 +24,7 @@ test.describe('refused writes', () => {
     await createGroup(owner, 'Potes de Carol')
 
     const guest = await browser.newPage()
-    await guest.goto(await copyInvite(owner))
-    await signUp(guest, 'Dan', uniqueEmail('dan'))
-    await expect(guest.getByRole('heading', { name: 'Potes de Carol' })).toBeVisible()
+    await joinInvite(guest, await copyInvite(owner), 'Dan', uniqueEmail('dan'), 'Potes de Carol')
 
     await owner.reload()
     await addExpense(owner, 'Resteau', '10')
