@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { centsFromEuros, euros } from '../../lib/amounts.ts'
+import { errorMessage } from '../../lib/errorMessage.ts'
 import { field } from '../../lib/forms.ts'
 import { groupsClient, type GroupDto, type GroupsClient } from '../groups/client.ts'
 
@@ -27,8 +28,8 @@ export const Paybacks = ({ group, client = groupsClient, onChange }: Props) => {
         })
       )
       setError('')
-    } catch {
-      setError('Impossible de constater le Règlement')
+    } catch (error) {
+      setError(errorMessage(error, 'Impossible de constater le Règlement'))
     }
   }
 
@@ -36,8 +37,8 @@ export const Paybacks = ({ group, client = groupsClient, onChange }: Props) => {
     try {
       onChange(await client.deletePayback(group.id, paybackId))
       setError('')
-    } catch {
-      setError('Règlement introuvable')
+    } catch (error) {
+      setError(errorMessage(error, 'Règlement introuvable'))
     }
   }
 

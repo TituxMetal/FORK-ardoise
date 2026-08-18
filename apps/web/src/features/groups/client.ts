@@ -102,7 +102,8 @@ const request = async <T>(path: string, init?: { method?: string; body?: string 
     headers: { 'content-type': 'application/json' }
   })
   if (!response.ok) {
-    throw new Error('Groupe introuvable')
+    const body = (await response.json().catch(() => null)) as { message?: string } | null
+    throw new Error(body?.message ?? 'Réponse inattendue du serveur')
   }
   return response.json() as Promise<T>
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { groupsClient, type GroupDto, type GroupsClient } from '../features/groups/client.ts'
+import { errorMessage } from '../lib/errorMessage.ts'
 import { SessionForms } from '../features/session/SessionForms.tsx'
 
 type Props = {
@@ -21,7 +22,7 @@ export const InvitePage = ({ secret, session, client = groupsClient }: Props) =>
     void client
       .join(secret)
       .then(setGroup)
-      .catch(() => setError('Invitation introuvable'))
+      .catch((error: unknown) => setError(errorMessage(error, 'Invitation introuvable')))
   }, [client, secret, sessionName])
 
   if (!session) {

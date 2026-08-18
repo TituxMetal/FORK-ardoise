@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { errorMessage } from '../../lib/errorMessage.ts'
 import { field } from '../../lib/forms.ts'
 import { groupsClient, type GroupsClient } from './client.ts'
 
@@ -18,8 +19,8 @@ export const CreateGroupForm = ({ client = groupsClient, onCreated }: Props) => 
       await client.create(name)
       setError('')
       onCreated()
-    } catch {
-      setError('Impossible de créer le Groupe')
+    } catch (error) {
+      setError(errorMessage(error, 'Impossible de créer le Groupe'))
     }
   }
 
