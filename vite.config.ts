@@ -25,7 +25,8 @@ export default defineConfig({
     ]
   },
   test: {
-    include: ['**/*.spec.ts', '**/*.spec.tsx']
+    include: ['**/*.spec.ts', '**/*.spec.tsx'],
+    exclude: ['**/e2e/**']
   },
   run: {
     cache: true

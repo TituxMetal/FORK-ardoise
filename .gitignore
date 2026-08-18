@@ -32,6 +32,10 @@ dist-ssr
 # AI agent worktrees
 .claude/worktrees/
 
+# Playwright
+test-results
+playwright-report
+
 # SQLite
 *.db
 *.db-journal

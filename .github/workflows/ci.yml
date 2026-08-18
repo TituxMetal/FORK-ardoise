@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: voidzero-dev/setup-vp@v1.17.0
+        with:
+          node-version: '24'
+          cache: true
+
+      - run: vp install
+
+      - name: Generate the Prisma client
+        run: vp run prisma:generate
+        working-directory: apps/api
+
+      - run: vp check
+      - run: vp test
+
+      - name: Install the Playwright browser
+        run: vp exec playwright install --with-deps chromium
+
+      - name: Apply Prisma migrations for the e2e database
+        run: vp run prisma:deploy
+        working-directory: apps/api
+
+      - name: Run the Playwright suite
+        run: vp run test:e2e
