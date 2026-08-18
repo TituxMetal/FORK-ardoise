@@ -1,5 +1,5 @@
 /** @vitest-environment happy-dom */
-import { cleanup, render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
 import { createMemoryClient } from '../features/groups/memoryClient.ts'
@@ -191,5 +191,37 @@ describe('GroupPage', () => {
 
     await user.selectOptions(within(form).getByLabelText('Créancier'), 'bob')
     expect(within(form).getByText('Plafond 0,27 €')).toBeTruthy()
+  })
+
+  it('shows an error without a loading fallback when the Group cannot load', async () => {
+    const client = createMemoryClient()
+    render(
+      <GroupPage
+        id="missing"
+        client={{
+          ...client,
+          get: async () => {
+            throw new Error('Groupe introuvable')
+          }
+        }}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe('Groupe introuvable')
+    })
+    expect(screen.queryByText('Chargement…')).toBeNull()
+  })
+
+  it('loads the new Group when the id changes', async () => {
+    const client = createMemoryClient()
+    const first = await client.create('Potes de Bob')
+    const second = await client.create('Collègues')
+    const { rerender } = render(<GroupPage id={first.id} client={client} />)
+    await screen.findByRole('heading', { name: 'Potes de Bob' })
+
+    rerender(<GroupPage id={second.id} client={client} />)
+    expect(screen.queryByRole('heading', { name: 'Potes de Bob' })).toBeNull()
+    expect(await screen.findByRole('heading', { name: 'Collègues' })).toBeTruthy()
   })
 })

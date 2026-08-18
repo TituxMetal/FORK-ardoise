@@ -14,6 +14,7 @@ export const InvitePage = ({ secret, session, client = groupsClient }: Props) =>
   const [error, setError] = useState('')
 
   useEffect(() => {
+    setError('')
     if (!sessionName) {
       return
     }

@@ -21,6 +21,8 @@ export const GroupPage = ({
   const [creditorId, setCreditorId] = useState('')
 
   useEffect(() => {
+    setGroup(null)
+    setError('')
     void client
       .get(id)
       .then(fetched => {
@@ -425,7 +427,7 @@ export const GroupPage = ({
             ))}
           </ul>
         </article>
-      ) : (
+      ) : error ? null : (
         <p>Chargement…</p>
       )}
     </section>

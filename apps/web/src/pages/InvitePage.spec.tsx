@@ -62,4 +62,25 @@ describe('InvitePage', () => {
     expect(joined).toEqual([])
     expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
   })
+
+  it('clears a previous error when a new Invite is joined', async () => {
+    const client = {
+      ...joiningClient([]),
+      join: async (secret: string) => {
+        if (secret === 'bad') {
+          throw new Error('Invitation introuvable')
+        }
+        return group
+      }
+    }
+    const { rerender } = render(
+      <InvitePage secret="bad" session={{ name: 'Bob' }} client={client} />
+    )
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe('Invitation introuvable')
+    })
+
+    rerender(<InvitePage secret="invite-secret" session={{ name: 'Bob' }} client={client} />)
+    expect(await screen.findByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
+  })
 })

@@ -48,12 +48,12 @@ export const useRoute = (): Route => {
   return route
 }
 
-type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
   to: string
   children: ReactNode
 }
 
-export const Link = ({ to, children, onClick, ...rest }: LinkProps) => {
+export const Link = ({ to, children, onClick, target, download, ...rest }: LinkProps) => {
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event)
     if (
@@ -62,7 +62,9 @@ export const Link = ({ to, children, onClick, ...rest }: LinkProps) => {
       event.metaKey ||
       event.altKey ||
       event.ctrlKey ||
-      event.shiftKey
+      event.shiftKey ||
+      (target && target !== '_self') ||
+      download
     ) {
       return
     }
@@ -70,7 +72,7 @@ export const Link = ({ to, children, onClick, ...rest }: LinkProps) => {
     navigate(to)
   }
   return (
-    <a href={to} onClick={handleClick} {...rest}>
+    <a href={to} target={target} download={download} onClick={handleClick} {...rest}>
       {children}
     </a>
   )
