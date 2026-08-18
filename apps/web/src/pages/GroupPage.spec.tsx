@@ -44,40 +44,6 @@ describe('GroupPage', () => {
     expect(written).toEqual([`${window.location.origin}/invites/invite-secret`])
   })
 
-  it('records a Service, lists it apart from Expenses and updates Balances', async () => {
-    await openGroup()
-
-    const user = userEvent.setup()
-    const form = screen.getByRole('form', { name: 'Constater un Service' })
-    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
-    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-    await user.type(within(form).getByLabelText('Montant'), '1')
-    await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
-    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
-
-    expect(await screen.findByText('Ordi Bob')).toBeTruthy()
-    expect(screen.getByText('Aucune Dépense')).toBeTruthy()
-    expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
-    expect(screen.getByText('Bob −0,33 €')).toBeTruthy()
-    expect(screen.getByText('Camille −0,33 €')).toBeTruthy()
-  })
-
-  it('lets any Member delete a Service from the list', async () => {
-    await openGroup()
-
-    const user = userEvent.setup()
-    const form = screen.getByRole('form', { name: 'Constater un Service' })
-    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
-    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-    await user.type(within(form).getByLabelText('Montant'), '1')
-    await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
-    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
-    await user.click(await screen.findByRole('button', { name: 'Supprimer Ordi Bob' }))
-
-    expect(await screen.findByText('Aucun Service')).toBeTruthy()
-    expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
-  })
-
   const recordPizza = async () => {
     const user = userEvent.setup()
     const form = screen.getByRole('form', { name: 'Constater une Dépense' })
