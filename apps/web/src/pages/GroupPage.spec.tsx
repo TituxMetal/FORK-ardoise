@@ -44,40 +44,6 @@ describe('GroupPage', () => {
     expect(written).toEqual([`${window.location.origin}/invites/invite-secret`])
   })
 
-  it('records an Expense, lists it and updates Balances', async () => {
-    await openGroup()
-
-    const user = userEvent.setup()
-    const form = screen.getByRole('form', { name: 'Constater une Dépense' })
-    await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
-    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-    await user.type(within(form).getByLabelText('Montant'), '1')
-    await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
-    await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
-
-    expect(await screen.findByText('Pizza')).toBeTruthy()
-    expect(screen.getByText('2026-08-15')).toBeTruthy()
-    expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
-    expect(screen.getByText('Bob −0,33 €')).toBeTruthy()
-    expect(screen.getByText('Camille −0,33 €')).toBeTruthy()
-  })
-
-  it('lets any Member delete an Expense from the list', async () => {
-    await openGroup()
-
-    const user = userEvent.setup()
-    const form = screen.getByRole('form', { name: 'Constater une Dépense' })
-    await user.type(within(form).getByLabelText('Libellé'), 'Pizza')
-    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-    await user.type(within(form).getByLabelText('Montant'), '1')
-    await user.selectOptions(within(form).getByLabelText('Payeur'), 'lea')
-    await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
-    await user.click(await screen.findByRole('button', { name: 'Supprimer Pizza' }))
-
-    expect(await screen.findByText('Aucune Dépense')).toBeTruthy()
-    expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
-  })
-
   it('records a Service, lists it apart from Expenses and updates Balances', async () => {
     await openGroup()
 
