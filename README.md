@@ -1,6 +1,6 @@
 # Ardoise
 
-Dépenses, services et règlements entre potes, organisés en groupes.
+Expenses, services and paybacks between friends, organised in groups.
 
 ## Development
 
@@ -9,7 +9,7 @@ bun install
 vp dev
 ```
 
-`vp dev` lance le web (Vite, http://localhost:1337) et l’api (Hono, http://localhost:3000). Le web proxifie `/api` vers l’api.
+`vp dev` boots the web app (Vite, http://localhost:1337) and the API (Hono, http://localhost:3000). The web app proxies `/api` to the API.
 
 ```bash
 vp test
