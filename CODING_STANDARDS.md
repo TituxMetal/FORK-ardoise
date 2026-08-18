@@ -22,10 +22,11 @@ The current tree predates these rules (French identifiers, classes, `test()`, on
 - Component / type files PascalCase.
 - Function modules camelCase. A function file is not PascalCase.
 - Specs colocated, `.spec.ts` / `.spec.tsx`.
+- Playwright specs: `apps/web/e2e/` — one suite over the whole product, not colocated.
 
 ## Tests
 
-- New specs: `describe` / `it`.
+- New specs: `describe` / `it`. Playwright specs: `test.describe` / `test` (the library exports no `it`), English titles.
 - Layers: domain + HTTP in-process + React Testing Library + Playwright.
 - Behaviour at a public seam. No implementation-detail tests.
 

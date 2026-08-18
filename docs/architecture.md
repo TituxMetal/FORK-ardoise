@@ -56,7 +56,7 @@ Four layers, all kept:
 1. **Domain** — pure functions, colocated `.spec.ts`.
 2. **HTTP** — in-process Hono, session cookie, the API contract.
 3. **React Testing Library** — component behaviour with a fake client.
-4. **Playwright** — real browser + real API. This is the layer that catches an API 4xx shown as a browser 500.
+4. **Playwright** — real browser + real API. This is the layer that catches an API 4xx shown as a browser 500. Specs live in `apps/web/e2e/` and run via `vp run test:e2e` (boots web + API through the web start plugin).
 
 New specs use `describe` / `it`. Existing `test()` dies on the retrofit ticket. No browser suite as the _only_ contract: HTTP stays.
 
