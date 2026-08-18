@@ -3,34 +3,32 @@ import type { Payback } from '../domain/Payback.entity.ts'
 import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
 import { toPayback } from './ToPayback.mapper.ts'
 
-export class PrismaPaybackRepository implements IPaybackRepository {
-  constructor(private readonly prisma: PrismaClient) {}
-
+export const prismaPaybackRepository = (prisma: PrismaClient): IPaybackRepository => ({
   async save(payback: Payback) {
-    await this.prisma.payback.create({
+    await prisma.payback.create({
       data: {
         id: payback.id,
-        groupeId: payback.groupeId,
+        groupId: payback.groupId,
         debtorId: payback.debtorId,
         creditorId: payback.creditorId,
         amount: payback.amount.value
       }
     })
-  }
+  },
 
   async findById(id: string) {
-    const row = await this.prisma.payback.findUnique({ where: { id } })
+    const row = await prisma.payback.findUnique({ where: { id } })
     return row ? toPayback(row) : null
-  }
+  },
 
-  async findByGroupeId(groupeId: string) {
-    const rows = await this.prisma.payback.findMany({
-      where: { groupeId }
+  async findByGroupId(groupId: string) {
+    const rows = await prisma.payback.findMany({
+      where: { groupId }
     })
     return rows.map(toPayback)
-  }
+  },
 
   async delete(id: string) {
-    await this.prisma.payback.delete({ where: { id } })
+    await prisma.payback.delete({ where: { id } })
   }
-}
+})

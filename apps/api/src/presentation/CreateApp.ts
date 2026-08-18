@@ -8,7 +8,7 @@ import { createGroupsRoutes } from '../groups/presentation/Groups.routes.ts'
 import { createInvitesRoutes } from '../groups/presentation/Invites.routes.ts'
 import { prismaServiceRepository } from '../services/infrastructure/PrismaService.repository.ts'
 import { createServicesRoutes } from '../services/presentation/Services.routes.ts'
-import { PrismaPaybackRepository } from '../paybacks/infrastructure/PrismaPayback.repository.ts'
+import { prismaPaybackRepository } from '../paybacks/infrastructure/PrismaPayback.repository.ts'
 import { createPaybacksRoutes } from '../paybacks/presentation/Paybacks.routes.ts'
 import { createAuth } from '../infrastructure/CreateAuth.adapter.ts'
 import { createPrismaClient } from '../infrastructure/CreatePrisma.client.ts'
@@ -23,7 +23,7 @@ export const createApp = (
   const groups = prismaGroupRepository(prisma)
   const expenses = prismaExpenseRepository(prisma)
   const services = prismaServiceRepository(prisma)
-  const paybacks = new PrismaPaybackRepository(prisma)
+  const paybacks = prismaPaybackRepository(prisma)
   app.onError(mapException)
   app.get('/ping', c => c.body(null, 200))
   app.on(['POST', 'GET'], '/auth/*', c => auth.handler(c.req.raw))
