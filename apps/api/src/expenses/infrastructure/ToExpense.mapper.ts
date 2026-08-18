@@ -5,7 +5,7 @@ import { labelReconstitute } from '../domain/Label.vo.ts'
 
 export const toExpense = (row: {
   id: string
-  groupeId: string
+  groupId: string
   label: string
   day: string
   amount: number
@@ -17,7 +17,7 @@ export const toExpense = (row: {
   const parts = [...row.parts].sort((a, b) => a.ordinal - b.ordinal)
   return expenseReconstitute(
     row.id,
-    row.groupeId,
+    row.groupId,
     labelReconstitute(row.label),
     dayReconstitute(row.day),
     amountReconstitute(row.amount),

@@ -5,7 +5,7 @@ import { equalParts, type Part } from '../../domain/Part.ts'
 
 export type Service = {
   id: string
-  groupeId: string
+  groupId: string
   label: Label
   day: Day
   amount: Amount
@@ -15,7 +15,7 @@ export type Service = {
 }
 
 export const serviceCreate = (
-  groupeId: string,
+  groupId: string,
   label: Label,
   day: Day,
   amount: Amount,
@@ -23,7 +23,7 @@ export const serviceCreate = (
   participantIds: string[]
 ): Service => ({
   id: crypto.randomUUID(),
-  groupeId,
+  groupId,
   label,
   day,
   amount,
@@ -34,11 +34,11 @@ export const serviceCreate = (
 
 export const serviceReconstitute = (
   id: string,
-  groupeId: string,
+  groupId: string,
   label: Label,
   day: Day,
   amount: Amount,
   providerId: string,
   participantIds: string[],
   parts: Part[]
-): Service => ({ id, groupeId, label, day, amount, providerId, participantIds, parts })
+): Service => ({ id, groupId, label, day, amount, providerId, participantIds, parts })

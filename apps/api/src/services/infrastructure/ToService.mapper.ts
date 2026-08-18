@@ -5,7 +5,7 @@ import { serviceReconstitute } from '../domain/Service.entity.ts'
 
 export const toService = (row: {
   id: string
-  groupeId: string
+  groupId: string
   label: string
   day: string
   amount: number
@@ -17,7 +17,7 @@ export const toService = (row: {
   const parts = [...row.parts].sort((a, b) => a.ordinal - b.ordinal)
   return serviceReconstitute(
     row.id,
-    row.groupeId,
+    row.groupId,
     labelReconstitute(row.label),
     dayReconstitute(row.day),
     amountReconstitute(row.amount),

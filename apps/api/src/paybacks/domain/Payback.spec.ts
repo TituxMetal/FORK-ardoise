@@ -15,7 +15,7 @@ describe('Payback', () => {
   })
 
   it('accepts a Payback under the cap', () => {
-    const payback = paybackCreate('groupe', 'bob', 'lea', amountFromCents(20), -33, 66)
+    const payback = paybackCreate('group', 'bob', 'lea', amountFromCents(20), -33, 66)
 
     expect(payback.debtorId).toBe('bob')
     expect(payback.creditorId).toBe('lea')
@@ -23,31 +23,31 @@ describe('Payback', () => {
   })
 
   it('accepts a Payback equal to the cap', () => {
-    const payback = paybackCreate('groupe', 'bob', 'lea', amountFromCents(33), -33, 66)
+    const payback = paybackCreate('group', 'bob', 'lea', amountFromCents(33), -33, 66)
 
     expect(payback.amount.value).toBe(33)
   })
 
   it('refuses a Payback above the cap', () => {
-    expect(() => paybackCreate('groupe', 'bob', 'lea', amountFromCents(34), -33, 66)).toThrow(
+    expect(() => paybackCreate('group', 'bob', 'lea', amountFromCents(34), -33, 66)).toThrow(
       PAYBACK_ABOVE_CAP
     )
   })
 
   it('refuses a debtor who is not negative', () => {
-    expect(() => paybackCreate('groupe', 'bob', 'lea', amountFromCents(10), 0, 66)).toThrow(
+    expect(() => paybackCreate('group', 'bob', 'lea', amountFromCents(10), 0, 66)).toThrow(
       PAYBACK_DEBTOR_NOT_NEGATIVE
     )
-    expect(() => paybackCreate('groupe', 'bob', 'lea', amountFromCents(10), 10, 66)).toThrow(
+    expect(() => paybackCreate('group', 'bob', 'lea', amountFromCents(10), 10, 66)).toThrow(
       PAYBACK_DEBTOR_NOT_NEGATIVE
     )
   })
 
   it('refuses a creditor who is not positive', () => {
-    expect(() => paybackCreate('groupe', 'bob', 'lea', amountFromCents(10), -33, 0)).toThrow(
+    expect(() => paybackCreate('group', 'bob', 'lea', amountFromCents(10), -33, 0)).toThrow(
       PAYBACK_CREDITOR_NOT_POSITIVE
     )
-    expect(() => paybackCreate('groupe', 'bob', 'lea', amountFromCents(10), -33, -10)).toThrow(
+    expect(() => paybackCreate('group', 'bob', 'lea', amountFromCents(10), -33, -10)).toThrow(
       PAYBACK_CREDITOR_NOT_POSITIVE
     )
   })

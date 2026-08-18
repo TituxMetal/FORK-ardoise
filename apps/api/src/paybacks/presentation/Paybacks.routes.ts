@@ -27,7 +27,7 @@ export const createPaybacksRoutes = (
   const deletePaybackUseCase = deletePayback(groups, expenses, services, paybacks)
 
   app.post(
-    '/:groupeId/paybacks',
+    '/:groupId/paybacks',
     zValidator('json', createPaybackBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
@@ -37,20 +37,16 @@ export const createPaybacksRoutes = (
     async c => {
       const group = await createPaybackUseCase.execute(
         c.get('userId'),
-        c.req.param('groupeId'),
+        c.req.param('groupId'),
         c.req.valid('json')
       )
       return c.json(group, 201)
     }
   )
 
-  app.delete('/:groupeId/paybacks/:id', async c =>
+  app.delete('/:groupId/paybacks/:id', async c =>
     c.json(
-      await deletePaybackUseCase.execute(
-        c.get('userId'),
-        c.req.param('groupeId'),
-        c.req.param('id')
-      )
+      await deletePaybackUseCase.execute(c.get('userId'), c.req.param('groupId'), c.req.param('id'))
     )
   )
 

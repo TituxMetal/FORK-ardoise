@@ -10,7 +10,7 @@ export const prismaExpenseRepository = (prisma: PrismaClient): IExpenseRepositor
     await prisma.expense.create({
       data: {
         id: expense.id,
-        groupeId: expense.groupeId,
+        groupId: expense.groupId,
         label: expense.label.value,
         day: expense.day.value,
         amount: expense.amount.value,
@@ -34,9 +34,9 @@ export const prismaExpenseRepository = (prisma: PrismaClient): IExpenseRepositor
     return row ? toExpense(row) : null
   },
 
-  async findByGroupeId(groupeId: string) {
+  async findByGroupId(groupId: string) {
     const rows = await prisma.expense.findMany({
-      where: { groupeId },
+      where: { groupId },
       include,
       orderBy: { day: 'asc' }
     })

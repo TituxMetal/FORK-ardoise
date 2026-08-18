@@ -31,7 +31,7 @@ export const createExpensesRoutes = (
   const deleteExpenseUseCase = deleteExpense(groups, expenses, services, paybacks)
 
   app.post(
-    '/:groupeId/expenses',
+    '/:groupId/expenses',
     zValidator('json', createExpenseBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
@@ -41,20 +41,16 @@ export const createExpensesRoutes = (
     async c => {
       const group = await createExpenseUseCase.execute(
         c.get('userId'),
-        c.req.param('groupeId'),
+        c.req.param('groupId'),
         c.req.valid('json')
       )
       return c.json(group, 201)
     }
   )
 
-  app.delete('/:groupeId/expenses/:id', async c =>
+  app.delete('/:groupId/expenses/:id', async c =>
     c.json(
-      await deleteExpenseUseCase.execute(
-        c.get('userId'),
-        c.req.param('groupeId'),
-        c.req.param('id')
-      )
+      await deleteExpenseUseCase.execute(c.get('userId'), c.req.param('groupId'), c.req.param('id'))
     )
   )
 

@@ -5,7 +5,7 @@ import type { Label } from './Label.vo.ts'
 
 export type Expense = {
   id: string
-  groupeId: string
+  groupId: string
   label: Label
   day: Day
   amount: Amount
@@ -15,7 +15,7 @@ export type Expense = {
 }
 
 export const expenseCreate = (
-  groupeId: string,
+  groupId: string,
   label: Label,
   day: Day,
   amount: Amount,
@@ -23,7 +23,7 @@ export const expenseCreate = (
   participantIds: string[]
 ): Expense => ({
   id: crypto.randomUUID(),
-  groupeId,
+  groupId,
   label,
   day,
   amount,
@@ -34,11 +34,11 @@ export const expenseCreate = (
 
 export const expenseReconstitute = (
   id: string,
-  groupeId: string,
+  groupId: string,
   label: Label,
   day: Day,
   amount: Amount,
   payerId: string,
   participantIds: string[],
   parts: Part[]
-): Expense => ({ id, groupeId, label, day, amount, payerId, participantIds, parts })
+): Expense => ({ id, groupId, label, day, amount, payerId, participantIds, parts })

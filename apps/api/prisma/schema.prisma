@@ -83,31 +83,31 @@ model Group {
 }
 
 model Member {
-  id       String @id
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  groupeId String
-  groupe   Group  @relation(fields: [groupeId], references: [id], onDelete: Cascade)
-  name     String
+  id      String @id
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name    String
 
-  @@unique([userId, groupeId])
+  @@unique([userId, groupId])
   @@index([userId])
-  @@index([groupeId])
+  @@index([groupId])
   @@map("member")
 }
 
 model Expense {
-  id            String                @id
-  groupeId      String
-  groupe        Group                 @relation(fields: [groupeId], references: [id], onDelete: Cascade)
-  label         String
-  day           String
-  amount        Int
-  payerId       String
-  participants  ExpenseParticipant[]
-  parts         ExpensePart[]
+  id           String                @id
+  groupId      String
+  group        Group                 @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  label        String
+  day          String
+  amount       Int
+  payerId      String
+  participants ExpenseParticipant[]
+  parts        ExpensePart[]
 
-  @@index([groupeId])
+  @@index([groupId])
   @@map("expense")
 }
 
@@ -134,8 +134,8 @@ model ExpensePart {
 
 model Service {
   id           String               @id
-  groupeId     String
-  groupe       Group                @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  groupId      String
+  group        Group                @relation(fields: [groupId], references: [id], onDelete: Cascade)
   label        String
   day          String
   amount       Int
@@ -143,7 +143,7 @@ model Service {
   participants ServiceParticipant[]
   parts        ServicePart[]
 
-  @@index([groupeId])
+  @@index([groupId])
   @@map("service")
 }
 
@@ -170,12 +170,12 @@ model ServicePart {
 
 model Payback {
   id         String @id
-  groupeId   String
-  groupe     Group  @relation(fields: [groupeId], references: [id], onDelete: Cascade)
+  groupId    String
+  group      Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   debtorId   String
   creditorId String
   amount     Int
 
-  @@index([groupeId])
+  @@index([groupId])
   @@map("payback")
 }

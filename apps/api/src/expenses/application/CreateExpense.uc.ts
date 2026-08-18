@@ -25,8 +25,8 @@ export const createExpense = (
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
-  execute: async (userId: string, groupeId: string, input: CreateExpenseInput) => {
-    const group = await groups.findById(groupeId)
+  execute: async (userId: string, groupId: string, input: CreateExpenseInput) => {
+    const group = await groups.findById(groupId)
     if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
@@ -38,7 +38,7 @@ export const createExpense = (
       throw invalidData('Membre introuvable')
     }
     const expense = expenseCreate(
-      groupeId,
+      groupId,
       labelFrom(input.label),
       dayFrom(input.day),
       amountFromCents(input.amount),
@@ -48,9 +48,9 @@ export const createExpense = (
     await expenses.save(expense)
     return toGroupDto(
       group,
-      await expenses.findByGroupeId(groupeId),
-      await services.findByGroupeId(groupeId),
-      await paybacks.findByGroupeId(groupeId)
+      await expenses.findByGroupId(groupId),
+      await services.findByGroupId(groupId),
+      await paybacks.findByGroupId(groupId)
     )
   }
 })

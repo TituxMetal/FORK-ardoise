@@ -5,6 +5,6 @@ export const IExpenseRepository = Symbol('IExpenseRepository')
 export type IExpenseRepository = {
   save: (expense: Expense) => Promise<void>
   findById: (id: string) => Promise<Expense | null>
-  findByGroupeId: (groupeId: string) => Promise<Expense[]>
+  findByGroupId: (groupId: string) => Promise<Expense[]>
   delete: (id: string) => Promise<void>
 }

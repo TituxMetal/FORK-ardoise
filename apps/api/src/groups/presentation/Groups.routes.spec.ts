@@ -14,7 +14,7 @@ const sessionSql = readFileSync(
   ),
   'utf8'
 )
-const groupeSql = readFileSync(
+const groupSql = readFileSync(
   fileURLToPath(
     new URL(
       '../../../prisma/migrations/20260815190000_groupe_membre/migration.sql',
@@ -23,7 +23,7 @@ const groupeSql = readFileSync(
   ),
   'utf8'
 )
-const invitationSql = readFileSync(
+const groupSecretSql = readFileSync(
   fileURLToPath(
     new URL(
       '../../../prisma/migrations/20260816042947_invitation_secret/migration.sql',
@@ -81,12 +81,19 @@ const inviteSecretSql = readFileSync(
   'utf8'
 )
 
+const groupIdSql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260818010000_group_id/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}`
+    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))

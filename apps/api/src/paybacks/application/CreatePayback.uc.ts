@@ -22,17 +22,17 @@ export const createPayback = (
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
-  execute: async (userId: string, groupeId: string, input: CreatePaybackInput) => {
-    const group = await groups.findById(groupeId)
+  execute: async (userId: string, groupId: string, input: CreatePaybackInput) => {
+    const group = await groups.findById(groupId)
     if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
     if (!groupHasMember(group, input.debtorId) || !groupHasMember(group, input.creditorId)) {
       throw invalidData('Membre introuvable')
     }
-    const groupExpenses = await expenses.findByGroupeId(groupeId)
-    const providedServices = await services.findByGroupeId(groupeId)
-    const existing = await paybacks.findByGroupeId(groupeId)
+    const groupExpenses = await expenses.findByGroupId(groupId)
+    const providedServices = await services.findByGroupId(groupId)
+    const existing = await paybacks.findByGroupId(groupId)
     const balances = balancesOf(
       group.members.map(member => ({ userId: member.userId, name: member.name })),
       groupExpenses.map(expense => ({
@@ -55,7 +55,7 @@ export const createPayback = (
     const creditorBalance =
       balances.find(balance => balance.userId === input.creditorId)?.amount ?? 0
     const payback = paybackCreate(
-      groupeId,
+      groupId,
       input.debtorId,
       input.creditorId,
       amountFromCents(input.amount),

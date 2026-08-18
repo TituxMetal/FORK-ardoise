@@ -12,21 +12,21 @@ export const deletePayback = (
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
-  execute: async (userId: string, groupeId: string, paybackId: string) => {
-    const group = await groups.findById(groupeId)
+  execute: async (userId: string, groupId: string, paybackId: string) => {
+    const group = await groups.findById(groupId)
     if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
     const payback = await paybacks.findById(paybackId)
-    if (!payback || payback.groupeId !== groupeId) {
+    if (!payback || payback.groupId !== groupId) {
       throw notFound('Règlement introuvable')
     }
     await paybacks.delete(paybackId)
     return toGroupDto(
       group,
-      await expenses.findByGroupeId(groupeId),
-      await services.findByGroupeId(groupeId),
-      await paybacks.findByGroupeId(groupeId)
+      await expenses.findByGroupId(groupId),
+      await services.findByGroupId(groupId),
+      await paybacks.findByGroupId(groupId)
     )
   }
 })

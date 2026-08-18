@@ -12,21 +12,21 @@ export const deleteService = (
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
-  execute: async (userId: string, groupeId: string, serviceId: string) => {
-    const group = await groups.findById(groupeId)
+  execute: async (userId: string, groupId: string, serviceId: string) => {
+    const group = await groups.findById(groupId)
     if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
     const service = await services.findById(serviceId)
-    if (!service || service.groupeId !== groupeId) {
+    if (!service || service.groupId !== groupId) {
       throw notFound('Service introuvable')
     }
     await services.delete(serviceId)
     return toGroupDto(
       group,
-      await expenses.findByGroupeId(groupeId),
-      await services.findByGroupeId(groupeId),
-      await paybacks.findByGroupeId(groupeId)
+      await expenses.findByGroupId(groupId),
+      await services.findByGroupId(groupId),
+      await paybacks.findByGroupId(groupId)
     )
   }
 })

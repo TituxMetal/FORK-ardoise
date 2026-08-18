@@ -37,7 +37,7 @@ export const prismaGroupRepository = (prisma: PrismaClient): IGroupRepository =>
       data: added.map(member => ({
         id: crypto.randomUUID(),
         userId: member.userId,
-        groupeId: group.id,
+        groupId: group.id,
         name: member.name
       }))
     })

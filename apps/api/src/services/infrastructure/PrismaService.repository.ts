@@ -10,7 +10,7 @@ export const prismaServiceRepository = (prisma: PrismaClient): IServiceRepositor
     await prisma.service.create({
       data: {
         id: service.id,
-        groupeId: service.groupeId,
+        groupId: service.groupId,
         label: service.label.value,
         day: service.day.value,
         amount: service.amount.value,
@@ -34,9 +34,9 @@ export const prismaServiceRepository = (prisma: PrismaClient): IServiceRepositor
     return row ? toService(row) : null
   },
 
-  async findByGroupeId(groupeId: string) {
+  async findByGroupId(groupId: string) {
     const rows = await prisma.service.findMany({
-      where: { groupeId },
+      where: { groupId },
       include,
       orderBy: { day: 'asc' }
     })

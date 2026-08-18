@@ -19,7 +19,7 @@ const sessionSql = readFileSync(
   ),
   'utf8'
 )
-const groupeSql = readFileSync(
+const groupSql = readFileSync(
   fileURLToPath(
     new URL(
       '../../../prisma/migrations/20260815190000_groupe_membre/migration.sql',
@@ -28,7 +28,7 @@ const groupeSql = readFileSync(
   ),
   'utf8'
 )
-const invitationSql = readFileSync(
+const groupSecretSql = readFileSync(
   fileURLToPath(
     new URL(
       '../../../prisma/migrations/20260816042947_invitation_secret/migration.sql',
@@ -86,12 +86,19 @@ const inviteSecretSql = readFileSync(
   'utf8'
 )
 
+const groupIdSql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260818010000_group_id/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
+
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupeSql}\n${invitationSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}`
+    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))
@@ -122,7 +129,7 @@ const createGroup = (app: ReturnType<typeof createApp>, cookie: string, name: st
     body: JSON.stringify({ name })
   })
 
-const openArdoise = async () => {
+const openApp = async () => {
   const app = await createTestApp()
   const leaRes = await signUp(app)
   const bobRes = await signUp(app, {
@@ -162,10 +169,10 @@ const openArdoise = async () => {
 const createExpense = (
   app: ReturnType<typeof createApp>,
   cookie: string,
-  groupeId: string,
+  groupId: string,
   body: Record<string, unknown>
 ) =>
-  app.request(`/groups/${groupeId}/expenses`, {
+  app.request(`/groups/${groupId}/expenses`, {
     method: 'POST',
     headers: { cookie, 'content-type': 'application/json' },
     body: JSON.stringify(body)
@@ -174,25 +181,25 @@ const createExpense = (
 const createPayback = (
   app: ReturnType<typeof createApp>,
   cookie: string,
-  groupeId: string,
+  groupId: string,
   body: Record<string, unknown>
 ) =>
-  app.request(`/groups/${groupeId}/paybacks`, {
+  app.request(`/groups/${groupId}/paybacks`, {
     method: 'POST',
     headers: { cookie, 'content-type': 'application/json' },
     body: JSON.stringify(body)
   })
 
 const pizza = async () => {
-  const ardoise = await openArdoise()
-  await createExpense(ardoise.app, ardoise.lea.cookie, ardoise.group.id, {
+  const fixture = await openApp()
+  await createExpense(fixture.app, fixture.lea.cookie, fixture.group.id, {
     label: 'Pizza',
     day: '2026-08-15',
     amount: 100,
-    payerId: ardoise.lea.userId,
-    participantIds: [ardoise.lea.userId, ardoise.bob.userId, ardoise.camille.userId]
+    payerId: fixture.lea.userId,
+    participantIds: [fixture.lea.userId, fixture.bob.userId, fixture.camille.userId]
   })
-  return ardoise
+  return fixture
 }
 
 describe('paybacks', () => {
@@ -221,7 +228,7 @@ describe('paybacks', () => {
       { userId: bob.userId, name: 'Bob', amount: -13 },
       { userId: camille.userId, name: 'Camille', amount: -33 }
     ])
-    expect(body.balances.reduce((sum, solde) => sum + solde.amount, 0)).toBe(0)
+    expect(body.balances.reduce((sum, balance) => sum + balance.amount, 0)).toBe(0)
   })
 
   it('lets any member record a payback at the cap', async () => {

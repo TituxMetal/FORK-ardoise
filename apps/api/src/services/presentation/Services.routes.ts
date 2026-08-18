@@ -31,7 +31,7 @@ export const createServicesRoutes = (
   const deleteServiceUseCase = deleteService(groups, expenses, services, paybacks)
 
   app.post(
-    '/:groupeId/services',
+    '/:groupId/services',
     zValidator('json', createServiceBody, result => {
       if (!result.success) {
         const issue = result.error.issues[0]
@@ -41,20 +41,16 @@ export const createServicesRoutes = (
     async c => {
       const group = await createServiceUseCase.execute(
         c.get('userId'),
-        c.req.param('groupeId'),
+        c.req.param('groupId'),
         c.req.valid('json')
       )
       return c.json(group, 201)
     }
   )
 
-  app.delete('/:groupeId/services/:id', async c =>
+  app.delete('/:groupId/services/:id', async c =>
     c.json(
-      await deleteServiceUseCase.execute(
-        c.get('userId'),
-        c.req.param('groupeId'),
-        c.req.param('id')
-      )
+      await deleteServiceUseCase.execute(c.get('userId'), c.req.param('groupId'), c.req.param('id'))
     )
   )
 

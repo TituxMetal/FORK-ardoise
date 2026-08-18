@@ -19,9 +19,9 @@ export const getGroup = (
     }
     return toGroupDto(
       group,
-      await expenses.findByGroupeId(groupId),
-      await services.findByGroupeId(groupId),
-      await paybacks.findByGroupeId(groupId)
+      await expenses.findByGroupId(groupId),
+      await services.findByGroupId(groupId),
+      await paybacks.findByGroupId(groupId)
     )
   }
 })

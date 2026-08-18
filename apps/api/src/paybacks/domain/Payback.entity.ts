@@ -3,7 +3,7 @@ import type { Amount } from '../../domain/Amount.ts'
 
 export type Payback = {
   id: string
-  groupeId: string
+  groupId: string
   debtorId: string
   creditorId: string
   amount: Amount
@@ -17,7 +17,7 @@ export const paybackCap = (debtorBalance: number, creditorBalance: number) =>
   Math.min(-debtorBalance, creditorBalance)
 
 export const paybackCreate = (
-  groupeId: string,
+  groupId: string,
   debtorId: string,
   creditorId: string,
   amount: Amount,
@@ -34,13 +34,13 @@ export const paybackCreate = (
   if (amount.value > cap) {
     throw invalidData(PAYBACK_ABOVE_CAP)
   }
-  return { id: crypto.randomUUID(), groupeId, debtorId, creditorId, amount }
+  return { id: crypto.randomUUID(), groupId, debtorId, creditorId, amount }
 }
 
 export const paybackReconstitute = (
   id: string,
-  groupeId: string,
+  groupId: string,
   debtorId: string,
   creditorId: string,
   amount: Amount
-): Payback => ({ id, groupeId, debtorId, creditorId, amount })
+): Payback => ({ id, groupId, debtorId, creditorId, amount })

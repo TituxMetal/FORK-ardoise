@@ -10,7 +10,7 @@ const day = dayReconstitute('2026-08-15')
 
 describe('Expense', () => {
   it('splits the Amount equally and gives the remainder to the Payer', () => {
-    const expense = expenseCreate('groupe', label, day, amountFromCents(100), 'lea', [
+    const expense = expenseCreate('group', label, day, amountFromCents(100), 'lea', [
       'lea',
       'bob',
       'camille'
@@ -25,7 +25,7 @@ describe('Expense', () => {
   })
 
   it('adds a Part for a Payer outside Participants holding the remainder', () => {
-    const expense = expenseCreate('groupe', label, day, amountFromCents(101), 'lea', [
+    const expense = expenseCreate('group', label, day, amountFromCents(101), 'lea', [
       'bob',
       'camille'
     ])
@@ -38,7 +38,7 @@ describe('Expense', () => {
   })
 
   it('refuses zero Participants', () => {
-    expect(() => expenseCreate('groupe', label, day, amountFromCents(100), 'lea', [])).toThrow(
+    expect(() => expenseCreate('group', label, day, amountFromCents(100), 'lea', [])).toThrow(
       PARTICIPANTS_REQUIRED
     )
   })
