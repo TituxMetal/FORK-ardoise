@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { AMOUNT_INTEGER, AMOUNT_POSITIVE, amountFromCents, amountFromEuros } from './Amount.ts'
+import { AMOUNT_INTEGER, AMOUNT_POSITIVE, amountFromCents, amountFromEuros } from '~/domain/Amount'
 
 describe('Amount', () => {
   it('keeps an integer number of cents from cents', () => {

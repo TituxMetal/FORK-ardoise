@@ -1,8 +1,8 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-import type { GroupDto, GroupsClient } from '../features/groups/client.ts'
-import { InvitePage } from './InvitePage.tsx'
+import type { GroupDto, GroupsClient } from '~features/groups/client'
+import { InvitePage } from '~/pages/InvitePage'
 
 afterEach(cleanup)
 

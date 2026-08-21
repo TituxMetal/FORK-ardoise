@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from './Amount.ts'
-import { PARTICIPANTS_REQUIRED, equalParts } from './Part.ts'
+import { amountFromCents } from '~/domain/Amount'
+import { PARTICIPANTS_REQUIRED, equalParts } from '~/domain/Part'
 
 describe('equalParts', () => {
   it('gives the Payer the remainder among the Participants', () => {

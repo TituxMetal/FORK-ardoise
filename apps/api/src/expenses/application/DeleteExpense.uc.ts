@@ -1,10 +1,10 @@
-import { notFound } from '../../domain/notFound.ts'
-import { toGroupDto } from '../../groups/application/ToGroup.mapper.ts'
-import { groupHasMember } from '../../groups/domain/Group.entity.ts'
-import type { IGroupRepository } from '../../groups/domain/IGroup.repository.ts'
-import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
-import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
+import { notFound } from '~/domain/notFound'
+import { toGroupDto } from '~/groups/application/ToGroup.mapper'
+import { groupHasMember } from '~/groups/domain/Group.entity'
+import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
+import type { IServiceRepository } from '~/services/domain/IService.repository'
+import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
 
 export const deleteExpense = (
   groups: IGroupRepository,

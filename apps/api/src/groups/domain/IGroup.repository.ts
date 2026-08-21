@@ -1,4 +1,4 @@
-import type { Group } from './Group.entity.ts'
+import type { Group } from '~/groups/domain/Group.entity'
 
 export const IGroupRepository = Symbol('IGroupRepository')
 

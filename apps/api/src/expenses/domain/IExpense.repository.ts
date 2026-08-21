@@ -1,4 +1,4 @@
-import type { Expense } from './Expense.entity.ts'
+import type { Expense } from '~/expenses/domain/Expense.entity'
 
 export const IExpenseRepository = Symbol('IExpenseRepository')
 

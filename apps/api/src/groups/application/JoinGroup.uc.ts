@@ -1,8 +1,8 @@
-import { notFound } from '../../domain/notFound.ts'
-import { groupAddMember } from '../domain/Group.entity.ts'
-import type { IGroupRepository } from '../domain/IGroup.repository.ts'
-import { memberOf } from '../domain/Member.entity.ts'
-import { toGroupDto } from './ToGroup.mapper.ts'
+import { notFound } from '~/domain/notFound'
+import { groupAddMember } from '~/groups/domain/Group.entity'
+import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import { memberOf } from '~/groups/domain/Member.entity'
+import { toGroupDto } from '~/groups/application/ToGroup.mapper'
 
 export const joinGroup = (groups: IGroupRepository) => ({
   execute: async (userId: string, userName: string, secret: string) => {

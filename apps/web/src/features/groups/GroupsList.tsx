@@ -1,5 +1,5 @@
-import { Link } from '../../lib/router.tsx'
-import type { GroupSummary } from './client.ts'
+import { Link } from '~/lib/router'
+import type { GroupSummary } from '~features/groups/client'
 
 export const GroupsList = ({ groups }: { groups: GroupSummary[] }) => (
   <div className="space-y-2">

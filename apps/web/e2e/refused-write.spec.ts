@@ -8,7 +8,7 @@ import {
   signUp,
   uniqueEmail,
   waitForApi
-} from './helpers.ts'
+} from './helpers'
 
 test.describe('refused writes', () => {
   test.beforeAll(async ({ request }) => {

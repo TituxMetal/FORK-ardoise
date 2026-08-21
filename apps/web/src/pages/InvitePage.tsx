@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { groupsClient, type GroupDto, type GroupsClient } from '../features/groups/client.ts'
-import { errorMessage } from '../lib/errorMessage.ts'
-import { SessionForms } from '../features/session/SessionForms.tsx'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/client'
+import { errorMessage } from '~/lib/errorMessage'
+import { SessionForms } from '~features/session/SessionForms'
 
 type Props = {
   secret: string

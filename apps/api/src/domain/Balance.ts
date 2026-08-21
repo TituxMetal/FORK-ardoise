@@ -1,4 +1,4 @@
-import type { Part } from './Part.ts'
+import type { Part } from '~/domain/Part'
 
 export type Balance = {
   userId: string

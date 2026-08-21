@@ -2,8 +2,8 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-import { createMemoryClient } from '../features/groups/memoryClient.ts'
-import { GroupsPage } from './GroupsPage.tsx'
+import { createMemoryClient } from '~features/groups/memoryClient'
+import { GroupsPage } from '~/pages/GroupsPage'
 
 afterEach(cleanup)
 

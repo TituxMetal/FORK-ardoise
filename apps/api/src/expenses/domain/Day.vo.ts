@@ -1,4 +1,4 @@
-import { invalidData } from '../../domain/invalidData.ts'
+import { invalidData } from '~/domain/invalidData'
 
 export type Day = {
   value: string

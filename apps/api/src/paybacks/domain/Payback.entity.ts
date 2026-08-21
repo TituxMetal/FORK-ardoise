@@ -1,5 +1,5 @@
-import { invalidData } from '../../domain/invalidData.ts'
-import type { Amount } from '../../domain/Amount.ts'
+import { invalidData } from '~/domain/invalidData'
+import type { Amount } from '~/domain/Amount'
 
 export type Payback = {
   id: string

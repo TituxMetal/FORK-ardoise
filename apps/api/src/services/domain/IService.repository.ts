@@ -1,4 +1,4 @@
-import type { Service } from './Service.entity.ts'
+import type { Service } from '~/services/domain/Service.entity'
 
 export const IServiceRepository = Symbol('IServiceRepository')
 

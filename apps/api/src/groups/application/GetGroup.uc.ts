@@ -1,10 +1,10 @@
-import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
-import { notFound } from '../../domain/notFound.ts'
-import type { IPaybackRepository } from '../../paybacks/domain/IPayback.repository.ts'
-import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import { groupHasMember } from '../domain/Group.entity.ts'
-import type { IGroupRepository } from '../domain/IGroup.repository.ts'
-import { toGroupDto } from './ToGroup.mapper.ts'
+import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import { notFound } from '~/domain/notFound'
+import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
+import type { IServiceRepository } from '~/services/domain/IService.repository'
+import { groupHasMember } from '~/groups/domain/Group.entity'
+import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import { toGroupDto } from '~/groups/application/ToGroup.mapper'
 
 export const getGroup = (
   groups: IGroupRepository,

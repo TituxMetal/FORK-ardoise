@@ -1,7 +1,7 @@
-import { dayReconstitute } from '../../expenses/domain/Day.vo.ts'
-import { labelReconstitute } from '../../expenses/domain/Label.vo.ts'
-import { amountReconstitute } from '../../domain/Amount.ts'
-import { serviceReconstitute } from '../domain/Service.entity.ts'
+import { dayReconstitute } from '~/expenses/domain/Day.vo'
+import { labelReconstitute } from '~/expenses/domain/Label.vo'
+import { amountReconstitute } from '~/domain/Amount'
+import { serviceReconstitute } from '~/services/domain/Service.entity'
 
 export const toService = (row: {
   id: string

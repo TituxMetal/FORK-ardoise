@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react'
-import { centsFromEuros, euros } from '../../lib/amounts.ts'
-import { errorMessage } from '../../lib/errorMessage.ts'
-import { field } from '../../lib/forms.ts'
-import { groupsClient, type GroupDto, type GroupsClient } from '../groups/client.ts'
+import { centsFromEuros, euros } from '~/lib/amounts'
+import { errorMessage } from '~/lib/errorMessage'
+import { field } from '~/lib/forms'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/client'
 
 type Props = {
   group: GroupDto

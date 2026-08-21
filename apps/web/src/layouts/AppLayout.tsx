@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { authClient } from '../lib/authClient.ts'
+import { authClient } from '~/lib/authClient'
 
 type Props = {
   session: { name: string } | null

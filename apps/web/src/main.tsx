@@ -1,13 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { AppLayout } from './layouts/AppLayout.tsx'
-import { authClient } from './lib/authClient.ts'
-import { useRoute } from './lib/router.tsx'
-import { AuthPage } from './pages/AuthPage.tsx'
-import { GroupsPage } from './pages/GroupsPage.tsx'
-import { GroupPage } from './pages/GroupPage.tsx'
-import { InvitePage } from './pages/InvitePage.tsx'
-import './index.css'
+import { AppLayout } from '~/layouts/AppLayout'
+import { authClient } from '~/lib/authClient'
+import { useRoute } from '~/lib/router'
+import { AuthPage } from '~/pages/AuthPage'
+import { GroupsPage } from '~/pages/GroupsPage'
+import { GroupPage } from '~/pages/GroupPage'
+import { InvitePage } from '~/pages/InvitePage'
+import '~/index.css'
 
 const App = () => {
   const route = useRoute()

@@ -1,8 +1,8 @@
-import { groupCreate } from '../domain/Group.entity.ts'
-import { groupNameFrom } from '../domain/GroupName.vo.ts'
-import type { IGroupRepository } from '../domain/IGroup.repository.ts'
-import { memberOf } from '../domain/Member.entity.ts'
-import { toGroupDto } from './ToGroup.mapper.ts'
+import { groupCreate } from '~/groups/domain/Group.entity'
+import { groupNameFrom } from '~/groups/domain/GroupName.vo'
+import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import { memberOf } from '~/groups/domain/Member.entity'
+import { toGroupDto } from '~/groups/application/ToGroup.mapper'
 
 export const createGroup = (groups: IGroupRepository) => ({
   execute: async (userId: string, userName: string, name: string) => {

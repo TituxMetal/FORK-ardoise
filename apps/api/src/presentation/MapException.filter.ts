@@ -1,4 +1,4 @@
-import type { DomainError } from '../domain/DomainError.ts'
+import type { DomainError } from '~/domain/DomainError'
 import type { Context } from 'hono'
 
 const isDomainError = (error: Error): error is DomainError =>

@@ -1,14 +1,14 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import type { IExpenseRepository } from '../../expenses/domain/IExpense.repository.ts'
-import { AMOUNT_POSITIVE } from '../../domain/Amount.ts'
-import { invalidData } from '../../domain/invalidData.ts'
-import type { IGroupRepository } from '../../groups/domain/IGroup.repository.ts'
-import type { IServiceRepository } from '../../services/domain/IService.repository.ts'
-import { createPayback } from '../application/CreatePayback.uc.ts'
-import { deletePayback } from '../application/DeletePayback.uc.ts'
-import type { IPaybackRepository } from '../domain/IPayback.repository.ts'
+import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import { AMOUNT_POSITIVE } from '~/domain/Amount'
+import { invalidData } from '~/domain/invalidData'
+import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import type { IServiceRepository } from '~/services/domain/IService.repository'
+import { createPayback } from '~/paybacks/application/CreatePayback.uc'
+import { deletePayback } from '~/paybacks/application/DeletePayback.uc'
+import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 
 const createPaybackBody = z.object({
   debtorId: z.string(),

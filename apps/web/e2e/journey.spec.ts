@@ -8,7 +8,7 @@ import {
   signUp,
   uniqueEmail,
   waitForApi
-} from './helpers.ts'
+} from './helpers'
 
 let ownerPage: Page
 let inviteUrl = ''

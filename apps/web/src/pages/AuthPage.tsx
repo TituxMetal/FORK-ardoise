@@ -1,3 +1,3 @@
-import { SessionForms } from '../features/session/SessionForms.tsx'
+import { SessionForms } from '~features/session/SessionForms'
 
 export const AuthPage = () => <SessionForms />

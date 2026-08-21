@@ -4,9 +4,9 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
-import type { GroupDto } from '../../groups/application/Group.dto.ts'
-import { createPrismaClient } from '../../infrastructure/CreatePrisma.client.ts'
-import { createApp } from '../../presentation/CreateApp.ts'
+import type { GroupDto } from '~/groups/application/Group.dto'
+import { createPrismaClient } from '~/infrastructure/CreatePrisma.client'
+import { createApp } from '~/presentation/CreateApp'
 
 const sessionSql = readFileSync(
   fileURLToPath(

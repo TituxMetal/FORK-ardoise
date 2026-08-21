@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Expense } from '../domain/Expense.entity.ts'
-import type { IExpenseRepository } from '../domain/IExpense.repository.ts'
-import { toExpense } from './ToExpense.mapper.ts'
+import type { Expense } from '~/expenses/domain/Expense.entity'
+import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import { toExpense } from '~/expenses/infrastructure/ToExpense.mapper'
 
 const include = { participants: true, parts: true } as const
 

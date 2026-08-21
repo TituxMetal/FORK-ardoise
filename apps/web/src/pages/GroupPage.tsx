@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Expenses } from '../features/expenses/Expenses.tsx'
-import { groupsClient, type GroupDto, type GroupsClient } from '../features/groups/client.ts'
-import { Paybacks } from '../features/paybacks/Paybacks.tsx'
-import { Services } from '../features/services/Services.tsx'
-import { Link } from '../lib/router.tsx'
+import { Expenses } from '~features/expenses/Expenses'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/client'
+import { Paybacks } from '~features/paybacks/Paybacks'
+import { Services } from '~features/services/Services'
+import { Link } from '~/lib/router'
 
 type Props = {
   id: string

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from '../../domain/Amount.ts'
+import { amountFromCents } from '~/domain/Amount'
 import {
   PAYBACK_ABOVE_CAP,
   PAYBACK_CREDITOR_NOT_POSITIVE,
   PAYBACK_DEBTOR_NOT_NEGATIVE,
   paybackCap,
   paybackCreate
-} from './Payback.entity.ts'
+} from '~/paybacks/domain/Payback.entity'
 
 describe('Payback', () => {
   it('caps a Payback at the min of what the debtor owes and the creditor is owed', () => {

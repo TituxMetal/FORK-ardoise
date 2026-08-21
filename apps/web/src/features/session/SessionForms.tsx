@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { authClient } from '../../lib/authClient.ts'
-import { field } from '../../lib/forms.ts'
+import { authClient } from '~/lib/authClient'
+import { field } from '~/lib/forms'
 
 export const SessionForms = () => {
   const [error, setError] = useState('')

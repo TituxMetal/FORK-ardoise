@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { errorMessage } from '../../lib/errorMessage.ts'
-import { field } from '../../lib/forms.ts'
-import { groupsClient, type GroupsClient } from './client.ts'
+import { errorMessage } from '~/lib/errorMessage'
+import { field } from '~/lib/forms'
+import { groupsClient, type GroupsClient } from '~features/groups/client'
 
 type Props = {
   client?: GroupsClient

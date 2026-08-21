@@ -1,9 +1,9 @@
-import type { Expense } from '../../expenses/domain/Expense.entity.ts'
-import { balancesOf } from '../../domain/Balance.ts'
-import type { Payback } from '../../paybacks/domain/Payback.entity.ts'
-import type { Service } from '../../services/domain/Service.entity.ts'
-import type { Group } from '../domain/Group.entity.ts'
-import type { GroupDto } from './Group.dto.ts'
+import type { Expense } from '~/expenses/domain/Expense.entity'
+import { balancesOf } from '~/domain/Balance'
+import type { Payback } from '~/paybacks/domain/Payback.entity'
+import type { Service } from '~/services/domain/Service.entity'
+import type { Group } from '~/groups/domain/Group.entity'
+import type { GroupDto } from '~/groups/application/Group.dto'
 
 export const toGroupDto = (
   group: Group,

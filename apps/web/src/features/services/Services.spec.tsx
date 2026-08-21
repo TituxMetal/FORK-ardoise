@@ -3,11 +3,11 @@ import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-import { euros } from '../../lib/amounts.ts'
-import { Expenses } from '../expenses/Expenses.tsx'
-import type { GroupDto } from '../groups/client.ts'
-import { createMemoryClient } from '../groups/memoryClient.ts'
-import { Services } from './Services.tsx'
+import { euros } from '~/lib/amounts'
+import { Expenses } from '~features/expenses/Expenses'
+import type { GroupDto } from '~features/groups/client'
+import { createMemoryClient } from '~features/groups/memoryClient'
+import { Services } from '~features/services/Services'
 
 afterEach(cleanup)
 

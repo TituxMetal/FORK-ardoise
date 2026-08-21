@@ -1,7 +1,7 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-import { Link, parsePath } from './router.tsx'
+import { Link, parsePath } from '~/lib/router'
 
 afterEach(() => {
   cleanup()

@@ -1,5 +1,5 @@
-import { invalidData } from './invalidData.ts'
-import { amountFromNonNegativeCents, type Amount } from './Amount.ts'
+import { invalidData } from '~/domain/invalidData'
+import { amountFromNonNegativeCents, type Amount } from '~/domain/Amount'
 
 export type Part = {
   userId: string

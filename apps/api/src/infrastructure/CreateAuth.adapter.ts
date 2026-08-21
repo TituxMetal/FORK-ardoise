@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
-import type { IAuth } from '../application/IAuth.port.ts'
+import type { IAuth } from '~/application/IAuth.port'
 
 export const createAuth = (prisma: PrismaClient): IAuth => {
   const auth = betterAuth({

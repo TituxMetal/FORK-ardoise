@@ -1,7 +1,7 @@
-import type { Amount } from '../../domain/Amount.ts'
-import { equalParts, type Part } from '../../domain/Part.ts'
-import type { Day } from './Day.vo.ts'
-import type { Label } from './Label.vo.ts'
+import type { Amount } from '~/domain/Amount'
+import { equalParts, type Part } from '~/domain/Part'
+import type { Day } from '~/expenses/domain/Day.vo'
+import type { Label } from '~/expenses/domain/Label.vo'
 
 export type Expense = {
   id: string

@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import { joinGroup } from '../application/JoinGroup.uc.ts'
-import type { IGroupRepository } from '../domain/IGroup.repository.ts'
+import { joinGroup } from '~/groups/application/JoinGroup.uc'
+import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
 
 export const createInvitesRoutes = (groups: IGroupRepository) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()

@@ -1,7 +1,7 @@
-import type { Day } from '../../expenses/domain/Day.vo.ts'
-import type { Label } from '../../expenses/domain/Label.vo.ts'
-import type { Amount } from '../../domain/Amount.ts'
-import { equalParts, type Part } from '../../domain/Part.ts'
+import type { Day } from '~/expenses/domain/Day.vo'
+import type { Label } from '~/expenses/domain/Label.vo'
+import type { Amount } from '~/domain/Amount'
+import { equalParts, type Part } from '~/domain/Part'
 
 export type Service = {
   id: string

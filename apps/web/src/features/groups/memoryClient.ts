@@ -5,7 +5,7 @@ import type {
   GroupDto,
   GroupSummary,
   GroupsClient
-} from './client.ts'
+} from '~features/groups/client'
 
 const emptyGroup = (id: string, name: string, members: GroupDto['members']): GroupDto => ({
   id,

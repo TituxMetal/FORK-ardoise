@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from './Amount.ts'
-import { equalParts } from './Part.ts'
-import { balancesOf } from './Balance.ts'
+import { amountFromCents } from '~/domain/Amount'
+import { equalParts } from '~/domain/Part'
+import { balancesOf } from '~/domain/Balance'
 
 const members = [
   { userId: 'lea', name: 'Léa' },

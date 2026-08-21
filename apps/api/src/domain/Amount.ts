@@ -1,4 +1,4 @@
-import { invalidData } from './invalidData.ts'
+import { invalidData } from '~/domain/invalidData'
 
 export type Amount = {
   value: number
