@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from '~/domain/Amount'
+import { amountFromCents } from '~/shared/domain'
 import {
   PAYBACK_ABOVE_CAP,
   PAYBACK_CREDITOR_NOT_POSITIVE,

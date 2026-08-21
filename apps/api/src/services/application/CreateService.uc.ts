@@ -1,9 +1,8 @@
 import { dayFrom } from '~/expenses/domain/Day.vo'
 import { labelFrom } from '~/expenses/domain/Label.vo'
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
-import { amountFromCents } from '~/domain/Amount'
-import { invalidData } from '~/domain/invalidData'
-import { notFound } from '~/domain/notFound'
+import { amountFromCents, invalidData, notFound } from '~/shared/domain'
+
 import { toGroupDto } from '~/groups/application/ToGroup.mapper'
 import { groupHasMember } from '~/groups/domain/Group.entity'
 import type { IGroupRepository } from '~/groups/domain/IGroup.repository'

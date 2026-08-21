@@ -1,5 +1,5 @@
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
-import { notFound } from '~/domain/notFound'
+import { notFound } from '~/shared/domain'
 import { toGroupDto } from '~/groups/application/ToGroup.mapper'
 import { groupHasMember } from '~/groups/domain/Group.entity'
 import type { IGroupRepository } from '~/groups/domain/IGroup.repository'

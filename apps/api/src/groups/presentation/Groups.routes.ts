@@ -1,7 +1,7 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { invalidData } from '~/domain/invalidData'
+import { invalidData } from '~/shared/domain'
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 import type { IServiceRepository } from '~/services/domain/IService.repository'

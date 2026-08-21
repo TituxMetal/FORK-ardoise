@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
-import { createPrismaClient } from '~/infrastructure/CreatePrisma.client'
+import { createPrismaClient } from '~/shared/infrastructure'
 import { createApp } from '~/presentation/CreateApp'
 import type { GroupDto } from '~/groups/application/Group.dto'
 

@@ -1,7 +1,5 @@
-import { amountFromCents } from '~/domain/Amount'
-import { balancesOf } from '~/domain/Balance'
-import { invalidData } from '~/domain/invalidData'
-import { notFound } from '~/domain/notFound'
+import { amountFromCents, balancesOf, invalidData, notFound } from '~/shared/domain'
+
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
 import { toGroupDto } from '~/groups/application/ToGroup.mapper'
 import { groupHasMember } from '~/groups/domain/Group.entity'

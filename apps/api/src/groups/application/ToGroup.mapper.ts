@@ -1,5 +1,5 @@
 import type { Expense } from '~/expenses/domain/Expense.entity'
-import { balancesOf } from '~/domain/Balance'
+import { balancesOf } from '~/shared/domain'
 import type { Payback } from '~/paybacks/domain/Payback.entity'
 import type { Service } from '~/services/domain/Service.entity'
 import type { Group } from '~/groups/domain/Group.entity'

@@ -1,5 +1,5 @@
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
-import { notFound } from '~/domain/notFound'
+import { notFound } from '~/shared/domain'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 import type { IServiceRepository } from '~/services/domain/IService.repository'
 import { groupHasMember } from '~/groups/domain/Group.entity'

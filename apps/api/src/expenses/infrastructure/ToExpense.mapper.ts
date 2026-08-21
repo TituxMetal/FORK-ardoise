@@ -1,4 +1,4 @@
-import { amountReconstitute } from '~/domain/Amount'
+import { amountReconstitute } from '~/shared/domain'
 import { dayReconstitute } from '~/expenses/domain/Day.vo'
 import { expenseReconstitute } from '~/expenses/domain/Expense.entity'
 import { labelReconstitute } from '~/expenses/domain/Label.vo'

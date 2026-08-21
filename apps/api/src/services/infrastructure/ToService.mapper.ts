@@ -1,6 +1,6 @@
 import { dayReconstitute } from '~/expenses/domain/Day.vo'
 import { labelReconstitute } from '~/expenses/domain/Label.vo'
-import { amountReconstitute } from '~/domain/Amount'
+import { amountReconstitute } from '~/shared/domain'
 import { serviceReconstitute } from '~/services/domain/Service.entity'
 
 export const toService = (row: {

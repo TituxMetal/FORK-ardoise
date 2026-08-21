@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from '~/domain/Amount'
-import { PARTICIPANTS_REQUIRED } from '~/domain/Part'
+import { amountFromCents, PARTICIPANTS_REQUIRED } from '~/shared/domain'
+
 import { dayReconstitute } from '~/expenses/domain/Day.vo'
 import { expenseCreate } from '~/expenses/domain/Expense.entity'
 import { labelReconstitute } from '~/expenses/domain/Label.vo'

@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
-import type { IAuth } from '~/application/IAuth.port'
+import type { Auth } from '~/shared/application'
 import { prismaExpenseRepository } from '~/expenses/infrastructure/PrismaExpense.repository'
 import { createExpensesRoutes } from '~/expenses/presentation/Expenses.routes'
 import { prismaGroupRepository } from '~/groups/infrastructure/PrismaGroup.repository'
@@ -10,14 +10,13 @@ import { prismaServiceRepository } from '~/services/infrastructure/PrismaService
 import { createServicesRoutes } from '~/services/presentation/Services.routes'
 import { prismaPaybackRepository } from '~/paybacks/infrastructure/PrismaPayback.repository'
 import { createPaybacksRoutes } from '~/paybacks/presentation/Paybacks.routes'
-import { createAuth } from '~/infrastructure/CreateAuth.adapter'
-import { createPrismaClient } from '~/infrastructure/CreatePrisma.client'
-import { mapException } from '~/presentation/MapException.filter'
-import { requireSession } from '~/presentation/RequireSession.middleware'
+import { createAuth, createPrismaClient } from '~/shared/infrastructure'
+
+import { mapException, requireSession } from '~/shared/presentation'
 
 export const createApp = (
   prisma: PrismaClient = createPrismaClient(),
-  auth: IAuth = createAuth(prisma)
+  auth: Auth = createAuth(prisma)
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const groups = prismaGroupRepository(prisma)

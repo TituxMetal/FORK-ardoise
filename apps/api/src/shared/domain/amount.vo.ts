@@ -1,4 +1,4 @@
-import { invalidData } from '~/domain/invalidData'
+import { invalidData } from './invalidData.vo'
 
 export type Amount = {
   value: number

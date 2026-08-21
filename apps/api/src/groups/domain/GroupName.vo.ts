@@ -1,4 +1,4 @@
-import { invalidData } from '~/domain/invalidData'
+import { invalidData } from '~/shared/domain'
 
 export type GroupName = {
   value: string

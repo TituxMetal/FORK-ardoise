@@ -1,8 +1,8 @@
 import { createMiddleware } from 'hono/factory'
-import type { IAuth } from '~/application/IAuth.port'
-import { unauthorized } from '~/domain/unauthorized'
+import type { Auth } from '~/shared/application'
+import { unauthorized } from '~/shared/domain'
 
-export const requireSession = (auth: IAuth) =>
+export const requireSession = (auth: Auth) =>
   createMiddleware(async (c, next) => {
     const user = await auth.getSessionUser(c.req.raw.headers)
     if (!user) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from '~/domain/Amount'
-import { PARTICIPANTS_REQUIRED, equalParts } from '~/domain/Part'
+import { amountFromCents } from './amount.vo'
+import { PARTICIPANTS_REQUIRED, equalParts } from './part.vo'
 
 describe('equalParts', () => {
   it('gives the Payer the remainder among the Participants', () => {
@@ -35,6 +35,8 @@ describe('equalParts', () => {
   })
 
   it('refuses zero Participants', () => {
-    expect(() => equalParts(amountFromCents(100), [], 'lea')).toThrow(PARTICIPANTS_REQUIRED)
+    const parts = () => equalParts(amountFromCents(100), [], 'lea')
+
+    expect(parts).toThrow(PARTICIPANTS_REQUIRED)
   })
 })

@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Alias } from 'vite'
@@ -9,7 +9,17 @@ const webUi = fileURLToPath(new URL('./src/components/ui', import.meta.url))
 const webFeatures = fileURLToPath(new URL('./src/features', import.meta.url))
 
 const withExtension = (target: string): string => {
-  if (existsSync(target)) return target
+  if (existsSync(target)) {
+    try {
+      if (statSync(target).isDirectory()) {
+        if (existsSync(join(target, 'index.ts'))) return join(target, 'index.ts')
+        if (existsSync(join(target, 'index.tsx'))) return join(target, 'index.tsx')
+      }
+    } catch {
+      return target
+    }
+    return target
+  }
   if (existsSync(`${target}.ts`)) return `${target}.ts`
   if (existsSync(`${target}.tsx`)) return `${target}.tsx`
   return target

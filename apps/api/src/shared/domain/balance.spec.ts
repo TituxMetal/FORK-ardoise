@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from '~/domain/Amount'
-import { equalParts } from '~/domain/Part'
-import { balancesOf } from '~/domain/Balance'
+import { amountFromCents } from './amount.vo'
+import { equalParts } from './part.vo'
+import { balancesOf } from './balance.rule'
 
 const members = [
   { userId: 'lea', name: 'Léa' },
@@ -12,6 +12,7 @@ const members = [
 describe('balancesOf', () => {
   it('credits the Payer and debits the other Participants', () => {
     const parts = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
+
     const balances = balancesOf(members, [{ payerId: 'lea', amount: 100, parts }])
 
     expect(balances).toEqual([
@@ -24,6 +25,7 @@ describe('balancesOf', () => {
   it('gives a Payer outside the Participants the remainder and sums to 0', () => {
     const people = [...members, { userId: 'dan', name: 'Dan' }]
     const parts = equalParts(amountFromCents(100), ['bob', 'camille', 'dan'], 'lea')
+
     const balances = balancesOf(people, [{ payerId: 'lea', amount: 100, parts }])
 
     expect(balances).toEqual([
@@ -37,6 +39,7 @@ describe('balancesOf', () => {
 
   it('does not let an Expense in one Group change the Balances of another', () => {
     const parts = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
+
     const friends = balancesOf(members, [{ payerId: 'lea', amount: 100, parts }])
     const coworkers = balancesOf(
       [
@@ -55,6 +58,7 @@ describe('balancesOf', () => {
 
   it('credits the Provider of a Service like the Payer of an Expense', () => {
     const parts = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
+
     const balances = balancesOf(members, [], [{ providerId: 'lea', amount: 100, parts }])
 
     expect(balances).toEqual([
@@ -67,6 +71,7 @@ describe('balancesOf', () => {
   it('lets an Expense and a Service in the same Group cancel out', () => {
     const pizza = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
     const computer = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'bob')
+
     const balances = balancesOf(
       members,
       [{ payerId: 'lea', amount: 100, parts: pizza }],
@@ -81,15 +86,9 @@ describe('balancesOf', () => {
     expect(balances.reduce((sum, balance) => sum + balance.amount, 0)).toBe(0)
   })
 
-  it('credits the Provider of a Service only when it is a Service', () => {
-    const parts = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
-    const balances = balancesOf(members, [], [{ providerId: 'lea', amount: 100, parts }])
-
-    expect(balances.find(balance => balance.userId === 'lea')?.amount).toBe(66)
-  })
-
   it('debits the debtor and credits the creditor of a Payback', () => {
     const parts = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
+
     const balances = balancesOf(
       members,
       [{ payerId: 'lea', amount: 100, parts }],
@@ -107,6 +106,7 @@ describe('balancesOf', () => {
 
   it('leaves Balances that still sum to 0 after a partial Payback', () => {
     const parts = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
+
     const balances = balancesOf(
       members,
       [{ payerId: 'lea', amount: 100, parts }],
@@ -125,6 +125,7 @@ describe('balancesOf', () => {
   it('computes the complete Balance from paid, services, parts, received and paid back', () => {
     const pizza = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'lea')
     const computer = equalParts(amountFromCents(100), ['lea', 'bob', 'camille'], 'bob')
+
     const balances = balancesOf(
       members,
       [{ payerId: 'lea', amount: 100, parts: pizza }],

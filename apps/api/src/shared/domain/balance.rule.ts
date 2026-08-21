@@ -1,4 +1,4 @@
-import type { Part } from '~/domain/Part'
+import type { Part } from './part.vo'
 
 export type Balance = {
   userId: string

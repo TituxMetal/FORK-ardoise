@@ -1,4 +1,4 @@
-import { notFound } from '~/domain/notFound'
+import { notFound } from '~/shared/domain'
 import { groupAddMember } from '~/groups/domain/Group.entity'
 import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
 import { memberOf } from '~/groups/domain/Member.entity'
