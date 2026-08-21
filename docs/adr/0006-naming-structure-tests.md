@@ -4,11 +4,11 @@ The retrofit copied a NestJS-shaped style onto a Hono app: PascalCase files, `I`
 
 ## Naming
 
-PascalCase is for React components and exported types. A function file is camelCase. There are no classes, so no file is named like a class.
+PascalCase is for React component files and exported type identifiers (`GroupPage.tsx`, `GroupDto`). Every other module file — function, type, value object — is camelCase + role suffix. A function file is never PascalCase. There are no classes, so no file is named like a class.
 
 Every non-barrel file in `apps/api/src` carries a role suffix — the table lives in `CODING_STANDARDS.md` (`.entity`, `.vo`, `.rule`, `.repository`, `.adapter`, `.uc`, `.dto`, `.mapper`, `.routes`, `.middleware`, `.filter`, `.client`, `.port`, `index.ts`). The layer folder says the layer, the suffix says the role; no per-role subfolders.
 
-Web function modules carry a role suffix when the role exists (`groups.client.ts`, `auth.schema.ts`); components and types stay PascalCase.
+Web function modules carry a role suffix when the role exists (`groups.client.ts`, `auth.schema.ts`); component files and exported type identifiers stay PascalCase (`GroupPage.tsx`, `GroupDto`).
 
 ## Structure
 

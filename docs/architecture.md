@@ -11,7 +11,7 @@ Do not merge them into one Hono+SPA app. The HTTP API is the product seam. Ardoi
 
 ## Contract
 
-The API composes a single Hono app in `createApp.ts`. Its type is the contract:
+The retrofit target: the API composes a single Hono app in `createApp.ts`. Its type is the contract:
 
 ```ts
 // apps/api/src/createApp.ts
@@ -19,11 +19,11 @@ export const createApp = () => { … }
 export type AppType = ReturnType<typeof createApp>
 ```
 
-The web imports `AppType` type-only (through the `api/*` alias, erased at build) and calls the API through `hc<AppType>` from `hono/client`. Input types come from the `zValidator` schemas, output types from `c.json()` — no hand-written client, no shared package. better-auth keeps its own client (`authClient`). API errors are not inferred by `hc`: a thin wrapper reads `res.json()` and throws, keeping the `throw` contract components expect.
+Today `createApp` lives at `apps/api/src/presentation/CreateApp.ts`; the retrofit moves it to `src/` root (see #10). The web imports `AppType` type-only (through the `api/*` alias, erased at build) and calls the API through `hc<AppType>` from `hono/client`. Input types come from the `zValidator` schemas, output types from `c.json()` — no hand-written client, no shared package. better-auth keeps its own client (`authClient`). API errors are not inferred by `hc`: a thin wrapper reads `res.json()` and throws, keeping the `throw` contract components expect.
 
 ## API
 
-Folders by vocabulary (`groups`, `expenses`, `services`, `paybacks`, …), plus `shared/` for everything shared between vocabularies. Entry points sit at the `src/` root, like NestJS `main.ts`:
+Folders by vocabulary (`groups`, `expenses`, `services`, `paybacks`, …), plus `shared/` for everything shared between vocabularies. Entry points sit at the `src/` root, like NestJS `main.ts`. This is the post-retrofit target tree (today the API still lives in the old shape: `presentation/CreateApp.ts`, `presentation/StartServer.ts`, French-named leftovers — the retrofit ticket #10 moves it):
 
 ```text
 apps/api/src/
@@ -85,7 +85,7 @@ One file, one colocated spec; Arrange / Act / Assert separated by a blank line. 
 ## Names
 
 - Folders kebab-case.
-- Component and type files PascalCase (`GroupPage.tsx`). PascalCase is never a function file.
+- Component files PascalCase (`GroupPage.tsx`); exported type identifiers PascalCase (`GroupDto`); module files camelCase + role suffix. PascalCase is never a function file.
 - Function modules camelCase with a role suffix when the role exists.
 - Specs sit next to the file, suffix `.spec.ts` / `.spec.tsx`.
 - Aliases: `~`, `~ui`, `~features`, `api/*`. Imports carry no extension.

@@ -14,7 +14,7 @@ The retrofit ticket moves the current tree to these rules. Do not mix a rename i
 
 - `apps/api` + `apps/web`. See `docs/architecture.md`.
 - `export const` only. No `class`. No `function` keyword.
-- No `I` prefix on interfaces. PascalCase is for React components and exported types, never for a function file.
+- No `I` prefix on interfaces. PascalCase is for React component files and exported type identifiers; every other module file is camelCase + role suffix. A function file is never PascalCase.
 
 ## API files
 
@@ -43,7 +43,7 @@ No per-role subfolders (`entities/`, `value-objects/`, `use-cases/`): the layer 
 - `pages/` one file per route, composes feature components.
 - `features/<name>/`: `components/` + `api/` always; `hooks/`, `schemas/`, `store/`, `types/`, `utils/` as the feature needs them. Never an empty folder.
 - `components/ui/`: shared reusable UI (Input, Button, FormWrapper…), barrel `index.ts`.
-- Component / type files PascalCase (`GroupPage.tsx`, `Input.tsx`).
+- Component files PascalCase (`GroupPage.tsx`, `Input.tsx`); exported type identifiers PascalCase (`GroupDto`); type modules camelCase + suffix (`auth.types.ts`).
 - Function modules camelCase with a role suffix when the role exists (`groups.client.ts`, `auth.schema.ts`, `auth.store.ts`); no invented suffix (`amounts.ts`, `errorMessage.ts`).
 - Specs colocated, `.spec.ts` / `.spec.tsx`.
 - Playwright specs: `apps/web/e2e/` — one suite over the whole product, not colocated.
