@@ -3,9 +3,9 @@ import { labelFrom } from '~/expenses/domain/Label.vo'
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
 import { amountFromCents, invalidData, notFound } from '~/shared/domain'
 
-import { toGroupDto } from '~/groups/application/ToGroup.mapper'
-import { groupHasMember } from '~/groups/domain/Group.entity'
-import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import { toGroupDto } from '~/groups/application/toGroup.mapper'
+import { groupHasMember } from '~/groups/domain/group.entity'
+import type { GroupRepository } from '~/groups/domain/group.repository'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 import { serviceCreate } from '~/services/domain/Service.entity'
 import type { IServiceRepository } from '~/services/domain/IService.repository'
@@ -19,7 +19,7 @@ export type CreateServiceInput = {
 }
 
 export const createService = (
-  groups: IGroupRepository,
+  groups: GroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository

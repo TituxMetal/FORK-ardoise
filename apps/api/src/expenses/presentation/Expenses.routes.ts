@@ -6,7 +6,7 @@ import { LABEL_REQUIRED } from '~/expenses/domain/Label.vo'
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
 
-import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import type { GroupRepository } from '~/groups/domain/group.repository'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 import type { IServiceRepository } from '~/services/domain/IService.repository'
 import { createExpense } from '~/expenses/application/CreateExpense.uc'
@@ -21,7 +21,7 @@ const createExpenseBody = z.object({
 })
 
 export const createExpensesRoutes = (
-  groups: IGroupRepository,
+  groups: GroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository

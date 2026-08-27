@@ -1,11 +1,11 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Group } from '~/groups/domain/Group.entity'
-import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
-import { toGroup } from '~/groups/infrastructure/ToGroup.mapper'
+import type { Group } from '~/groups/domain/group.entity'
+import type { GroupRepository } from '~/groups/domain/group.repository'
+import { toGroup } from '~/groups/infrastructure/toGroup.mapper'
 
 const include = { members: true } as const
 
-export const prismaGroupRepository = (prisma: PrismaClient): IGroupRepository => ({
+export const prismaGroupAdapter = (prisma: PrismaClient): GroupRepository => ({
   async save(group: Group) {
     const existing = await prisma.group.findUnique({
       where: { id: group.id },

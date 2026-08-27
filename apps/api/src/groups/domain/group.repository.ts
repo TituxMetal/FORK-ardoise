@@ -1,8 +1,6 @@
-import type { Group } from '~/groups/domain/Group.entity'
+import type { Group } from '~/groups/domain/group.entity'
 
-export const IGroupRepository = Symbol('IGroupRepository')
-
-export type IGroupRepository = {
+export type GroupRepository = {
   save: (group: Group) => Promise<void>
   findById: (id: string) => Promise<Group | null>
   findByUserId: (userId: string) => Promise<Group[]>

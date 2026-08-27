@@ -5,18 +5,18 @@ import { invalidData } from '~/shared/domain'
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 import type { IServiceRepository } from '~/services/domain/IService.repository'
-import { createGroup } from '~/groups/application/CreateGroup.uc'
-import { getGroup } from '~/groups/application/GetGroup.uc'
-import { listGroups } from '~/groups/application/ListGroups.uc'
-import { GROUP_NAME_REQUIRED } from '~/groups/domain/GroupName.vo'
-import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import { createGroup } from '~/groups/application/createGroup.uc'
+import { getGroup } from '~/groups/application/getGroup.uc'
+import { listGroups } from '~/groups/application/listGroups.uc'
+import { GROUP_NAME_REQUIRED } from '~/groups/domain/groupName.vo'
+import type { GroupRepository } from '~/groups/domain/group.repository'
 
 const createGroupBody = z.object({
   name: z.string({ error: GROUP_NAME_REQUIRED })
 })
 
 export const createGroupsRoutes = (
-  groups: IGroupRepository,
+  groups: GroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository

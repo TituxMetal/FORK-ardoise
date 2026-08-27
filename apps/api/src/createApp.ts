@@ -3,9 +3,9 @@ import { Hono } from 'hono'
 import type { Auth } from '~/shared/application'
 import { prismaExpenseRepository } from '~/expenses/infrastructure/PrismaExpense.repository'
 import { createExpensesRoutes } from '~/expenses/presentation/Expenses.routes'
-import { prismaGroupRepository } from '~/groups/infrastructure/PrismaGroup.repository'
-import { createGroupsRoutes } from '~/groups/presentation/Groups.routes'
-import { createInvitesRoutes } from '~/groups/presentation/Invites.routes'
+import { prismaGroupAdapter } from '~/groups/infrastructure/prismaGroup.adapter'
+import { createGroupsRoutes } from '~/groups/presentation/groups.routes'
+import { createInvitesRoutes } from '~/groups/presentation/invites.routes'
 import { prismaServiceRepository } from '~/services/infrastructure/PrismaService.repository'
 import { createServicesRoutes } from '~/services/presentation/Services.routes'
 import { prismaPaybackRepository } from '~/paybacks/infrastructure/PrismaPayback.repository'
@@ -19,7 +19,7 @@ export const createApp = (
   auth: Auth = createAuth(prisma)
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
-  const groups = prismaGroupRepository(prisma)
+  const groups = prismaGroupAdapter(prisma)
   const expenses = prismaExpenseRepository(prisma)
   const services = prismaServiceRepository(prisma)
   const paybacks = prismaPaybackRepository(prisma)

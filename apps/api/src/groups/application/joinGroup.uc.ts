@@ -1,10 +1,10 @@
 import { notFound } from '~/shared/domain'
-import { groupAddMember } from '~/groups/domain/Group.entity'
-import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
-import { memberOf } from '~/groups/domain/Member.entity'
-import { toGroupDto } from '~/groups/application/ToGroup.mapper'
+import { groupAddMember } from '~/groups/domain/group.entity'
+import type { GroupRepository } from '~/groups/domain/group.repository'
+import { memberOf } from '~/groups/domain/member.entity'
+import { toGroupDto } from '~/groups/application/toGroup.mapper'
 
-export const joinGroup = (groups: IGroupRepository) => ({
+export const joinGroup = (groups: GroupRepository) => ({
   execute: async (userId: string, userName: string, secret: string) => {
     const group = await groups.findByInviteSecret(secret)
     if (!group) {

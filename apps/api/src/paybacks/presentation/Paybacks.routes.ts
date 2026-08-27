@@ -4,7 +4,7 @@ import { z } from 'zod'
 import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
 
-import type { IGroupRepository } from '~/groups/domain/IGroup.repository'
+import type { GroupRepository } from '~/groups/domain/group.repository'
 import type { IServiceRepository } from '~/services/domain/IService.repository'
 import { createPayback } from '~/paybacks/application/CreatePayback.uc'
 import { deletePayback } from '~/paybacks/application/DeletePayback.uc'
@@ -17,7 +17,7 @@ const createPaybackBody = z.object({
 })
 
 export const createPaybacksRoutes = (
-  groups: IGroupRepository,
+  groups: GroupRepository,
   expenses: IExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository

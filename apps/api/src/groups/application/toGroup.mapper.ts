@@ -2,8 +2,8 @@ import type { Expense } from '~/expenses/domain/Expense.entity'
 import { balancesOf } from '~/shared/domain'
 import type { Payback } from '~/paybacks/domain/Payback.entity'
 import type { Service } from '~/services/domain/Service.entity'
-import type { Group } from '~/groups/domain/Group.entity'
-import type { GroupDto } from '~/groups/application/Group.dto'
+import type { Group } from '~/groups/domain/group.entity'
+import type { GroupDto } from '~/groups/application/group.dto'
 
 export const toGroupDto = (
   group: Group,

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
 import { createPrismaClient } from '~/shared/infrastructure'
 import { createApp } from '~/createApp'
-import type { GroupDto } from '~/groups/application/Group.dto'
+import type { GroupDto } from '~/groups/application/group.dto'
 
 const sessionSql = readFileSync(
   fileURLToPath(
@@ -128,6 +128,7 @@ describe('groups', () => {
   it('creating a named Group makes the creator the first Member', async () => {
     const app = await createTestApp()
     const opened = await signUp(app)
+
     const response = await createGroup(app, cookieHeader(opened), 'Potes de Bob')
 
     expect(response.status).toBe(201)
@@ -192,6 +193,7 @@ describe('groups', () => {
     await createGroup(app, cookie, 'Collègues')
 
     const listed = await app.request('/groups', { headers: { cookie } })
+
     expect(listed.status).toBe(200)
     expect(await listed.json()).toEqual([
       { id: expect.any(String), name: 'Potes de Bob' },
@@ -202,6 +204,7 @@ describe('groups', () => {
   it('creating a Group with a non-string name is refused with 400', async () => {
     const app = await createTestApp()
     const opened = await signUp(app)
+
     const response = await app.request('/groups', {
       method: 'POST',
       headers: { cookie: cookieHeader(opened), 'content-type': 'application/json' },
@@ -218,6 +221,7 @@ describe('groups', () => {
 
   it('creating a Group without a session is refused with 401', async () => {
     const app = await createTestApp()
+
     const response = await app.request('/groups', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
