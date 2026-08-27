@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { invalidData } from '~/shared/domain'
 import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
-import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
+import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import type { ServiceRepository } from '~/services/domain/service.repository'
 import { createGroup } from '~/groups/application/createGroup.uc'
 import { getGroup } from '~/groups/application/getGroup.uc'
@@ -19,7 +19,7 @@ export const createGroupsRoutes = (
   groups: GroupRepository,
   expenses: ExpenseRepository,
   services: ServiceRepository,
-  paybacks: IPaybackRepository
+  paybacks: PaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createGroupUseCase = createGroup(groups)

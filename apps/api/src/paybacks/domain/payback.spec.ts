@@ -6,7 +6,7 @@ import {
   PAYBACK_DEBTOR_NOT_NEGATIVE,
   paybackCap,
   paybackCreate
-} from '~/paybacks/domain/Payback.entity'
+} from '~/paybacks/domain/payback.entity'
 
 describe('Payback', () => {
   it('caps a Payback at the min of what the debtor owes and the creditor is owed', () => {

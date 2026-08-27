@@ -1,9 +1,9 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Payback } from '~/paybacks/domain/Payback.entity'
-import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
-import { toPayback } from '~/paybacks/infrastructure/ToPayback.mapper'
+import type { Payback } from '~/paybacks/domain/payback.entity'
+import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
+import { toPayback } from '~/paybacks/infrastructure/toPayback.mapper'
 
-export const prismaPaybackRepository = (prisma: PrismaClient): IPaybackRepository => ({
+export const prismaPaybackAdapter = (prisma: PrismaClient): PaybackRepository => ({
   async save(payback: Payback) {
     await prisma.payback.create({
       data: {

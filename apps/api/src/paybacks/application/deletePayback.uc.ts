@@ -4,13 +4,13 @@ import { toGroupDto } from '~/groups/application/toGroup.mapper'
 import { groupHasMember } from '~/groups/domain/group.entity'
 import type { GroupRepository } from '~/groups/domain/group.repository'
 import type { ServiceRepository } from '~/services/domain/service.repository'
-import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
+import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 
 export const deletePayback = (
   groups: GroupRepository,
   expenses: ExpenseRepository,
   services: ServiceRepository,
-  paybacks: IPaybackRepository
+  paybacks: PaybackRepository
 ) => ({
   execute: async (userId: string, groupId: string, paybackId: string) => {
     const group = await groups.findById(groupId)

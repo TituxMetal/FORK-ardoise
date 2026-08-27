@@ -1,8 +1,8 @@
-import type { Payback } from '~/paybacks/domain/Payback.entity'
+import type { Payback } from '~/paybacks/domain/payback.entity'
 
-export const IPaybackRepository = Symbol('IPaybackRepository')
+export const PaybackRepository = Symbol('PaybackRepository')
 
-export type IPaybackRepository = {
+export type PaybackRepository = {
   save: (payback: Payback) => Promise<void>
   findById: (id: string) => Promise<Payback | null>
   findByGroupId: (groupId: string) => Promise<Payback[]>

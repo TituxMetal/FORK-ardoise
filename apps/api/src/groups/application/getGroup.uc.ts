@@ -1,6 +1,6 @@
 import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { notFound } from '~/shared/domain'
-import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
+import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import type { ServiceRepository } from '~/services/domain/service.repository'
 import { groupHasMember } from '~/groups/domain/group.entity'
 import type { GroupRepository } from '~/groups/domain/group.repository'
@@ -10,7 +10,7 @@ export const getGroup = (
   groups: GroupRepository,
   expenses: ExpenseRepository,
   services: ServiceRepository,
-  paybacks: IPaybackRepository
+  paybacks: PaybackRepository
 ) => ({
   execute: async (userId: string, groupId: string) => {
     const group = await groups.findById(groupId)

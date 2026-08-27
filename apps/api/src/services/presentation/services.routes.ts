@@ -7,7 +7,7 @@ import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
 
 import type { GroupRepository } from '~/groups/domain/group.repository'
-import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
+import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import { createService } from '~/services/application/createService.uc'
 import { deleteService } from '~/services/application/deleteService.uc'
 import type { ServiceRepository } from '~/services/domain/service.repository'
@@ -24,7 +24,7 @@ export const createServicesRoutes = (
   groups: GroupRepository,
   expenses: ExpenseRepository,
   services: ServiceRepository,
-  paybacks: IPaybackRepository
+  paybacks: PaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createServiceUseCase = createService(groups, expenses, services, paybacks)

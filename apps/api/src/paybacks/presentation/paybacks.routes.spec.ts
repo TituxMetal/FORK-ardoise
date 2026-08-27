@@ -11,7 +11,7 @@ import {
   PAYBACK_ABOVE_CAP,
   PAYBACK_CREDITOR_NOT_POSITIVE,
   PAYBACK_DEBTOR_NOT_NEGATIVE
-} from '~/paybacks/domain/Payback.entity'
+} from '~/paybacks/domain/payback.entity'
 
 const sessionSql = readFileSync(
   fileURLToPath(
@@ -273,6 +273,7 @@ describe('paybacks', () => {
 
     for (const refusal of refusals) {
       const response = await createPayback(app, lea.cookie, group.id, refusal.body)
+
       expect(response.status).toBe(400)
       expect(await response.json()).toEqual({
         statusCode: 400,
@@ -282,6 +283,7 @@ describe('paybacks', () => {
     }
 
     const listed = await app.request(`/groups/${group.id}`, { headers: { cookie: lea.cookie } })
+
     expect(((await listed.json()) as GroupDto).paybacks).toEqual([])
   })
 
@@ -298,6 +300,7 @@ describe('paybacks', () => {
       method: 'DELETE',
       headers: { cookie: camille.cookie }
     })
+
     expect(deleted.status).toBe(200)
     const after = (await deleted.json()) as GroupDto
     expect(after.paybacks).toEqual([])
@@ -311,6 +314,7 @@ describe('paybacks', () => {
       method: 'DELETE',
       headers: { cookie: lea.cookie }
     })
+
     expect(second.status).toBe(404)
     expect(await second.json()).toEqual({
       statusCode: 404,
