@@ -62,3 +62,7 @@ _Avoid_: solde, debt, dette, solde global, global balance
 **Payback**:
 A transfer from one Member to another that reduces what is owed. Real money changing hands.
 _Avoid_: règlement, settlement, repayment, payment, transfert, remboursement, paiement
+
+**Slate**:
+The whole of a Group's Expenses, Services, Paybacks and the Balances they derive, read together. A Member sees a Slate; nobody types one in. It is what a screen shows and a write refreshes.
+_Avoid_: board, dashboard, tableau, ardoise (the product name)
