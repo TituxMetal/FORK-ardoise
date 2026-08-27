@@ -1,4 +1,4 @@
-import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { notFound } from '~/shared/domain'
 import { toGroupDto } from '~/groups/application/toGroup.mapper'
 import { groupHasMember } from '~/groups/domain/group.entity'
@@ -8,7 +8,7 @@ import type { IServiceRepository } from '~/services/domain/IService.repository'
 
 export const deleteService = (
   groups: GroupRepository,
-  expenses: IExpenseRepository,
+  expenses: ExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({

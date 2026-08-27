@@ -1,11 +1,11 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Expense } from '~/expenses/domain/Expense.entity'
-import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
-import { toExpense } from '~/expenses/infrastructure/ToExpense.mapper'
+import type { Expense } from '~/expenses/domain/expense.entity'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
+import { toExpense } from '~/expenses/infrastructure/toExpense.mapper'
 
 const include = { participants: true, parts: true } as const
 
-export const prismaExpenseRepository = (prisma: PrismaClient): IExpenseRepository => ({
+export const prismaExpenseAdapter = (prisma: PrismaClient): ExpenseRepository => ({
   async save(expense: Expense) {
     await prisma.expense.create({
       data: {

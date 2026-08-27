@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { amountFromCents, PARTICIPANTS_REQUIRED } from '~/shared/domain'
 
-import { dayReconstitute } from '~/expenses/domain/Day.vo'
-import { expenseCreate } from '~/expenses/domain/Expense.entity'
-import { labelReconstitute } from '~/expenses/domain/Label.vo'
+import { dayReconstitute } from '~/expenses/domain/day.vo'
+import { expenseCreate } from '~/expenses/domain/expense.entity'
+import { labelReconstitute } from '~/expenses/domain/label.vo'
 
 const label = labelReconstitute('Pizza')
 const day = dayReconstitute('2026-08-15')

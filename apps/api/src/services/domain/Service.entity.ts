@@ -1,5 +1,5 @@
-import type { Day } from '~/expenses/domain/Day.vo'
-import type { Label } from '~/expenses/domain/Label.vo'
+import type { Day } from '~/expenses/domain/day.vo'
+import type { Label } from '~/expenses/domain/label.vo'
 import { type Amount, equalParts, type Part } from '~/shared/domain'
 
 export type Service = {

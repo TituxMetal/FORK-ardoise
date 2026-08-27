@@ -1,6 +1,6 @@
 import { amountFromCents, balancesOf, invalidData, notFound } from '~/shared/domain'
 
-import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { toGroupDto } from '~/groups/application/toGroup.mapper'
 import { groupHasMember } from '~/groups/domain/group.entity'
 import type { GroupRepository } from '~/groups/domain/group.repository'
@@ -16,7 +16,7 @@ export type CreatePaybackInput = {
 
 export const createPayback = (
   groups: GroupRepository,
-  expenses: IExpenseRepository,
+  expenses: ExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({

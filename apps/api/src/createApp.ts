@@ -1,8 +1,8 @@
 import type { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
 import type { Auth } from '~/shared/application'
-import { prismaExpenseRepository } from '~/expenses/infrastructure/PrismaExpense.repository'
-import { createExpensesRoutes } from '~/expenses/presentation/Expenses.routes'
+import { prismaExpenseAdapter } from '~/expenses/infrastructure/prismaExpense.adapter'
+import { createExpensesRoutes } from '~/expenses/presentation/expenses.routes'
 import { prismaGroupAdapter } from '~/groups/infrastructure/prismaGroup.adapter'
 import { createGroupsRoutes } from '~/groups/presentation/groups.routes'
 import { createInvitesRoutes } from '~/groups/presentation/invites.routes'
@@ -20,7 +20,7 @@ export const createApp = (
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const groups = prismaGroupAdapter(prisma)
-  const expenses = prismaExpenseRepository(prisma)
+  const expenses = prismaExpenseAdapter(prisma)
   const services = prismaServiceRepository(prisma)
   const paybacks = prismaPaybackRepository(prisma)
   app.onError(mapException)

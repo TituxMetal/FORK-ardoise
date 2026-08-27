@@ -4,11 +4,11 @@ import { groupHasMember } from '~/groups/domain/group.entity'
 import type { GroupRepository } from '~/groups/domain/group.repository'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 import type { IServiceRepository } from '~/services/domain/IService.repository'
-import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 
 export const deleteExpense = (
   groups: GroupRepository,
-  expenses: IExpenseRepository,
+  expenses: ExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({

@@ -1,6 +1,6 @@
-import { dayFrom } from '~/expenses/domain/Day.vo'
-import { labelFrom } from '~/expenses/domain/Label.vo'
-import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import { dayFrom } from '~/expenses/domain/day.vo'
+import { labelFrom } from '~/expenses/domain/label.vo'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { amountFromCents, invalidData, notFound } from '~/shared/domain'
 
 import { toGroupDto } from '~/groups/application/toGroup.mapper'
@@ -20,7 +20,7 @@ export type CreateServiceInput = {
 
 export const createService = (
   groups: GroupRepository,
-  expenses: IExpenseRepository,
+  expenses: ExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => ({

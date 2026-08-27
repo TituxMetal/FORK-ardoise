@@ -262,6 +262,7 @@ describe('expenses', () => {
     const readOther = await app.request(`/groups/${otherBody.id}`, {
       headers: { cookie: lea.cookie }
     })
+
     expect(readOther.status).toBe(200)
     const body = (await readOther.json()) as GroupDto
     expect(body.expenses).toEqual([])
@@ -283,6 +284,7 @@ describe('expenses', () => {
       method: 'DELETE',
       headers: { cookie: bob.cookie }
     })
+
     expect(deleted.status).toBe(200)
     const after = (await deleted.json()) as GroupDto
     expect(after.expenses).toEqual([])
@@ -292,6 +294,7 @@ describe('expenses', () => {
       method: 'DELETE',
       headers: { cookie: lea.cookie }
     })
+
     expect(second.status).toBe(404)
     expect(await second.json()).toEqual({
       statusCode: 404,
@@ -341,6 +344,7 @@ describe('expenses', () => {
 
     for (const refusal of refusals) {
       const response = await createExpense(app, cookie, group.id, refusal.body)
+
       expect(response.status).toBe(400)
       expect(await response.json()).toEqual({
         statusCode: 400,
@@ -350,6 +354,7 @@ describe('expenses', () => {
     }
 
     const listed = await app.request(`/groups/${group.id}`, { headers: { cookie: bob.cookie } })
+
     expect(((await listed.json()) as GroupDto).expenses).toEqual([])
   })
 })

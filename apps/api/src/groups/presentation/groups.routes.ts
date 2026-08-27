@@ -2,7 +2,7 @@ import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { invalidData } from '~/shared/domain'
-import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
 import type { IServiceRepository } from '~/services/domain/IService.repository'
 import { createGroup } from '~/groups/application/createGroup.uc'
@@ -17,7 +17,7 @@ const createGroupBody = z.object({
 
 export const createGroupsRoutes = (
   groups: GroupRepository,
-  expenses: IExpenseRepository,
+  expenses: ExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => {

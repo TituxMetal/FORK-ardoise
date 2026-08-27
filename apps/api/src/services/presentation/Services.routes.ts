@@ -1,9 +1,9 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { DAY_REQUIRED } from '~/expenses/domain/Day.vo'
-import { LABEL_REQUIRED } from '~/expenses/domain/Label.vo'
-import type { IExpenseRepository } from '~/expenses/domain/IExpense.repository'
+import { DAY_REQUIRED } from '~/expenses/domain/day.vo'
+import { LABEL_REQUIRED } from '~/expenses/domain/label.vo'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
 
 import type { GroupRepository } from '~/groups/domain/group.repository'
@@ -22,7 +22,7 @@ const createServiceBody = z.object({
 
 export const createServicesRoutes = (
   groups: GroupRepository,
-  expenses: IExpenseRepository,
+  expenses: ExpenseRepository,
   services: IServiceRepository,
   paybacks: IPaybackRepository
 ) => {
