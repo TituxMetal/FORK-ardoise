@@ -1,4 +1,4 @@
-import { createApp } from '~/presentation/CreateApp'
+import { createApp } from '~/createApp'
 
 const port = Number(process.env.PORT ?? 3000)
 

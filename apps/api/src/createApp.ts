@@ -36,3 +36,4 @@ export const createApp = (
   app.route('/invites', createInvitesRoutes(groups))
   return app
 }
+export type AppType = ReturnType<typeof createApp>

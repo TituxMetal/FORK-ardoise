@@ -5,75 +5,69 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
 import { createPrismaClient } from '~/shared/infrastructure'
-import { createApp } from '~/presentation/CreateApp'
+import { createApp } from '~/createApp'
 
 const sessionSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260815130000_session_user/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260815130000_session_user/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 const groupSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260815190000_groupe_membre/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260815190000_groupe_membre/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 const groupSecretSql = readFileSync(
   fileURLToPath(
-    new URL(
-      '../../prisma/migrations/20260816042947_invitation_secret/migration.sql',
-      import.meta.url
-    )
+    new URL('../prisma/migrations/20260816042947_invitation_secret/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 const expenseSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260816052720_depense/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260816052720_depense/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 const serviceSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260816061030_service/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260816061030_service/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 const paybackSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260816070637_reglement/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260816070637_reglement/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 
 const renameSql = readFileSync(
   fileURLToPath(
-    new URL(
-      '../../prisma/migrations/20260816153023_rename_to_glossary/migration.sql',
-      import.meta.url
-    )
+    new URL('../prisma/migrations/20260816153023_rename_to_glossary/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 
 const expenseColumnSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260817000000_expense_columns/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260817000000_expense_columns/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 
 const inviteSecretSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260818000000_invite_secret/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260818000000_invite_secret/migration.sql', import.meta.url)
   ),
   'utf8'
 )
 
 const groupIdSql = readFileSync(
   fileURLToPath(
-    new URL('../../prisma/migrations/20260818010000_group_id/migration.sql', import.meta.url)
+    new URL('../prisma/migrations/20260818010000_group_id/migration.sql', import.meta.url)
   ),
   'utf8'
 )

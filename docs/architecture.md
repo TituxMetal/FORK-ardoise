@@ -19,11 +19,11 @@ export const createApp = () => { … }
 export type AppType = ReturnType<typeof createApp>
 ```
 
-Today `createApp` lives at `apps/api/src/presentation/CreateApp.ts`; the retrofit moves it to `src/` root (see #10). The web imports `AppType` type-only (through the `api/*` alias, erased at build) and calls the API through `hc<AppType>` from `hono/client`. Input types come from the `zValidator` schemas, output types from `c.json()` — no hand-written client, no shared package. better-auth keeps its own client (`authClient`). API errors are not inferred by `hc`: a thin wrapper reads `res.json()` and throws, keeping the `throw` contract components expect.
+The composition root lives at `apps/api/src/createApp.ts` (see #10). The web imports `AppType` type-only (through the `api/*` alias, erased at build) and calls the API through `hc<AppType>` from `hono/client`. Input types come from the `zValidator` schemas, output types from `c.json()` — no hand-written client, no shared package. better-auth keeps its own client (`authClient`). API errors are not inferred by `hc`: a thin wrapper reads `res.json()` and throws, keeping the `throw` contract components expect.
 
 ## API
 
-Folders by vocabulary (`groups`, `expenses`, `services`, `paybacks`, …), plus `shared/` for everything shared between vocabularies. Entry points sit at the `src/` root, like NestJS `main.ts`. This is the post-retrofit target tree (today the API still lives in the old shape: `presentation/CreateApp.ts`, `presentation/StartServer.ts`, French-named leftovers — the retrofit ticket #10 moves it):
+Folders by vocabulary (`groups`, `expenses`, `services`, `paybacks`, …), plus `shared/` for everything shared between vocabularies. Entry points sit at the `src/` root, like NestJS `main.ts`. This is the post-retrofit target tree (today the API still has French-named leftovers — the retrofit ticket #10 moves them):
 
 ```text
 apps/api/src/

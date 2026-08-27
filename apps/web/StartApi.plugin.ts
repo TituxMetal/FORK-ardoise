@@ -10,7 +10,7 @@ export const startApi = (): Plugin => {
     apply: 'serve',
     configureServer(server) {
       const apiRoot = fileURLToPath(new URL('../api', import.meta.url))
-      child = spawn('bun', ['--watch', 'src/presentation/StartServer.ts'], {
+      child = spawn('bun', ['--watch', 'src/main.ts'], {
         cwd: apiRoot,
         stdio: 'inherit',
         env: { ...process.env, PORT: '3000' }
