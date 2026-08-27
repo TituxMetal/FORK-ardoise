@@ -1,11 +1,11 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Service } from '~/services/domain/Service.entity'
-import type { IServiceRepository } from '~/services/domain/IService.repository'
-import { toService } from '~/services/infrastructure/ToService.mapper'
+import type { Service } from '~/services/domain/service.entity'
+import type { ServiceRepository } from '~/services/domain/service.repository'
+import { toService } from '~/services/infrastructure/toService.mapper'
 
 const include = { participants: true, parts: true } as const
 
-export const prismaServiceRepository = (prisma: PrismaClient): IServiceRepository => ({
+export const prismaServiceAdapter = (prisma: PrismaClient): ServiceRepository => ({
   async save(service: Service) {
     await prisma.service.create({
       data: {

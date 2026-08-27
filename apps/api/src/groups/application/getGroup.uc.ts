@@ -1,7 +1,7 @@
 import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { notFound } from '~/shared/domain'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
-import type { IServiceRepository } from '~/services/domain/IService.repository'
+import type { ServiceRepository } from '~/services/domain/service.repository'
 import { groupHasMember } from '~/groups/domain/group.entity'
 import type { GroupRepository } from '~/groups/domain/group.repository'
 import { toGroupDto } from '~/groups/application/toGroup.mapper'
@@ -9,7 +9,7 @@ import { toGroupDto } from '~/groups/application/toGroup.mapper'
 export const getGroup = (
   groups: GroupRepository,
   expenses: ExpenseRepository,
-  services: IServiceRepository,
+  services: ServiceRepository,
   paybacks: IPaybackRepository
 ) => ({
   execute: async (userId: string, groupId: string) => {

@@ -1,8 +1,8 @@
-import type { Service } from '~/services/domain/Service.entity'
+import type { Service } from '~/services/domain/service.entity'
 
-export const IServiceRepository = Symbol('IServiceRepository')
+export const ServiceRepository = Symbol('ServiceRepository')
 
-export type IServiceRepository = {
+export type ServiceRepository = {
   save: (service: Service) => Promise<void>
   findById: (id: string) => Promise<Service | null>
   findByGroupId: (groupId: string) => Promise<Service[]>

@@ -8,9 +8,9 @@ import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
 
 import type { GroupRepository } from '~/groups/domain/group.repository'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
-import { createService } from '~/services/application/CreateService.uc'
-import { deleteService } from '~/services/application/DeleteService.uc'
-import type { IServiceRepository } from '~/services/domain/IService.repository'
+import { createService } from '~/services/application/createService.uc'
+import { deleteService } from '~/services/application/deleteService.uc'
+import type { ServiceRepository } from '~/services/domain/service.repository'
 
 const createServiceBody = z.object({
   label: z.string({ error: LABEL_REQUIRED }),
@@ -23,7 +23,7 @@ const createServiceBody = z.object({
 export const createServicesRoutes = (
   groups: GroupRepository,
   expenses: ExpenseRepository,
-  services: IServiceRepository,
+  services: ServiceRepository,
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()

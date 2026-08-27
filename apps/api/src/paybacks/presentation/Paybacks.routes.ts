@@ -5,7 +5,7 @@ import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
 
 import type { GroupRepository } from '~/groups/domain/group.repository'
-import type { IServiceRepository } from '~/services/domain/IService.repository'
+import type { ServiceRepository } from '~/services/domain/service.repository'
 import { createPayback } from '~/paybacks/application/CreatePayback.uc'
 import { deletePayback } from '~/paybacks/application/DeletePayback.uc'
 import type { IPaybackRepository } from '~/paybacks/domain/IPayback.repository'
@@ -19,7 +19,7 @@ const createPaybackBody = z.object({
 export const createPaybacksRoutes = (
   groups: GroupRepository,
   expenses: ExpenseRepository,
-  services: IServiceRepository,
+  services: ServiceRepository,
   paybacks: IPaybackRepository
 ) => {
   const app = new Hono<{ Variables: { userId: string; userName: string } }>()

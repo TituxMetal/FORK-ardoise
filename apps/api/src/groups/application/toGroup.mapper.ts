@@ -1,7 +1,7 @@
 import type { Expense } from '~/expenses/domain/expense.entity'
 import { balancesOf } from '~/shared/domain'
 import type { Payback } from '~/paybacks/domain/Payback.entity'
-import type { Service } from '~/services/domain/Service.entity'
+import type { Service } from '~/services/domain/service.entity'
 import type { Group } from '~/groups/domain/group.entity'
 import type { GroupDto } from '~/groups/application/group.dto'
 
