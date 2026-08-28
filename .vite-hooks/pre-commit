@@ -1,1 +1,2 @@
 vp staged
+vp exec bun run tools/checkSpecCoverage.ts --staged

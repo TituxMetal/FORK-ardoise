@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: voidzero-dev/setup-vp@v1.17.0
         with:
@@ -24,6 +26,7 @@ jobs:
 
       - run: vp check
       - run: vp test
+      - run: vp run check:spec-coverage --no-cache
 
       - name: Install the Playwright browser
         run: vp exec playwright install --with-deps chromium
