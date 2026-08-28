@@ -3,6 +3,9 @@
 // GroupPage.spec.tsx). Exempt: barrels, entries, vite-env.d.ts, configs, and
 // pure ports (*.port.ts / *.repository.ts). See docs issue #63.
 //
+// The gate fails closed: a git error or an invalid base never yields a green
+// run.
+//
 // Scope:
 //   --all               whole tracked tree (retrofit verification, #51)
 //   --diff <base>       only source files changed vs <base> (CI)
@@ -14,12 +17,30 @@ const EXEMPT_BASENAMES = ['index.ts', 'main.ts', 'main.tsx', 'vite-env.d.ts']
 const EXEMPT_MARKERS = ['.config.']
 const EXEMPT_SUFFIXES = ['.port.ts', '.repository.ts']
 
-const git = (args: string[]): string[] =>
-  Bun.spawnSync({ cmd: ['git', ...args], stdout: 'pipe' })
-    .stdout.toString()
+const parse = (stdout: Uint8Array): string[] =>
+  stdout
+    .toString()
     .split('\n')
     .map(line => line.trim())
     .filter(Boolean)
+
+// Fail closed: a git error aborts the gate instead of yielding an empty diff.
+const git = (args: string[]): string[] => {
+  const result = Bun.spawnSync({ cmd: ['git', ...args], stdout: 'pipe', stderr: 'pipe' })
+  if (!result.success) {
+    console.error(
+      `spec-coverage gate: git ${args.join(' ')} failed: ${result.stderr.toString().trim()}`
+    )
+    process.exit(1)
+  }
+  return parse(result.stdout)
+}
+
+// Tolerant variant for probes that legitimately fail (e.g. a missing ref).
+const gitTolerant = (args: string[]): string[] => {
+  const result = Bun.spawnSync({ cmd: ['git', ...args], stdout: 'pipe' })
+  return result.success ? parse(result.stdout) : []
+}
 
 const isSource = (file: string): boolean =>
   /\.(ts|tsx)$/.test(file) && !/\.spec\.(ts|tsx)$/.test(file)
@@ -42,7 +63,7 @@ const stagedSources = (): string[] =>
   git(['diff', '--cached', '--name-only', '--', ...ROOTS]).filter(isSource)
 
 const hasOriginMain = (): boolean =>
-  git(['rev-parse', '--verify', '--quiet', 'origin/main']).length > 0
+  gitTolerant(['rev-parse', '--verify', '--quiet', 'origin/main']).length > 0
 
 const mirrorSpec = (file: string): string => {
   const dot = file.lastIndexOf('.')
@@ -55,6 +76,10 @@ const collectFor = (args: string[]): (() => string[]) => {
     case '--all':
       return treeSources
     case '--diff':
+      if (!base) {
+        console.error('spec-coverage gate: --diff requires a base ref')
+        process.exit(1)
+      }
       return () => changedSources(base)
     case '--staged':
       return stagedSources
