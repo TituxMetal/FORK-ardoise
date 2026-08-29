@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Expenses } from '~features/expenses/Expenses'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/client'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api/groups.client'
 import { Paybacks } from '~features/paybacks/Paybacks'
 import { Services } from '~features/services/Services'
 import { Link } from '~/lib/router'

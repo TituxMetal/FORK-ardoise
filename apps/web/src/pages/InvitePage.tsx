@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/client'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api/groups.client'
 import { errorMessage } from '~/lib/errorMessage'
 import { SessionForms } from '~features/session/SessionForms'
 

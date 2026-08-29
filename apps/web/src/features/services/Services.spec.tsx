@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { euros } from '~/lib/amounts'
 import { Expenses } from '~features/expenses/Expenses'
-import type { GroupDto } from '~features/groups/client'
+import type { GroupDto } from '~features/groups/api/groups.client'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { Services } from '~features/services/Services'
 

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { centsFromEuros, euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/client'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api/groups.client'
 
 type Props = {
   group: GroupDto

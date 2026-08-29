@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { createApp } from 'api/createApp'
 import { createPrismaClient } from 'api/shared/infrastructure'
 import type { Auth, SessionUser } from 'api/shared/application'
-import { createGroupsClient, type GroupsClient } from '~features/groups/client'
+import { createGroupsClient, type GroupsClient } from '~features/groups/api/groups.client'
 
 export const testUsers = {
   lea: { id: 'lea', name: 'Léa' },
