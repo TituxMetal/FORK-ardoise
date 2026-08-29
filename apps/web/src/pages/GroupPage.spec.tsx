@@ -16,9 +16,9 @@ beforeEach(async () => {
 })
 
 const openGroup = async () => {
-  const client = api.client(testUsers.lea)
+  const client = api.groups(testUsers.lea)
   const group = await client.create('Potes de Bob')
-  render(<GroupPage id={group.id} client={client} />)
+  render(<GroupPage id={group.id} groups={client} />)
   await screen.findByRole('heading', { name: 'Potes de Bob' })
 }
 
@@ -34,12 +34,12 @@ describe('GroupPage', () => {
 
   it('lets a Member copy the Invite link of the opened Group', async () => {
     const written: string[] = []
-    const client = api.client(testUsers.lea)
+    const client = api.groups(testUsers.lea)
     const group = await client.create('Potes de Bob')
     render(
       <GroupPage
         id={group.id}
-        client={client}
+        groups={client}
         copy={async text => {
           written.push(text)
         }}
@@ -53,7 +53,7 @@ describe('GroupPage', () => {
   })
 
   it('shows an error without a loading fallback when the Group cannot load', async () => {
-    render(<GroupPage id="missing" client={api.client(testUsers.lea)} />)
+    render(<GroupPage id="missing" groups={api.groups(testUsers.lea)} />)
 
     await waitFor(() => {
       expect(screen.getByRole('alert').textContent).toBe('Groupe introuvable')
@@ -62,13 +62,13 @@ describe('GroupPage', () => {
   })
 
   it('loads the new Group when the id changes', async () => {
-    const client = api.client(testUsers.lea)
+    const client = api.groups(testUsers.lea)
     const first = await client.create('Potes de Bob')
     const second = await client.create('Collègues')
-    const { rerender } = render(<GroupPage id={first.id} client={client} />)
+    const { rerender } = render(<GroupPage id={first.id} groups={client} />)
     await screen.findByRole('heading', { name: 'Potes de Bob' })
 
-    rerender(<GroupPage id={second.id} client={client} />)
+    rerender(<GroupPage id={second.id} groups={client} />)
     expect(screen.queryByRole('heading', { name: 'Potes de Bob' })).toBeNull()
     expect(await screen.findByRole('heading', { name: 'Collègues' })).toBeTruthy()
   })

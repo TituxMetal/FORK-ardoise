@@ -11,7 +11,7 @@ afterEach(async () => {
 
 describe('createTestApi', () => {
   it('serves the API in-process with one User per client', async () => {
-    const lea = api.client(testUsers.lea)
+    const lea = api.groups(testUsers.lea)
 
     const group = await lea.create('Potes de Bob')
 
@@ -19,8 +19,8 @@ describe('createTestApi', () => {
   })
 
   it('keeps Users isolated: a Group is only listed by its Members', async () => {
-    const lea = api.client(testUsers.lea)
-    const bob = api.client(testUsers.bob)
+    const lea = api.groups(testUsers.lea)
+    const bob = api.groups(testUsers.bob)
 
     const group = await lea.create('Potes de Bob')
 

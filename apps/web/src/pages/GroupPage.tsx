@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
-import { Expenses } from '~features/expenses/Expenses'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api/groups.client'
-import { Paybacks } from '~features/paybacks/Paybacks'
-import { Services } from '~features/services/Services'
+import { Alert, Button } from '~ui/index'
+import { Expenses } from '~features/expenses/components'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api'
+import { Paybacks } from '~features/paybacks/components'
+import { Services } from '~features/services/components'
 import { Link } from '~/lib/router'
 
 type Props = {
   id: string
-  client?: GroupsClient
+  groups?: GroupsClient
   copy?: (text: string) => Promise<void>
 }
 
 export const GroupPage = ({
   id,
-  client = groupsClient,
+  groups = groupsClient,
   copy = text => navigator.clipboard.writeText(text)
 }: Props) => {
   const [group, setGroup] = useState<GroupDto | null>(null)
@@ -27,38 +28,33 @@ export const GroupPage = ({
   useEffect(() => {
     setGroup(null)
     setError('')
-    void client
+    void groups
       .get(id)
       .then(fetched => {
         setGroup(fetched)
         setError('')
       })
       .catch(() => setError('Groupe introuvable'))
-  }, [client, id])
+  }, [groups, id])
 
   return (
     <section className="space-y-4">
       <Link to="/" className="inline-block rounded bg-zinc-800 px-3 py-2">
         ← Retour aux Groupes
       </Link>
-      {error ? (
-        <p className="text-red-400" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <Alert message={error} /> : null}
       {group ? (
         <article className="space-y-4">
           <h2 className="text-lg font-medium">{group.name}</h2>
-          <button
+          <Button
             type="button"
-            className="rounded bg-zinc-100 px-3 py-2 text-zinc-900"
             onClick={() => void copy(`${window.location.origin}/invites/${group.invite.secret}`)}
           >
             Copier le lien d’Invitation
-          </button>
-          <Expenses group={group} client={client} onChange={apply} />
-          <Services group={group} client={client} onChange={apply} />
-          <Paybacks group={group} client={client} onChange={apply} />
+          </Button>
+          <Expenses group={group} onChange={apply} />
+          <Services group={group} onChange={apply} />
+          <Paybacks group={group} onChange={apply} />
         </article>
       ) : error ? null : (
         <p>Chargement…</p>

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { authClient } from '~/lib/authClient'
+import { Button } from '~ui/index'
+import { authClient } from '~features/session/api'
 
 type Props = {
   session: { name: string } | null
@@ -17,13 +18,9 @@ export const AppLayout = ({ session, children }: Props) => {
       {session ? (
         <section className="space-y-4">
           <p>Session ouverte : {session.name}</p>
-          <button
-            type="button"
-            className="rounded bg-zinc-100 px-3 py-2 text-zinc-900"
-            onClick={() => void signOut()}
-          >
+          <Button type="button" onClick={() => void signOut()}>
             Fermer la session
-          </button>
+          </Button>
         </section>
       ) : null}
       {children}

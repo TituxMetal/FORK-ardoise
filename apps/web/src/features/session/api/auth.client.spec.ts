@@ -18,7 +18,8 @@ const respond = (body: unknown, status = 200) =>
     headers: { 'content-type': 'application/json' }
   })
 
-const loadAuthClient = async () => (await import('./authClient')).authClient
+// The client must be created after fetch is stubbed: load it on demand.
+const loadAuthClient = async () => (await import('./auth.client')).authClient
 
 const fetchCall = () => fetchMock.mock.calls[0]
 

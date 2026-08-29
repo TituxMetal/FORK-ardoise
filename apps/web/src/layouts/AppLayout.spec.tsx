@@ -2,10 +2,10 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
-import { authClient } from '~/lib/authClient'
+import { authClient } from '~features/session/api'
 import { AppLayout } from './AppLayout'
 
-vi.mock('~/lib/authClient', () => ({
+vi.mock('~features/session/api', () => ({
   authClient: {
     signOut: vi.fn()
   }

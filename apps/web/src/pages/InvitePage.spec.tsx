@@ -16,13 +16,13 @@ beforeEach(async () => {
 
 describe('InvitePage', () => {
   it('adds a User with a session who opens the Invite as a Member', async () => {
-    const lea = api.client(testUsers.lea)
+    const lea = api.groups(testUsers.lea)
     const group = await lea.create('Potes de Bob')
     render(
       <InvitePage
         secret={group.invite.secret}
         session={{ name: 'Bob' }}
-        client={api.client(testUsers.bob)}
+        client={api.groups(testUsers.bob)}
       />
     )
 
@@ -33,10 +33,10 @@ describe('InvitePage', () => {
   })
 
   it('does not join when opening the Invite without a session', async () => {
-    const lea = api.client(testUsers.lea)
+    const lea = api.groups(testUsers.lea)
     const group = await lea.create('Potes de Bob')
     render(
-      <InvitePage secret={group.invite.secret} session={null} client={api.client(testUsers.bob)} />
+      <InvitePage secret={group.invite.secret} session={null} client={api.groups(testUsers.bob)} />
     )
 
     await waitFor(() => {
@@ -48,13 +48,13 @@ describe('InvitePage', () => {
   })
 
   it('clears a previous error when a new Invite is joined', async () => {
-    const lea = api.client(testUsers.lea)
+    const lea = api.groups(testUsers.lea)
     const group = await lea.create('Potes de Bob')
     const { rerender } = render(
       <InvitePage
         secret="bad-secret"
         session={{ name: 'Bob' }}
-        client={api.client(testUsers.bob)}
+        client={api.groups(testUsers.bob)}
       />
     )
     await waitFor(() => {
@@ -65,7 +65,7 @@ describe('InvitePage', () => {
       <InvitePage
         secret={group.invite.secret}
         session={{ name: 'Bob' }}
-        client={api.client(testUsers.bob)}
+        client={api.groups(testUsers.bob)}
       />
     )
     expect(await screen.findByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()

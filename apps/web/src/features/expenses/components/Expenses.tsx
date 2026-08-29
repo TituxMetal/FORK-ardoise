@@ -1,26 +1,28 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEventHandler } from 'react'
+import { Alert, Button, FormWrapper, Input, Select } from '~ui/index'
 import { centsFromEuros, euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api/groups.client'
+import type { GroupDto } from '~features/groups/api'
+import { expensesClient, type ExpensesClient } from '~features/expenses/api'
 
 type Props = {
   group: GroupDto
-  client?: GroupsClient
+  client?: ExpensesClient
   onChange: (group: GroupDto) => void
 }
 
-export const Expenses = ({ group, client = groupsClient, onChange }: Props) => {
+export const Expenses = ({ group, client = expensesClient, onChange }: Props) => {
   const [error, setError] = useState('')
 
-  const createExpense = async (event: FormEvent<HTMLFormElement>) => {
+  const createExpense: SubmitEventHandler<HTMLFormElement> = async event => {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
     const selected = form.getAll('participantIds').filter(value => typeof value === 'string')
     event.currentTarget.reset()
     try {
       onChange(
-        await client.createExpense(group.id, {
+        await client.create(group.id, {
           label: field(form, 'label'),
           day: field(form, 'day'),
           amount: centsFromEuros(field(form, 'amount')),
@@ -36,7 +38,7 @@ export const Expenses = ({ group, client = groupsClient, onChange }: Props) => {
 
   const deleteExpense = async (expenseId: string) => {
     try {
-      onChange(await client.deleteExpense(group.id, expenseId))
+      onChange(await client.delete(group.id, expenseId))
       setError('')
     } catch (error) {
       setError(errorMessage(error, 'Dépense introuvable'))
@@ -45,57 +47,31 @@ export const Expenses = ({ group, client = groupsClient, onChange }: Props) => {
 
   return (
     <>
-      {error ? (
-        <p className="text-red-400" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <Alert message={error} /> : null}
       <form
         className="flex flex-col gap-3"
         aria-label="Constater une Dépense"
         onSubmit={createExpense}
       >
         <h3 className="font-medium">Constater une Dépense</h3>
-        <label className="flex flex-col gap-1">
-          Libellé
-          <input
-            name="label"
-            required
-            className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
-          />
-        </label>
-        <label className="flex flex-col gap-1">
-          Jour
-          <input
-            name="day"
-            required
-            placeholder="YYYY-MM-DD"
-            className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
-          />
-        </label>
-        <label className="flex flex-col gap-1">
-          Montant
-          <input
-            name="amount"
-            required
-            className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
-          />
-        </label>
-        <label className="flex flex-col gap-1">
-          Payeur
-          <select
-            name="payerId"
-            required
-            defaultValue={group.members[0]?.userId}
-            className="rounded border border-zinc-600 bg-zinc-800 px-2 py-1"
-          >
+        <FormWrapper label="Libellé">
+          <Input name="label" required />
+        </FormWrapper>
+        <FormWrapper label="Jour">
+          <Input name="day" required placeholder="YYYY-MM-DD" />
+        </FormWrapper>
+        <FormWrapper label="Montant">
+          <Input name="amount" required />
+        </FormWrapper>
+        <FormWrapper label="Payeur">
+          <Select name="payerId" required defaultValue={group.members[0]?.userId}>
             {group.members.map(member => (
               <option key={member.userId} value={member.userId}>
                 {member.name}
               </option>
             ))}
-          </select>
-        </label>
+          </Select>
+        </FormWrapper>
         <fieldset className="flex flex-col gap-1">
           <legend>Participants</legend>
           {group.members.map(member => (
@@ -105,9 +81,7 @@ export const Expenses = ({ group, client = groupsClient, onChange }: Props) => {
             </label>
           ))}
         </fieldset>
-        <button type="submit" className="rounded bg-zinc-100 px-3 py-2 text-zinc-900">
-          Constater la Dépense
-        </button>
+        <Button type="submit">Constater la Dépense</Button>
       </form>
       {group.expenses.length === 0 ? (
         <p>Aucune Dépense</p>
@@ -118,13 +92,13 @@ export const Expenses = ({ group, client = groupsClient, onChange }: Props) => {
               <p>{expense.label}</p>
               <p>{expense.day}</p>
               <p>{euros(expense.amount)}</p>
-              <button
+              <Button
+                variant="secondary"
                 type="button"
-                className="rounded bg-zinc-800 px-3 py-2"
                 onClick={() => void deleteExpense(expense.id)}
               >
                 Supprimer {expense.label}
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

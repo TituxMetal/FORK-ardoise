@@ -25,7 +25,7 @@ const createNamed = async (name: string) => {
 
 describe('GroupsPage', () => {
   it('creates a Group and lists it', async () => {
-    render(<GroupsPage client={api.client(testUsers.lea)} />)
+    render(<GroupsPage client={api.groups(testUsers.lea)} />)
 
     await createNamed('Potes de Bob')
 
@@ -33,7 +33,7 @@ describe('GroupsPage', () => {
   })
 
   it('keeps two Groups created by the same User on two distinct lines', async () => {
-    render(<GroupsPage client={api.client(testUsers.lea)} />)
+    render(<GroupsPage client={api.groups(testUsers.lea)} />)
 
     await createNamed('Potes de Bob')
     await createNamed('Collègues')
@@ -49,7 +49,7 @@ describe('GroupsPage', () => {
     render(
       <GroupsPage
         client={{
-          ...api.client(testUsers.lea),
+          ...api.groups(testUsers.lea),
           list: async () => {
             throw new Error('Groupe introuvable')
           }
@@ -63,7 +63,7 @@ describe('GroupsPage', () => {
   })
 
   it('opens a Group on its own route', async () => {
-    const client = api.client(testUsers.lea)
+    const client = api.groups(testUsers.lea)
     render(<GroupsPage client={client} />)
 
     await createNamed('Potes de Bob')

@@ -11,15 +11,15 @@ afterEach(async () => {
 
 describe('groupsClient', () => {
   it('throws the API message when the Group is missing', async () => {
-    await expect(api.client(testUsers.lea).get('missing')).rejects.toThrow('Groupe introuvable')
+    await expect(api.groups(testUsers.lea).get('missing')).rejects.toThrow('Groupe introuvable')
   })
 
   it('throws the API message when the Invite is missing', async () => {
-    await expect(api.client(testUsers.lea).join('nope')).rejects.toThrow('Invitation introuvable')
+    await expect(api.groups(testUsers.lea).join('nope')).rejects.toThrow('Invitation introuvable')
   })
 
   it('creates, lists and fetches a Group', async () => {
-    const lea = api.client(testUsers.lea)
+    const lea = api.groups(testUsers.lea)
 
     const group = await lea.create('Potes de Bob')
 
@@ -28,8 +28,8 @@ describe('groupsClient', () => {
   })
 
   it('adds the joining User as a Member', async () => {
-    const lea = api.client(testUsers.lea)
-    const bob = api.client(testUsers.bob)
+    const lea = api.groups(testUsers.lea)
+    const bob = api.groups(testUsers.bob)
 
     const group = await lea.create('Potes de Bob')
     await bob.join(group.invite.secret)

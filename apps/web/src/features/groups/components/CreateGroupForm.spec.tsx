@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
-import { CreateGroupForm } from '~features/groups/CreateGroupForm'
+import { CreateGroupForm } from '~features/groups/components'
 
 afterEach(cleanup)
 afterEach(async () => {
@@ -20,7 +20,7 @@ describe('CreateGroupForm', () => {
     const created: string[] = []
     render(
       <CreateGroupForm
-        client={api.client(testUsers.lea)}
+        client={api.groups(testUsers.lea)}
         onCreated={() => {
           created.push('created')
         }}
@@ -34,13 +34,13 @@ describe('CreateGroupForm', () => {
     await waitFor(() => {
       expect(created).toEqual(['created'])
     })
-    const [group] = await api.client(testUsers.lea).list()
+    const [group] = await api.groups(testUsers.lea).list()
     expect(group.name).toBe('Potes de Bob')
   })
 
   it('shows the API message when the creation fails', async () => {
     const client = {
-      ...api.client(testUsers.lea),
+      ...api.groups(testUsers.lea),
       create: async () => {
         throw new Error('Groupe introuvable')
       }

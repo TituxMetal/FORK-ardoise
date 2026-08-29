@@ -5,7 +5,10 @@ import { join } from 'node:path'
 import { createApp } from 'api/createApp'
 import { createPrismaClient } from 'api/shared/infrastructure'
 import type { Auth, SessionUser } from 'api/shared/application'
-import { createGroupsClient, type GroupsClient } from '~features/groups/api/groups.client'
+import { createExpensesClient, type ExpensesClient } from '~features/expenses/api'
+import { createGroupsClient, type GroupsClient } from '~features/groups/api'
+import { createPaybacksClient, type PaybacksClient } from '~features/paybacks/api'
+import { createServicesClient, type ServicesClient } from '~features/services/api'
 
 export const testUsers = {
   lea: { id: 'lea', name: 'Léa' },
@@ -40,7 +43,10 @@ const seedUsers = async (prisma: ReturnType<typeof createPrismaClient>) => {
 
 export type TestApi = {
   app: ReturnType<typeof createApp>
-  client: (user: SessionUser) => GroupsClient
+  groups: (user: SessionUser) => GroupsClient
+  expenses: (user: SessionUser) => ExpensesClient
+  services: (user: SessionUser) => ServicesClient
+  paybacks: (user: SessionUser) => PaybacksClient
   close: () => Promise<void>
 }
 
@@ -59,17 +65,17 @@ export const createTestApi = async (): Promise<TestApi> => {
     await prisma.$disconnect()
     rmSync(dir, { recursive: true, force: true })
   }
+  const asUser = (user: SessionUser) => async (input: RequestInfo | URL, init?: RequestInit) => {
+    const headers = new Headers(init?.headers)
+    headers.set('x-test-user', user.id)
+    return await app.request(input, { ...init, headers })
+  }
   return {
     app,
     close,
-    client: user =>
-      createGroupsClient({
-        baseUrl: '',
-        fetch: async (input, init) => {
-          const headers = new Headers(init?.headers)
-          headers.set('x-test-user', user.id)
-          return await app.request(input, { ...init, headers })
-        }
-      })
+    groups: user => createGroupsClient({ baseUrl: '', fetch: asUser(user) }),
+    expenses: user => createExpensesClient({ baseUrl: '', fetch: asUser(user) }),
+    services: user => createServicesClient({ baseUrl: '', fetch: asUser(user) }),
+    paybacks: user => createPaybacksClient({ baseUrl: '', fetch: asUser(user) })
   }
 }

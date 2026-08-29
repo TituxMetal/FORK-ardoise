@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react'
-import { CreateGroupForm } from '~features/groups/CreateGroupForm'
-import {
-  groupsClient,
-  type GroupsClient,
-  type GroupSummary
-} from '~features/groups/api/groups.client'
-import { GroupsList } from '~features/groups/GroupsList'
+import { CreateGroupForm } from '~features/groups/components'
+import { GroupsList } from '~features/groups/components'
+import { groupsClient, type GroupsClient, type GroupSummary } from '~features/groups/api'
 
 type Props = {
   client?: GroupsClient

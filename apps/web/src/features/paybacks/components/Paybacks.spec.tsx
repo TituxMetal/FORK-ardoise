@@ -3,11 +3,11 @@ import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
-import type { GroupDto } from '~features/groups/api/groups.client'
+import type { GroupDto } from '~features/groups/api'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
-import { Expenses } from '~features/expenses/Expenses'
-import { Services } from '~features/services/Services'
-import { Paybacks } from '~features/paybacks/Paybacks'
+import { Expenses } from '~features/expenses/components'
+import { Services } from '~features/services/components'
+import { Paybacks } from '~features/paybacks/components'
 
 afterEach(cleanup)
 afterEach(async () => {
@@ -20,18 +20,18 @@ beforeEach(async () => {
 })
 
 const openPaybacks = async () => {
-  const client = api.client(testUsers.lea)
+  const client = api.groups(testUsers.lea)
   const group = await client.create('Potes de Bob')
-  await api.client(testUsers.bob).join(group.invite.secret)
-  await api.client(testUsers.camille).join(group.invite.secret)
+  await api.groups(testUsers.bob).join(group.invite.secret)
+  await api.groups(testUsers.camille).join(group.invite.secret)
   const joined = await client.get(group.id)
   const Board = () => {
     const [current, setCurrent] = useState<GroupDto>(joined)
     return (
       <>
-        <Expenses group={current} client={client} onChange={setCurrent} />
-        <Services group={current} client={client} onChange={setCurrent} />
-        <Paybacks group={current} client={client} onChange={setCurrent} />
+        <Expenses group={current} client={api.expenses(testUsers.lea)} onChange={setCurrent} />
+        <Services group={current} client={api.services(testUsers.lea)} onChange={setCurrent} />
+        <Paybacks group={current} client={api.paybacks(testUsers.lea)} onChange={setCurrent} />
       </>
     )
   }

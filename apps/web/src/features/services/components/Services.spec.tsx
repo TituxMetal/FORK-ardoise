@@ -4,10 +4,10 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { euros } from '~/lib/amounts'
-import { Expenses } from '~features/expenses/Expenses'
-import type { GroupDto } from '~features/groups/api/groups.client'
+import { Expenses } from '~features/expenses/components'
+import type { GroupDto } from '~features/groups/api'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
-import { Services } from '~features/services/Services'
+import { Services } from '~features/services/components'
 
 afterEach(cleanup)
 afterEach(async () => {
@@ -20,17 +20,17 @@ beforeEach(async () => {
 })
 
 const openServices = async () => {
-  const client = api.client(testUsers.lea)
+  const client = api.groups(testUsers.lea)
   const group = await client.create('Potes de Bob')
-  await api.client(testUsers.bob).join(group.invite.secret)
-  await api.client(testUsers.camille).join(group.invite.secret)
+  await api.groups(testUsers.bob).join(group.invite.secret)
+  await api.groups(testUsers.camille).join(group.invite.secret)
   const joined = await client.get(group.id)
   const Board = () => {
     const [current, setCurrent] = useState<GroupDto>(joined)
     return (
       <>
-        <Expenses group={current} client={client} onChange={setCurrent} />
-        <Services group={current} client={client} onChange={setCurrent} />
+        <Expenses group={current} client={api.expenses(testUsers.lea)} onChange={setCurrent} />
+        <Services group={current} client={api.services(testUsers.lea)} onChange={setCurrent} />
         <ul>
           {current.balances.map(balance => (
             <li key={balance.userId}>

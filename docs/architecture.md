@@ -19,7 +19,7 @@ export const createApp = () => { … }
 export type AppType = ReturnType<typeof createApp>
 ```
 
-The composition root lives at `apps/api/src/createApp.ts` (see #10). The web imports `AppType` type-only (through the `api/*` alias, erased at build) and calls the API through `hc<AppType>` from `hono/client`. The test harness is the exception: it imports runtime values (`createApp`) through the same alias to mount the API in-process. Input types come from the `zValidator` schemas, output types from `c.json()` — no hand-written client, no shared package. better-auth keeps its own client (`authClient`). API errors are not inferred by `hc`: a thin wrapper reads `res.json()` and throws, keeping the `throw` contract components expect.
+The composition root lives at `apps/api/src/createApp.ts` (see #10). The web imports `AppType` type-only (through the `api/*` alias, erased at build) and calls the API through `hc<AppType>` from `hono/client`. The test harness is the exception: it imports runtime values (`createApp`) through the same alias to mount the API in-process. Input types come from the `zValidator` schemas, output types from `c.json()` — no hand-written client, no shared package. better-auth keeps its own client (`authClient`, in `features/session/api/auth.client.ts`). API errors are not inferred by `hc`: a thin wrapper reads `res.json()` and throws, keeping the `throw` contract components expect.
 
 ## API
 
@@ -65,7 +65,7 @@ apps/web/src/
   pages/            one file per route, composes feature components
   features/<name>/  components/ + api/ always; hooks/ schemas/ store/ types/ utils/ as needed
   components/ui/    shared reusable UI (Input, Button, FormWrapper…)
-  lib/              shared seams: http client, authClient, amounts, forms, errorMessage
+  lib/              shared seams: http client, amounts, forms, errorMessage
   types/  utils/  config/  styles/  assets/  layouts/
 ```
 
