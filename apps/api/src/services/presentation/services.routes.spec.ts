@@ -321,7 +321,7 @@ describe('services', () => {
     })
   })
 
-  it('rejects a missing label, a missing day, a non-positive Amount or empty Participants with 400', async () => {
+  it('rejects malformed shape, a non-integer or non-positive Amount, or empty Participants with 400', async () => {
     const { app, group, lea, bob } = await openApp()
     const cookie = lea.cookie
     const refusals = [
@@ -332,7 +332,17 @@ describe('services', () => {
           providerId: lea.userId,
           participantIds: [lea.userId]
         },
-        message: 'Libellé requis'
+        message: 'Format invalide'
+      },
+      {
+        body: {
+          label: 42,
+          day: '2026-08-15',
+          amount: 100,
+          providerId: lea.userId,
+          participantIds: [lea.userId]
+        },
+        message: 'Format invalide'
       },
       {
         body: {
@@ -341,7 +351,7 @@ describe('services', () => {
           providerId: lea.userId,
           participantIds: [lea.userId]
         },
-        message: 'Jour requis'
+        message: 'Format invalide'
       },
       {
         body: {
@@ -352,6 +362,16 @@ describe('services', () => {
           participantIds: [lea.userId]
         },
         message: 'Montant en centimes > 0 requis'
+      },
+      {
+        body: {
+          label: 'Ordi Bob',
+          day: '2026-08-15',
+          amount: 1.5,
+          providerId: lea.userId,
+          participantIds: [lea.userId]
+        },
+        message: 'Montant en centimes entiers requis'
       },
       {
         body: {

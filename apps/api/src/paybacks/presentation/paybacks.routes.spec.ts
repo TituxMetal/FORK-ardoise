@@ -250,7 +250,7 @@ describe('paybacks', () => {
     ])
   })
 
-  it('refuses a payback above the cap, a non-negative debtor or a non-positive creditor', async () => {
+  it('refuses a payback above the cap, a non-negative debtor, a non-positive creditor or a malformed amount', async () => {
     const { app, group, lea, bob, camille } = await pizza()
     const refusals = [
       {
@@ -268,6 +268,10 @@ describe('paybacks', () => {
       {
         body: { debtorId: 'inconnu', creditorId: lea.userId, amount: 10 },
         message: 'Membre introuvable'
+      },
+      {
+        body: { debtorId: bob.userId, creditorId: lea.userId, amount: 'dix' },
+        message: 'Format invalide'
       }
     ]
 

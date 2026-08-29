@@ -1,18 +1,15 @@
-import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { DAY_REQUIRED } from '~/expenses/domain/day.vo'
-import { LABEL_REQUIRED } from '~/expenses/domain/label.vo'
-import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
+import { validateBody } from '~/shared/presentation'
 import type { SlateView } from '~/groups/application/getSlate.uc'
 import { createService } from '~/services/application/createService.uc'
 import { deleteService } from '~/services/application/deleteService.uc'
 import type { ServiceRepository } from '~/services/domain/service.repository'
 
 const createServiceBody = z.object({
-  label: z.string({ error: LABEL_REQUIRED }),
-  day: z.string({ error: DAY_REQUIRED }),
-  amount: z.number({ error: AMOUNT_POSITIVE }),
+  label: z.string(),
+  day: z.string(),
+  amount: z.number(),
   providerId: z.string(),
   participantIds: z.array(z.string()).optional()
 })
@@ -22,23 +19,14 @@ export const createServicesRoutes = (services: ServiceRepository, view: SlateVie
   const deleteServiceUseCase = deleteService(services, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
-    .post(
-      '/:groupId/services',
-      zValidator('json', createServiceBody, result => {
-        if (!result.success) {
-          const issue = result.error.issues[0]
-          throw invalidData(issue?.message ?? LABEL_REQUIRED)
-        }
-      }),
-      async c => {
-        const group = await createServiceUseCase.execute(
-          c.get('userId'),
-          c.req.param('groupId'),
-          c.req.valid('json')
-        )
-        return c.json(group, 201)
-      }
-    )
+    .post('/:groupId/services', validateBody(createServiceBody), async c => {
+      const group = await createServiceUseCase.execute(
+        c.get('userId'),
+        c.req.param('groupId'),
+        c.req.valid('json')
+      )
+      return c.json(group, 201)
+    })
     .delete('/:groupId/services/:id', async c =>
       c.json(
         await deleteServiceUseCase.execute(

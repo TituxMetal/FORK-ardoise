@@ -201,18 +201,32 @@ describe('groups', () => {
     ])
   })
 
-  it('creating a Group with a non-string name is refused with 400', async () => {
+  it('refuses a non-string name with 400 Format invalide and a blank name with the domain rule', async () => {
     const app = await createTestApp()
     const opened = await signUp(app)
+    const cookie = cookieHeader(opened)
 
-    const response = await app.request('/groups', {
+    const malformed = await app.request('/groups', {
       method: 'POST',
-      headers: { cookie: cookieHeader(opened), 'content-type': 'application/json' },
-      body: JSON.stringify({ name: 1 })
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 42 })
     })
 
-    expect(response.status).toBe(400)
-    expect(await response.json()).toEqual({
+    expect(malformed.status).toBe(400)
+    expect(await malformed.json()).toEqual({
+      statusCode: 400,
+      code: 'INVALID_DATA',
+      message: 'Format invalide'
+    })
+
+    const blank = await app.request('/groups', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ name: '   ' })
+    })
+
+    expect(blank.status).toBe(400)
+    expect(await blank.json()).toEqual({
       statusCode: 400,
       code: 'INVALID_DATA',
       message: 'Nom du Groupe requis'
