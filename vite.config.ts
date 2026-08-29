@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite-plus'
-import { aliasEntries } from './apps/web/aliases.plugin'
+import { aliases } from './apps/web/aliases.plugin'
 
 export default defineConfig({
   defaultPackage: './apps/web',
@@ -25,10 +25,11 @@ export default defineConfig({
       }
     ]
   },
+
+  plugins: [aliases()],
   test: {
     include: ['**/*.spec.ts', '**/*.spec.tsx'],
-    exclude: ['**/e2e/**'],
-    alias: aliasEntries
+    exclude: ['**/e2e/**']
   },
   run: {
     cache: true

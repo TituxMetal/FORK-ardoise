@@ -1,7 +1,7 @@
 import { existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { Alias } from 'vite'
+import type { Plugin } from 'vite'
 
 const apiSrc = fileURLToPath(new URL('../api/src', import.meta.url))
 const webSrc = fileURLToPath(new URL('./src', import.meta.url))
@@ -25,19 +25,20 @@ const withExtension = (target: string): string => {
   return target
 }
 
-const resolveFrom =
-  (root: string): NonNullable<Alias['customResolver']> =>
-  id =>
-    withExtension(join(root, id))
-
-export const aliasEntries: Alias[] = [
-  { find: /^~ui\//, replacement: '', customResolver: resolveFrom(webUi) },
-  { find: /^~features\//, replacement: '', customResolver: resolveFrom(webFeatures) },
-  { find: /^api\//, replacement: '', customResolver: resolveFrom(apiSrc) },
-  {
-    find: /^~\//,
-    replacement: '',
-    customResolver: (id, importer) =>
-      withExtension(join(importer?.startsWith(apiSrc) ? apiSrc : webSrc, id))
+// Importer-aware aliases. `resolveId` with `enforce: 'pre'` replaces the
+// deprecated `resolve.alias` `customResolver` option (removed in Vite 9).
+export const aliases = (): Plugin => ({
+  name: 'ardoise-aliases',
+  enforce: 'pre',
+  resolveId(source, importer) {
+    if (source.startsWith('~ui/')) return withExtension(join(webUi, source.replace(/^~ui\//, '')))
+    if (source.startsWith('~features/'))
+      return withExtension(join(webFeatures, source.replace(/^~features\//, '')))
+    if (source.startsWith('api/')) return withExtension(join(apiSrc, source.replace(/^api\//, '')))
+    if (source.startsWith('~/')) {
+      const root = importer?.startsWith(apiSrc) ? apiSrc : webSrc
+      return withExtension(join(root, source.replace(/^~\//, '')))
+    }
+    return null
   }
-]
+})
