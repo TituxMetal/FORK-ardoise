@@ -1,7 +1,7 @@
 import { existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { Plugin } from 'vite'
+import type { Plugin } from 'vite-plus'
 
 const apiSrc = fileURLToPath(new URL('../api/src', import.meta.url))
 const webSrc = fileURLToPath(new URL('./src', import.meta.url))
