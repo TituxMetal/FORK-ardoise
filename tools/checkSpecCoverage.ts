@@ -1,7 +1,7 @@
 // Spec-coverage gate: every non-exempt source file under apps/*/src has its
 // mirror sibling spec (amount.vo.ts -> amount.vo.spec.ts, GroupPage.tsx ->
 // GroupPage.spec.tsx). Exempt: barrels, entries, vite-env.d.ts, configs, and
-// pure ports (*.port.ts / *.repository.ts). See docs issue #63.
+// pure type modules (*.dto.ts / *.port.ts / *.repository.ts). See docs issue #63.
 //
 // The gate fails closed: a git error or an invalid base never yields a green
 // run.
@@ -15,7 +15,7 @@
 const ROOTS = ['apps/api/src', 'apps/web/src']
 const EXEMPT_BASENAMES = ['index.ts', 'main.ts', 'main.tsx', 'vite-env.d.ts']
 const EXEMPT_MARKERS = ['.config.']
-const EXEMPT_SUFFIXES = ['.port.ts', '.repository.ts']
+const EXEMPT_SUFFIXES = ['.dto.ts', '.port.ts', '.repository.ts']
 
 const parse = (stdout: Uint8Array): string[] =>
   stdout

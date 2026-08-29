@@ -82,7 +82,7 @@ Four layers, all kept:
 
 The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
 
-Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure ports (`*.port.ts`, `*.repository.ts` — auth and persistence ports with no behaviour). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
+Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure type modules with no runtime behaviour (`*.dto.ts`, `*.port.ts`, `*.repository.ts` — DTOs and auth/persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
 
 Arrange / Act / Assert separated by a blank line. New specs use `describe` / `it`. Existing `test()` dies on the retrofit ticket. No browser suite as the _only_ contract: HTTP stays.
 
@@ -92,7 +92,7 @@ Arrange / Act / Assert separated by a blank line. New specs use `describe` / `it
 - Component files PascalCase (`GroupPage.tsx`); exported type identifiers PascalCase (`GroupDto`); module files camelCase + role suffix. PascalCase is never a function file.
 - Function modules camelCase with a role suffix when the role exists.
 - The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
-- Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure ports (`*.port.ts`, `*.repository.ts` — auth and persistence ports with no behaviour). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
+- Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure type modules with no runtime behaviour (`*.dto.ts`, `*.port.ts`, `*.repository.ts` — DTOs and auth/persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
 - Aliases: `~`, `~ui`, `~features`, `api/*`. Imports carry no extension.
 - Identifiers: `CONTEXT.md` English. No accents.
 
