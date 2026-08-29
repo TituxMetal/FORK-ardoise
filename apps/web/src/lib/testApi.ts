@@ -1,5 +1,5 @@
 import { createClient } from '@libsql/client'
-import { existsSync, mkdtempSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createApp } from 'api/createApp'
@@ -41,6 +41,7 @@ const seedUsers = async (prisma: ReturnType<typeof createPrismaClient>) => {
 export type TestApi = {
   app: ReturnType<typeof createApp>
   client: (user: SessionUser) => GroupsClient
+  close: () => Promise<void>
 }
 
 export const createTestApi = async (): Promise<TestApi> => {
@@ -54,8 +55,13 @@ export const createTestApi = async (): Promise<TestApi> => {
   await seedUsers(prisma)
 
   const app = createApp(prisma, stubAuth(testUsers))
+  const close = async () => {
+    await prisma.$disconnect()
+    rmSync(dir, { recursive: true, force: true })
+  }
   return {
     app,
+    close,
     client: user =>
       createGroupsClient({
         baseUrl: '',

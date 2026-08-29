@@ -6,6 +6,9 @@ import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { CreateGroupForm } from '~features/groups/CreateGroupForm'
 
 afterEach(cleanup)
+afterEach(async () => {
+  await api.close()
+})
 
 let api: TestApi
 beforeEach(async () => {

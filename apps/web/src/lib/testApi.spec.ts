@@ -1,10 +1,17 @@
-import { describe, expect, it } from 'vite-plus/test'
-import { createTestApi, testUsers } from '~/lib/testApi'
+import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
+import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
+
+let api: TestApi
+beforeEach(async () => {
+  api = await createTestApi()
+})
+afterEach(async () => {
+  await api.close()
+})
 
 describe('createTestApi', () => {
   it('serves the API in-process with one User per client', async () => {
-    const { client } = await createTestApi()
-    const lea = client(testUsers.lea)
+    const lea = api.client(testUsers.lea)
 
     const group = await lea.create('Potes de Bob')
 
@@ -12,9 +19,8 @@ describe('createTestApi', () => {
   })
 
   it('keeps Users isolated: a Group is only listed by its Members', async () => {
-    const { client } = await createTestApi()
-    const lea = client(testUsers.lea)
-    const bob = client(testUsers.bob)
+    const lea = api.client(testUsers.lea)
+    const bob = api.client(testUsers.bob)
 
     const group = await lea.create('Potes de Bob')
 

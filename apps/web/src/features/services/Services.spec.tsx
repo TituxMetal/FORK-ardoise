@@ -10,6 +10,9 @@ import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { Services } from '~features/services/Services'
 
 afterEach(cleanup)
+afterEach(async () => {
+  await api.close()
+})
 
 let api: TestApi
 beforeEach(async () => {

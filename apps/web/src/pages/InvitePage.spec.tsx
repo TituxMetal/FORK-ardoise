@@ -5,6 +5,9 @@ import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { InvitePage } from '~/pages/InvitePage'
 
 afterEach(cleanup)
+afterEach(async () => {
+  await api.close()
+})
 
 let api: TestApi
 beforeEach(async () => {

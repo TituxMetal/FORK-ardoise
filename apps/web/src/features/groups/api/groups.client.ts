@@ -39,22 +39,20 @@ export type GroupsClient = {
 }
 
 export type GroupsClientOptions = {
-  baseUrl: string
+  baseUrl?: string
   fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 }
 
 const unwrap = async <T>(response: { ok: boolean; json: () => Promise<unknown> }): Promise<T> => {
-  const body = (await response.json().catch(() => null)) as { message?: string } | null
-  if (!response.ok) {
-    throw new Error(body?.message ?? 'Réponse inattendue du serveur')
+  if (response.ok) {
+    return (await response.json()) as T
   }
-  return body as T
+  const body = (await response.json().catch(() => null)) as { message?: string } | null
+  throw new Error(body?.message ?? 'Réponse inattendue du serveur')
 }
 
-export const createGroupsClient = (
-  options: GroupsClientOptions = { baseUrl: '/api' }
-): GroupsClient => {
-  const http = createApiClient(options.baseUrl, options.fetch)
+export const createGroupsClient = (options: GroupsClientOptions = {}): GroupsClient => {
+  const http = createApiClient(options.baseUrl ?? '/api', options.fetch)
   return {
     list: async () => unwrap<GroupSummary[]>(await http.groups.$get()),
     create: async name => unwrap<GroupDto>(await http.groups.$post({ json: { name } })),

@@ -10,6 +10,9 @@ import { Services } from '~features/services/Services'
 import { Paybacks } from '~features/paybacks/Paybacks'
 
 afterEach(cleanup)
+afterEach(async () => {
+  await api.close()
+})
 
 let api: TestApi
 beforeEach(async () => {
