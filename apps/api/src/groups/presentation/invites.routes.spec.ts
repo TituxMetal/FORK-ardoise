@@ -216,4 +216,69 @@ describe('invites', () => {
       message: 'Invitation introuvable'
     })
   })
+
+  it('a User joining a Group with entries receives the real slate', async () => {
+    const app = await createTestApp()
+    const lea = await signUp(app)
+    const bob = await signUp(app, {
+      email: 'bob@example.com',
+      password: 'password1234',
+      name: 'Bob'
+    })
+    const camille = await signUp(app, {
+      email: 'camille@example.com',
+      password: 'password1234',
+      name: 'Camille'
+    })
+    const created = await createGroup(app, cookieHeader(lea), 'Potes de Bob')
+    const { id, invite } = (await created.json()) as GroupDto
+    await app.request(`/invites/${invite.secret}`, {
+      method: 'POST',
+      headers: { cookie: cookieHeader(camille) }
+    })
+    const opened = await app.request(`/groups/${id}`, {
+      headers: { cookie: cookieHeader(lea) }
+    })
+    const group = (await opened.json()) as GroupDto
+    const leaId = group.members.find(member => member.name === 'Léa')!.userId
+    const camilleId = group.members.find(member => member.name === 'Camille')!.userId
+    await app.request(`/groups/${id}/expenses`, {
+      method: 'POST',
+      headers: { cookie: cookieHeader(lea), 'content-type': 'application/json' },
+      body: JSON.stringify({
+        label: 'Pizza',
+        day: '2026-08-15',
+        amount: 100,
+        payerId: leaId,
+        participantIds: [leaId, camilleId]
+      })
+    })
+
+    const joined = await app.request(`/invites/${invite.secret}`, {
+      method: 'POST',
+      headers: { cookie: cookieHeader(bob) }
+    })
+
+    expect(joined.status).toBe(200)
+    const body = (await joined.json()) as GroupDto
+    expect(body.expenses).toEqual([
+      {
+        id: expect.any(String),
+        label: 'Pizza',
+        day: '2026-08-15',
+        amount: 100,
+        payerId: leaId,
+        participantIds: [leaId, camilleId],
+        parts: [
+          { userId: leaId, amount: 50 },
+          { userId: camilleId, amount: 50 }
+        ]
+      }
+    ])
+    expect(body.balances).toEqual([
+      { userId: leaId, name: 'Léa', amount: 50 },
+      { userId: camilleId, name: 'Camille', amount: -50 },
+      { userId: expect.any(String), name: 'Bob', amount: 0 }
+    ])
+  })
 })

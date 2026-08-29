@@ -1,10 +1,10 @@
-import { notFound } from '~/shared/domain'
+import type { SlateView } from '~/groups/application/getSlate.uc'
 import { groupAddMember } from '~/groups/domain/group.entity'
 import type { GroupRepository } from '~/groups/domain/group.repository'
 import { memberOf } from '~/groups/domain/member.entity'
-import { toGroupDto } from '~/groups/application/toGroup.mapper'
+import { notFound } from '~/shared/domain'
 
-export const joinGroup = (groups: GroupRepository) => ({
+export const joinGroup = (groups: GroupRepository, view: SlateView) => ({
   execute: async (userId: string, userName: string, secret: string) => {
     const group = await groups.findByInviteSecret(secret)
     if (!group) {
@@ -12,6 +12,6 @@ export const joinGroup = (groups: GroupRepository) => ({
     }
     groupAddMember(group, memberOf(userId, userName))
     await groups.save(group)
-    return toGroupDto(group)
+    return view.execute(userId, group.id)
   }
 })

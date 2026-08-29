@@ -1,14 +1,9 @@
-import { dayFrom } from '~/expenses/domain/day.vo'
-import { labelFrom } from '~/expenses/domain/label.vo'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
-import { amountFromCents, invalidData, notFound } from '~/shared/domain'
-
-import { toGroupDto } from '~/groups/application/toGroup.mapper'
-import { groupHasMember } from '~/groups/domain/group.entity'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
+import type { SlateView } from '~/groups/application/getSlate.uc'
+import { amountFromCents, invalidData } from '~/shared/domain'
 import { serviceCreate } from '~/services/domain/service.entity'
 import type { ServiceRepository } from '~/services/domain/service.repository'
+import { dayFrom } from '~/expenses/domain/day.vo'
+import { labelFrom } from '~/expenses/domain/label.vo'
 
 export type CreateServiceInput = {
   label: string
@@ -18,21 +13,14 @@ export type CreateServiceInput = {
   participantIds?: string[]
 }
 
-export const createService = (
-  groups: GroupRepository,
-  expenses: ExpenseRepository,
-  services: ServiceRepository,
-  paybacks: PaybackRepository
-) => ({
+export const createService = (services: ServiceRepository, view: SlateView) => ({
   execute: async (userId: string, groupId: string, input: CreateServiceInput) => {
-    const group = await groups.findById(groupId)
-    if (!group || !groupHasMember(group, userId)) {
-      throw notFound('Groupe introuvable')
-    }
-    const participantIds = input.participantIds ?? group.members.map(member => member.userId)
+    const slate = await view.execute(userId, groupId)
+    const memberIds = slate.members.map(member => member.userId)
+    const participantIds = input.participantIds ?? memberIds
     if (
-      !groupHasMember(group, input.providerId) ||
-      participantIds.some(id => !groupHasMember(group, id))
+      !memberIds.includes(input.providerId) ||
+      participantIds.some(id => !memberIds.includes(id))
     ) {
       throw invalidData('Membre introuvable')
     }
@@ -45,11 +33,6 @@ export const createService = (
       participantIds
     )
     await services.save(service)
-    return toGroupDto(
-      group,
-      await expenses.findByGroupId(groupId),
-      await services.findByGroupId(groupId),
-      await paybacks.findByGroupId(groupId)
-    )
+    return view.execute(userId, groupId)
   }
 })

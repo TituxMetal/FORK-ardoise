@@ -1,11 +1,39 @@
 import type { Expense } from '~/expenses/domain/expense.entity'
-import { balancesOf } from '~/shared/domain'
+import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import type { Payback } from '~/paybacks/domain/payback.entity'
+import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import type { Service } from '~/services/domain/service.entity'
-import type { Group } from '~/groups/domain/group.entity'
+import type { ServiceRepository } from '~/services/domain/service.repository'
+import { balancesOf, notFound } from '~/shared/domain'
 import type { GroupDto } from '~/groups/application/group.dto'
+import { groupHasMember, type Group } from '~/groups/domain/group.entity'
+import type { GroupRepository } from '~/groups/domain/group.repository'
 
-export const toGroupDto = (
+export type SlateView = {
+  execute: (userId: string, groupId: string) => Promise<GroupDto>
+}
+
+export const getSlate = (
+  groups: GroupRepository,
+  expenses: ExpenseRepository,
+  services: ServiceRepository,
+  paybacks: PaybackRepository
+): SlateView => ({
+  execute: async (userId: string, groupId: string) => {
+    const group = await groups.findById(groupId)
+    if (!group || !groupHasMember(group, userId)) {
+      throw notFound('Groupe introuvable')
+    }
+    return toGroupDto(
+      group,
+      await expenses.findByGroupId(groupId),
+      await services.findByGroupId(groupId),
+      await paybacks.findByGroupId(groupId)
+    )
+  }
+})
+
+const toGroupDto = (
   group: Group,
   expenses: Expense[] = [],
   services: Service[] = [],

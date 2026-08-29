@@ -1,11 +1,8 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
-
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import type { ServiceRepository } from '~/services/domain/service.repository'
+import type { SlateView } from '~/groups/application/getSlate.uc'
 import { createPayback } from '~/paybacks/application/createPayback.uc'
 import { deletePayback } from '~/paybacks/application/deletePayback.uc'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
@@ -16,14 +13,9 @@ const createPaybackBody = z.object({
   amount: z.number({ error: AMOUNT_POSITIVE })
 })
 
-export const createPaybacksRoutes = (
-  groups: GroupRepository,
-  expenses: ExpenseRepository,
-  services: ServiceRepository,
-  paybacks: PaybackRepository
-) => {
-  const createPaybackUseCase = createPayback(groups, expenses, services, paybacks)
-  const deletePaybackUseCase = deletePayback(groups, expenses, services, paybacks)
+export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateView) => {
+  const createPaybackUseCase = createPayback(paybacks, view)
+  const deletePaybackUseCase = deletePayback(paybacks, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post(

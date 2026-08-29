@@ -2,11 +2,8 @@ import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { invalidData } from '~/shared/domain'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
-import type { ServiceRepository } from '~/services/domain/service.repository'
+import type { SlateView } from '~/groups/application/getSlate.uc'
 import { createGroup } from '~/groups/application/createGroup.uc'
-import { getGroup } from '~/groups/application/getGroup.uc'
 import { listGroups } from '~/groups/application/listGroups.uc'
 import { GROUP_NAME_REQUIRED } from '~/groups/domain/groupName.vo'
 import type { GroupRepository } from '~/groups/domain/group.repository'
@@ -15,15 +12,9 @@ const createGroupBody = z.object({
   name: z.string({ error: GROUP_NAME_REQUIRED })
 })
 
-export const createGroupsRoutes = (
-  groups: GroupRepository,
-  expenses: ExpenseRepository,
-  services: ServiceRepository,
-  paybacks: PaybackRepository
-) => {
-  const createGroupUseCase = createGroup(groups)
+export const createGroupsRoutes = (groups: GroupRepository, view: SlateView) => {
+  const createGroupUseCase = createGroup(groups, view)
   const listGroupsUseCase = listGroups(groups)
-  const getGroupUseCase = getGroup(groups, expenses, services, paybacks)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post(
@@ -40,7 +31,5 @@ export const createGroupsRoutes = (
       }
     )
     .get('/', async c => c.json(await listGroupsUseCase.execute(c.get('userId'))))
-    .get('/:id', async c =>
-      c.json(await getGroupUseCase.execute(c.get('userId'), c.req.param('id')))
-    )
+    .get('/:id', async c => c.json(await view.execute(c.get('userId'), c.req.param('id'))))
 }

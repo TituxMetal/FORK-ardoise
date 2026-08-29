@@ -3,11 +3,8 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { DAY_REQUIRED } from '~/expenses/domain/day.vo'
 import { LABEL_REQUIRED } from '~/expenses/domain/label.vo'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
-
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
+import type { SlateView } from '~/groups/application/getSlate.uc'
 import { createService } from '~/services/application/createService.uc'
 import { deleteService } from '~/services/application/deleteService.uc'
 import type { ServiceRepository } from '~/services/domain/service.repository'
@@ -20,14 +17,9 @@ const createServiceBody = z.object({
   participantIds: z.array(z.string()).optional()
 })
 
-export const createServicesRoutes = (
-  groups: GroupRepository,
-  expenses: ExpenseRepository,
-  services: ServiceRepository,
-  paybacks: PaybackRepository
-) => {
-  const createServiceUseCase = createService(groups, expenses, services, paybacks)
-  const deleteServiceUseCase = deleteService(groups, expenses, services, paybacks)
+export const createServicesRoutes = (services: ServiceRepository, view: SlateView) => {
+  const createServiceUseCase = createService(services, view)
+  const deleteServiceUseCase = deleteService(services, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post(

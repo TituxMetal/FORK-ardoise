@@ -5,10 +5,7 @@ import { DAY_REQUIRED } from '~/expenses/domain/day.vo'
 import { LABEL_REQUIRED } from '~/expenses/domain/label.vo'
 import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { AMOUNT_POSITIVE, invalidData } from '~/shared/domain'
-
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
-import type { ServiceRepository } from '~/services/domain/service.repository'
+import type { SlateView } from '~/groups/application/getSlate.uc'
 import { createExpense } from '~/expenses/application/createExpense.uc'
 import { deleteExpense } from '~/expenses/application/deleteExpense.uc'
 
@@ -20,14 +17,9 @@ const createExpenseBody = z.object({
   participantIds: z.array(z.string()).optional()
 })
 
-export const createExpensesRoutes = (
-  groups: GroupRepository,
-  expenses: ExpenseRepository,
-  services: ServiceRepository,
-  paybacks: PaybackRepository
-) => {
-  const createExpenseUseCase = createExpense(groups, expenses, services, paybacks)
-  const deleteExpenseUseCase = deleteExpense(groups, expenses, services, paybacks)
+export const createExpensesRoutes = (expenses: ExpenseRepository, view: SlateView) => {
+  const createExpenseUseCase = createExpense(expenses, view)
+  const deleteExpenseUseCase = deleteExpense(expenses, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post(

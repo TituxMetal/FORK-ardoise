@@ -1,12 +1,7 @@
-import { amountFromCents, balancesOf, invalidData, notFound } from '~/shared/domain'
-
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
-import { toGroupDto } from '~/groups/application/toGroup.mapper'
-import { groupHasMember } from '~/groups/domain/group.entity'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import type { ServiceRepository } from '~/services/domain/service.repository'
+import type { SlateView } from '~/groups/application/getSlate.uc'
 import { paybackCreate } from '~/paybacks/domain/payback.entity'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
+import { amountFromCents, invalidData } from '~/shared/domain'
 
 export type CreatePaybackInput = {
   debtorId: string
@@ -14,44 +9,19 @@ export type CreatePaybackInput = {
   amount: number
 }
 
-export const createPayback = (
-  groups: GroupRepository,
-  expenses: ExpenseRepository,
-  services: ServiceRepository,
-  paybacks: PaybackRepository
-) => ({
+export const createPayback = (paybacks: PaybackRepository, view: SlateView) => ({
   execute: async (userId: string, groupId: string, input: CreatePaybackInput) => {
-    const group = await groups.findById(groupId)
-    if (!group || !groupHasMember(group, userId)) {
-      throw notFound('Groupe introuvable')
-    }
-    if (!groupHasMember(group, input.debtorId) || !groupHasMember(group, input.creditorId)) {
+    const slate = await view.execute(userId, groupId)
+    if (
+      !slate.members.some(member => member.userId === input.debtorId) ||
+      !slate.members.some(member => member.userId === input.creditorId)
+    ) {
       throw invalidData('Membre introuvable')
     }
-    const groupExpenses = await expenses.findByGroupId(groupId)
-    const providedServices = await services.findByGroupId(groupId)
-    const existing = await paybacks.findByGroupId(groupId)
-    const balances = balancesOf(
-      group.members.map(member => ({ userId: member.userId, name: member.name })),
-      groupExpenses.map(expense => ({
-        payerId: expense.payerId,
-        amount: expense.amount.value,
-        parts: expense.parts
-      })),
-      providedServices.map(service => ({
-        providerId: service.providerId,
-        amount: service.amount.value,
-        parts: service.parts
-      })),
-      existing.map(payback => ({
-        debtorId: payback.debtorId,
-        creditorId: payback.creditorId,
-        amount: payback.amount.value
-      }))
-    )
-    const debtorBalance = balances.find(balance => balance.userId === input.debtorId)?.amount ?? 0
+    const debtorBalance =
+      slate.balances.find(balance => balance.userId === input.debtorId)?.amount ?? 0
     const creditorBalance =
-      balances.find(balance => balance.userId === input.creditorId)?.amount ?? 0
+      slate.balances.find(balance => balance.userId === input.creditorId)?.amount ?? 0
     const payback = paybackCreate(
       groupId,
       input.debtorId,
@@ -61,6 +31,6 @@ export const createPayback = (
       creditorBalance
     )
     await paybacks.save(payback)
-    return toGroupDto(group, groupExpenses, providedServices, [...existing, payback])
+    return view.execute(userId, groupId)
   }
 })
