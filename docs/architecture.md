@@ -75,19 +75,24 @@ Routing is a Hono app in the browser: routes declared with `app.get('/groups/:id
 
 Four layers, all kept:
 
-1. **Domain** — pure functions, colocated `.spec.ts`.
+1. **Domain** — pure functions.
 2. **HTTP** — in-process Hono, session cookie, the API contract.
 3. **React Testing Library** — component behaviour against the real API in-process (`hc<AppType>('', { fetch: app.request.bind(app) })`), no fake client.
 4. **Playwright** — real browser + real API. This is the layer that catches an API 4xx shown as a browser 500. Specs live in `apps/web/e2e/` and run via `vp run test:e2e` (boots web + API through the web start plugin).
 
-One file, one colocated spec; Arrange / Act / Assert separated by a blank line. New specs use `describe` / `it`. Existing `test()` dies on the retrofit ticket. No browser suite as the _only_ contract: HTTP stays.
+The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
+
+Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure ports (`*.port.ts`, `*.repository.ts` — type-only auth and persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
+
+Arrange / Act / Assert separated by a blank line. New specs use `describe` / `it`. Existing `test()` dies on the retrofit ticket. No browser suite as the _only_ contract: HTTP stays.
 
 ## Names
 
 - Folders kebab-case.
 - Component files PascalCase (`GroupPage.tsx`); exported type identifiers PascalCase (`GroupDto`); module files camelCase + role suffix. PascalCase is never a function file.
 - Function modules camelCase with a role suffix when the role exists.
-- Specs sit next to the file, suffix `.spec.ts` / `.spec.tsx`.
+- The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
+- Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure ports (`*.port.ts`, `*.repository.ts` — type-only auth and persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
 - Aliases: `~`, `~ui`, `~features`, `api/*`. Imports carry no extension.
 - Identifiers: `CONTEXT.md` English. No accents.
 
