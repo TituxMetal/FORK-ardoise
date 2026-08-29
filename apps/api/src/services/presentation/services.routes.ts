@@ -26,33 +26,34 @@ export const createServicesRoutes = (
   services: ServiceRepository,
   paybacks: PaybackRepository
 ) => {
-  const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createServiceUseCase = createService(groups, expenses, services, paybacks)
   const deleteServiceUseCase = deleteService(groups, expenses, services, paybacks)
 
-  app.post(
-    '/:groupId/services',
-    zValidator('json', createServiceBody, result => {
-      if (!result.success) {
-        const issue = result.error.issues[0]
-        throw invalidData(issue?.message ?? LABEL_REQUIRED)
+  return new Hono<{ Variables: { userId: string; userName: string } }>()
+    .post(
+      '/:groupId/services',
+      zValidator('json', createServiceBody, result => {
+        if (!result.success) {
+          const issue = result.error.issues[0]
+          throw invalidData(issue?.message ?? LABEL_REQUIRED)
+        }
+      }),
+      async c => {
+        const group = await createServiceUseCase.execute(
+          c.get('userId'),
+          c.req.param('groupId'),
+          c.req.valid('json')
+        )
+        return c.json(group, 201)
       }
-    }),
-    async c => {
-      const group = await createServiceUseCase.execute(
-        c.get('userId'),
-        c.req.param('groupId'),
-        c.req.valid('json')
-      )
-      return c.json(group, 201)
-    }
-  )
-
-  app.delete('/:groupId/services/:id', async c =>
-    c.json(
-      await deleteServiceUseCase.execute(c.get('userId'), c.req.param('groupId'), c.req.param('id'))
     )
-  )
-
-  return app
+    .delete('/:groupId/services/:id', async c =>
+      c.json(
+        await deleteServiceUseCase.execute(
+          c.get('userId'),
+          c.req.param('groupId'),
+          c.req.param('id')
+        )
+      )
+    )
 }

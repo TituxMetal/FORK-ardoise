@@ -26,33 +26,34 @@ export const createExpensesRoutes = (
   services: ServiceRepository,
   paybacks: PaybackRepository
 ) => {
-  const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createExpenseUseCase = createExpense(groups, expenses, services, paybacks)
   const deleteExpenseUseCase = deleteExpense(groups, expenses, services, paybacks)
 
-  app.post(
-    '/:groupId/expenses',
-    zValidator('json', createExpenseBody, result => {
-      if (!result.success) {
-        const issue = result.error.issues[0]
-        throw invalidData(issue?.message ?? LABEL_REQUIRED)
+  return new Hono<{ Variables: { userId: string; userName: string } }>()
+    .post(
+      '/:groupId/expenses',
+      zValidator('json', createExpenseBody, result => {
+        if (!result.success) {
+          const issue = result.error.issues[0]
+          throw invalidData(issue?.message ?? LABEL_REQUIRED)
+        }
+      }),
+      async c => {
+        const group = await createExpenseUseCase.execute(
+          c.get('userId'),
+          c.req.param('groupId'),
+          c.req.valid('json')
+        )
+        return c.json(group, 201)
       }
-    }),
-    async c => {
-      const group = await createExpenseUseCase.execute(
-        c.get('userId'),
-        c.req.param('groupId'),
-        c.req.valid('json')
-      )
-      return c.json(group, 201)
-    }
-  )
-
-  app.delete('/:groupId/expenses/:id', async c =>
-    c.json(
-      await deleteExpenseUseCase.execute(c.get('userId'), c.req.param('groupId'), c.req.param('id'))
     )
-  )
-
-  return app
+    .delete('/:groupId/expenses/:id', async c =>
+      c.json(
+        await deleteExpenseUseCase.execute(
+          c.get('userId'),
+          c.req.param('groupId'),
+          c.req.param('id')
+        )
+      )
+    )
 }

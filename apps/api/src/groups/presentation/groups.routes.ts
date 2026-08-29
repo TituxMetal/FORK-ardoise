@@ -21,30 +21,26 @@ export const createGroupsRoutes = (
   services: ServiceRepository,
   paybacks: PaybackRepository
 ) => {
-  const app = new Hono<{ Variables: { userId: string; userName: string } }>()
   const createGroupUseCase = createGroup(groups)
   const listGroupsUseCase = listGroups(groups)
   const getGroupUseCase = getGroup(groups, expenses, services, paybacks)
 
-  app.post(
-    '/',
-    zValidator('json', createGroupBody, result => {
-      if (!result.success) {
-        throw invalidData(GROUP_NAME_REQUIRED)
+  return new Hono<{ Variables: { userId: string; userName: string } }>()
+    .post(
+      '/',
+      zValidator('json', createGroupBody, result => {
+        if (!result.success) {
+          throw invalidData(GROUP_NAME_REQUIRED)
+        }
+      }),
+      async c => {
+        const { name } = c.req.valid('json')
+        const group = await createGroupUseCase.execute(c.get('userId'), c.get('userName'), name)
+        return c.json(group, 201)
       }
-    }),
-    async c => {
-      const { name } = c.req.valid('json')
-      const group = await createGroupUseCase.execute(c.get('userId'), c.get('userName'), name)
-      return c.json(group, 201)
-    }
-  )
-
-  app.get('/', async c => c.json(await listGroupsUseCase.execute(c.get('userId'))))
-
-  app.get('/:id', async c =>
-    c.json(await getGroupUseCase.execute(c.get('userId'), c.req.param('id')))
-  )
-
-  return app
+    )
+    .get('/', async c => c.json(await listGroupsUseCase.execute(c.get('userId'))))
+    .get('/:id', async c =>
+      c.json(await getGroupUseCase.execute(c.get('userId'), c.req.param('id')))
+    )
 }
