@@ -14,6 +14,22 @@ const clickLink = (name: string) => {
   return event
 }
 
+// happy-dom resolves a target=_blank click by opening a page and loading the
+// href; intercept that fetch so it never reaches the network in tests.
+const stubPageOpenFetches = () => {
+  ;(
+    window as unknown as {
+      happyDOM: {
+        settings: {
+          fetch: { interceptor: { beforeAsyncRequest: () => Promise<Response | void> } }
+        }
+      }
+    }
+  ).happyDOM.settings.fetch.interceptor = {
+    beforeAsyncRequest: async () => new Response('', { status: 404 })
+  }
+}
+
 describe('parsePath', () => {
   it('parses the groups list route', () => {
     expect(parsePath('/')).toEqual({ name: 'groups' })
@@ -45,6 +61,7 @@ describe('Link', () => {
   })
 
   it('lets a target=_blank link behave like a normal link', () => {
+    stubPageOpenFetches()
     render(
       <Link to="/groups/g1" target="_blank">
         Groupe
