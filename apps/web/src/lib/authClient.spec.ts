@@ -1,9 +1,11 @@
 /** @vitest-environment happy-dom */
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const { fetchMock } = vi.hoisted(() => ({ fetchMock: vi.fn() }))
 
-vi.stubGlobal('fetch', fetchMock)
+beforeEach(() => {
+  vi.stubGlobal('fetch', fetchMock)
+})
 
 afterEach(() => {
   vi.clearAllMocks()
