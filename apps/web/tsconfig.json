@@ -10,11 +10,13 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
+    "typeRoots": ["../../node_modules/@types", "./node_modules/@types"],
+    "types": ["bun"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "~/*": ["./src/*"],
+      "~/*": ["./src/*", "../api/src/*"],
       "~ui/*": ["./src/components/ui/*"],
       "~features/*": ["./src/features/*"],
       "api/*": ["../api/src/*"]

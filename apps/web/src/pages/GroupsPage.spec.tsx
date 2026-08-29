@@ -1,11 +1,16 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vite-plus/test'
-import { createMemoryClient } from '~features/groups/memoryClient'
+import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
+import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { GroupsPage } from '~/pages/GroupsPage'
 
 afterEach(cleanup)
+
+let api: TestApi
+beforeEach(async () => {
+  api = await createTestApi()
+})
 
 const createNamed = async (name: string) => {
   const user = userEvent.setup()
@@ -17,8 +22,7 @@ const createNamed = async (name: string) => {
 
 describe('GroupsPage', () => {
   it('creates a Group and lists it', async () => {
-    const client = createMemoryClient()
-    render(<GroupsPage client={client} />)
+    render(<GroupsPage client={api.client(testUsers.lea)} />)
 
     await createNamed('Potes de Bob')
 
@@ -26,7 +30,7 @@ describe('GroupsPage', () => {
   })
 
   it('keeps two Groups created by the same User on two distinct lines', async () => {
-    render(<GroupsPage client={createMemoryClient()} />)
+    render(<GroupsPage client={api.client(testUsers.lea)} />)
 
     await createNamed('Potes de Bob')
     await createNamed('Collègues')
@@ -42,7 +46,7 @@ describe('GroupsPage', () => {
     render(
       <GroupsPage
         client={{
-          ...createMemoryClient(),
+          ...api.client(testUsers.lea),
           list: async () => {
             throw new Error('Groupe introuvable')
           }
@@ -56,7 +60,7 @@ describe('GroupsPage', () => {
   })
 
   it('opens a Group on its own route', async () => {
-    const client = createMemoryClient()
+    const client = api.client(testUsers.lea)
     render(<GroupsPage client={client} />)
 
     await createNamed('Potes de Bob')

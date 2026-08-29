@@ -2,19 +2,27 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { afterEach, describe, expect, it } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { euros } from '~/lib/amounts'
 import type { GroupDto } from '~features/groups/client'
-import { createMemoryClient } from '~features/groups/memoryClient'
+import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { Expenses } from '~features/expenses/Expenses'
 
 afterEach(cleanup)
 
+let api: TestApi
+beforeEach(async () => {
+  api = await createTestApi()
+})
+
 const openExpenses = async () => {
-  const client = createMemoryClient()
+  const client = api.client(testUsers.lea)
   const group = await client.create('Potes de Bob')
+  await api.client(testUsers.bob).join(group.invite.secret)
+  await api.client(testUsers.camille).join(group.invite.secret)
+  const joined = await client.get(group.id)
   const Board = () => {
-    const [current, setCurrent] = useState<GroupDto>(group)
+    const [current, setCurrent] = useState<GroupDto>(joined)
     return (
       <>
         <Expenses group={current} client={client} onChange={setCurrent} />

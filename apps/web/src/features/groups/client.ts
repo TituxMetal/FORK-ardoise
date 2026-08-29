@@ -1,85 +1,29 @@
-export type MemberDto = {
-  userId: string
-  name: string
-}
+import { hc, type InferRequestType, type InferResponseType } from 'hono/client'
+import type { AppType } from 'api/createApp'
 
-export type BalanceDto = {
-  userId: string
-  name: string
-  amount: number
-}
+const createApiClient = (
+  baseUrl: string,
+  fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+) => hc<AppType>(baseUrl, fetch ? { fetch } : undefined)
 
-export type PartDto = {
-  userId: string
-  amount: number
-}
+/** The typed Hono client for the API, built by {@link createApiClient}. */
+export type ApiClient = ReturnType<typeof createApiClient>
 
-export type ExpenseDto = {
-  id: string
-  label: string
-  day: string
-  amount: number
-  payerId: string
-  participantIds: string[]
-  parts: PartDto[]
-}
+export type GroupSummary = InferResponseType<ApiClient['groups']['$get'], 200>[number]
 
-export type ServiceDto = {
-  id: string
-  label: string
-  day: string
-  amount: number
-  providerId: string
-  participantIds: string[]
-  parts: PartDto[]
-}
+export type GroupDto = InferResponseType<ApiClient['groups'][':id']['$get'], 200>
 
-export type PaybackDto = {
-  id: string
-  debtorId: string
-  creditorId: string
-  amount: number
-}
+export type CreateExpenseInput = InferRequestType<
+  ApiClient['groups'][':groupId']['expenses']['$post']
+>['json']
 
-export type GroupDto = {
-  id: string
-  name: string
-  members: MemberDto[]
-  invite: {
-    secret: string
-  }
-  expenses: ExpenseDto[]
-  services: ServiceDto[]
-  paybacks: PaybackDto[]
-  balances: BalanceDto[]
-}
+export type CreateServiceInput = InferRequestType<
+  ApiClient['groups'][':groupId']['services']['$post']
+>['json']
 
-export type GroupSummary = {
-  id: string
-  name: string
-}
-
-export type CreateExpenseInput = {
-  label: string
-  day: string
-  amount: number
-  payerId: string
-  participantIds?: string[]
-}
-
-export type CreateServiceInput = {
-  label: string
-  day: string
-  amount: number
-  providerId: string
-  participantIds?: string[]
-}
-
-export type CreatePaybackInput = {
-  debtorId: string
-  creditorId: string
-  amount: number
-}
+export type CreatePaybackInput = InferRequestType<
+  ApiClient['groups'][':groupId']['paybacks']['$post']
+>['json']
 
 export type GroupsClient = {
   list: () => Promise<GroupSummary[]>
@@ -94,57 +38,54 @@ export type GroupsClient = {
   deletePayback: (groupId: string, paybackId: string) => Promise<GroupDto>
 }
 
-const request = async <T>(path: string, init?: { method?: string; body?: string }): Promise<T> => {
-  const response = await fetch(path, {
-    credentials: 'include',
-    method: init?.method,
-    body: init?.body,
-    headers: { 'content-type': 'application/json' }
-  })
-  if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { message?: string } | null
-    throw new Error(body?.message ?? 'Réponse inattendue du serveur')
-  }
-  return response.json() as Promise<T>
+export type GroupsClientOptions = {
+  baseUrl: string
+  fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 }
 
-export const groupsClient: GroupsClient = {
-  list: () => request<GroupSummary[]>('/api/groups'),
-  create: name =>
-    request<GroupDto>('/api/groups', {
-      method: 'POST',
-      body: JSON.stringify({ name })
-    }),
-  get: id => request<GroupDto>(`/api/groups/${id}`),
-  join: secret =>
-    request<GroupDto>(`/api/invites/${secret}`, {
-      method: 'POST'
-    }),
-  createExpense: (groupId, input) =>
-    request<GroupDto>(`/api/groups/${groupId}/expenses`, {
-      method: 'POST',
-      body: JSON.stringify(input)
-    }),
-  deleteExpense: (groupId, expenseId) =>
-    request<GroupDto>(`/api/groups/${groupId}/expenses/${expenseId}`, {
-      method: 'DELETE'
-    }),
-  createService: (groupId, input) =>
-    request<GroupDto>(`/api/groups/${groupId}/services`, {
-      method: 'POST',
-      body: JSON.stringify(input)
-    }),
-  deleteService: (groupId, serviceId) =>
-    request<GroupDto>(`/api/groups/${groupId}/services/${serviceId}`, {
-      method: 'DELETE'
-    }),
-  createPayback: (groupId, input) =>
-    request<GroupDto>(`/api/groups/${groupId}/paybacks`, {
-      method: 'POST',
-      body: JSON.stringify(input)
-    }),
-  deletePayback: (groupId, paybackId) =>
-    request<GroupDto>(`/api/groups/${groupId}/paybacks/${paybackId}`, {
-      method: 'DELETE'
-    })
+const unwrap = async <T>(response: { ok: boolean; json: () => Promise<unknown> }): Promise<T> => {
+  const body = (await response.json().catch(() => null)) as { message?: string } | null
+  if (!response.ok) {
+    throw new Error(body?.message ?? 'Réponse inattendue du serveur')
+  }
+  return body as T
 }
+
+export const createGroupsClient = (
+  options: GroupsClientOptions = { baseUrl: '/api' }
+): GroupsClient => {
+  const http = createApiClient(options.baseUrl, options.fetch)
+  return {
+    list: async () => unwrap<GroupSummary[]>(await http.groups.$get()),
+    create: async name => unwrap<GroupDto>(await http.groups.$post({ json: { name } })),
+    get: async id => unwrap<GroupDto>(await http.groups[':id'].$get({ param: { id } })),
+    join: async secret =>
+      unwrap<GroupDto>(await http.invites[':secret'].$post({ param: { secret } })),
+    createExpense: async (groupId, input) =>
+      unwrap<GroupDto>(
+        await http.groups[':groupId'].expenses.$post({ param: { groupId }, json: input })
+      ),
+    deleteExpense: async (groupId, expenseId) =>
+      unwrap<GroupDto>(
+        await http.groups[':groupId'].expenses[':id'].$delete({ param: { groupId, id: expenseId } })
+      ),
+    createService: async (groupId, input) =>
+      unwrap<GroupDto>(
+        await http.groups[':groupId'].services.$post({ param: { groupId }, json: input })
+      ),
+    deleteService: async (groupId, serviceId) =>
+      unwrap<GroupDto>(
+        await http.groups[':groupId'].services[':id'].$delete({ param: { groupId, id: serviceId } })
+      ),
+    createPayback: async (groupId, input) =>
+      unwrap<GroupDto>(
+        await http.groups[':groupId'].paybacks.$post({ param: { groupId }, json: input })
+      ),
+    deletePayback: async (groupId, paybackId) =>
+      unwrap<GroupDto>(
+        await http.groups[':groupId'].paybacks[':id'].$delete({ param: { groupId, id: paybackId } })
+      )
+  }
+}
+
+export const groupsClient: GroupsClient = createGroupsClient()

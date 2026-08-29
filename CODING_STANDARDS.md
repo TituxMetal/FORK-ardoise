@@ -61,7 +61,8 @@ No per-role subfolders (`entities/`, `value-objects/`, `use-cases/`): the layer 
 
 - `~/*` → `src/*` in both apps.
 - `~ui/*` → `src/components/ui/*` and `~features/*` → `src/features/*` in the web.
-- `api/*` → `apps/api/src/*` in the web, for type-only `AppType` imports.
+- `api/*` → `apps/api/src/*` in the web: type-only in product code; the test harness may import runtime values (e.g. `createApp`) to mount the API in-process.
+- In the web, `~/*` also falls back to `apps/api/src/*` for the type-checker only, so api sources' internal `~/` imports resolve when tsc follows the `api/*` import. The runtime resolver is importer-aware and never sends a web file into the api tree: product web code imports `~/x` only for web `src/x`, and the api tree only through `api/*`.
 - Imports carry no file extension.
 
 ## Format
