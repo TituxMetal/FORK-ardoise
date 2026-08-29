@@ -5,6 +5,7 @@ import {
   type MouseEvent,
   type ReactNode
 } from 'react'
+import { Hono } from 'hono'
 
 export type Route =
   | { name: 'groups' }
@@ -12,19 +13,20 @@ export type Route =
   | { name: 'invite'; secret: string }
   | { name: 'auth' }
 
-export const parsePath = (path: string): Route => {
-  const group = path.match(/^\/groups\/([^/]+)$/)
-  if (group) {
-    return { name: 'group', id: group[1] }
-  }
-  const invite = path.match(/^\/invites\/([^/]+)$/)
-  if (invite) {
-    return { name: 'invite', secret: invite[1] }
-  }
-  if (path === '/session') {
-    return { name: 'auth' }
-  }
-  return { name: 'groups' }
+const groupsRoute = { name: 'groups' } satisfies Route
+
+export const app = new Hono()
+  .get('/', c => c.json(groupsRoute))
+  .get('/groups/:id', c => c.json({ name: 'group', id: c.req.param('id') } satisfies Route))
+  .get('/invites/:secret', c =>
+    c.json({ name: 'invite', secret: c.req.param('secret') } satisfies Route)
+  )
+  .get('/session', c => c.json({ name: 'auth' } satisfies Route))
+  .notFound(c => c.json(groupsRoute))
+
+const resolvePath = async (path: string): Promise<Route> => {
+  const response = await app.fetch(new Request(path))
+  return (await response.json()) as Route
 }
 
 const listeners = new Set<() => void>()
@@ -34,13 +36,23 @@ export const navigate = (path: string) => {
   listeners.forEach(listener => listener())
 }
 
-export const useRoute = (): Route => {
-  const [route, setRoute] = useState<Route>(() => parsePath(window.location.pathname))
+export const useRoute = (): Route | null => {
+  const [route, setRoute] = useState<Route | null>(null)
   useEffect(() => {
-    const onChange = () => setRoute(parsePath(window.location.pathname))
+    let disposed = false
+    const onChange = () => {
+      const path = window.location.pathname
+      void resolvePath(path).then(next => {
+        if (!disposed && window.location.pathname === path) {
+          setRoute(next)
+        }
+      })
+    }
+    onChange()
     listeners.add(onChange)
     window.addEventListener('popstate', onChange)
     return () => {
+      disposed = true
       listeners.delete(onChange)
       window.removeEventListener('popstate', onChange)
     }

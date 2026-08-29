@@ -13,7 +13,7 @@ const App = () => {
   const route = useRoute()
   const { data: session, isPending } = authClient.useSession()
 
-  if (isPending) {
+  if (route === null || isPending) {
     return (
       <AppLayout session={null}>
         <p>Chargement…</p>

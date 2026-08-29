@@ -1,7 +1,7 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-import { Link, parsePath } from '~/lib/router'
+import { Link, app, useRoute } from '~/lib/router'
 
 afterEach(() => {
   cleanup()
@@ -17,38 +17,77 @@ const clickLink = (name: string) => {
 // happy-dom resolves a target=_blank click by opening a page and loading the
 // href; intercept that fetch so it never reaches the network in tests.
 const stubPageOpenFetches = () => {
-  ;(
-    window as unknown as {
-      happyDOM: {
-        settings: {
-          fetch: { interceptor: { beforeAsyncRequest: () => Promise<Response | void> } }
-        }
+  // happyDOM is a happy-dom runtime extra, absent from the DOM types.
+  const happyDom = window as unknown as {
+    happyDOM: {
+      settings: {
+        fetch: { interceptor: { beforeAsyncRequest: () => Promise<Response | void> } }
       }
     }
-  ).happyDOM.settings.fetch.interceptor = {
+  }
+  happyDom.happyDOM.settings.fetch.interceptor = {
     beforeAsyncRequest: async () => new Response('', { status: 404 })
   }
 }
 
-describe('parsePath', () => {
-  it('parses the groups list route', () => {
-    expect(parsePath('/')).toEqual({ name: 'groups' })
+describe('router', () => {
+  it('routes the groups list path', async () => {
+    const response = await app.fetch(new Request('/'))
+
+    expect(await response.json()).toEqual({ name: 'groups' })
   })
 
-  it('parses a group detail route', () => {
-    expect(parsePath('/groups/g1')).toEqual({ name: 'group', id: 'g1' })
+  it('routes a group detail path', async () => {
+    const response = await app.fetch(new Request('/groups/g1'))
+
+    expect(await response.json()).toEqual({ name: 'group', id: 'g1' })
   })
 
-  it('parses an invite route', () => {
-    expect(parsePath('/invites/abc-123')).toEqual({ name: 'invite', secret: 'abc-123' })
+  it('routes an invite path', async () => {
+    const response = await app.fetch(new Request('/invites/abc-123'))
+
+    expect(await response.json()).toEqual({ name: 'invite', secret: 'abc-123' })
   })
 
-  it('parses the auth route', () => {
-    expect(parsePath('/session')).toEqual({ name: 'auth' })
+  it('routes the auth path', async () => {
+    const response = await app.fetch(new Request('/session'))
+
+    expect(await response.json()).toEqual({ name: 'auth' })
   })
 
-  it('falls back to the groups list for unknown paths', () => {
-    expect(parsePath('/unknown')).toEqual({ name: 'groups' })
+  it('falls back to the groups list for unknown paths', async () => {
+    const response = await app.fetch(new Request('/unknown'))
+
+    expect(await response.json()).toEqual({ name: 'groups' })
+  })
+})
+
+describe('useRoute', () => {
+  const Probe = () => {
+    const route = useRoute()
+    return <p>{route ? route.name : 'pending'}</p>
+  }
+
+  it('renders the pending state until the first resolution', () => {
+    render(<Probe />)
+
+    expect(screen.getByText('pending')).toBeTruthy()
+  })
+
+  it('resolves the current pathname through the app', async () => {
+    render(<Probe />)
+
+    expect(await screen.findByText('groups')).toBeTruthy()
+  })
+
+  it('re-resolves on history navigation', async () => {
+    render(<Probe />)
+    await screen.findByText('groups')
+
+    window.history.pushState(null, '', '/groups/g1')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+
+    expect(await screen.findByText('group')).toBeTruthy()
   })
 })
 
