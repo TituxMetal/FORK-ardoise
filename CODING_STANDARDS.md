@@ -51,7 +51,7 @@ No per-role subfolders (`entities/`, `value-objects/`, `use-cases/`): the layer 
 ## Tests
 
 - The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
-- Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure ports (`*.port.ts`, `*.repository.ts` — type-only auth and persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
+- Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure ports (`*.port.ts`, `*.repository.ts` — auth and persistence ports with no behaviour). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
 - Structure: Arrange / Act / Assert separated by a blank line. No `// Arrange` comments.
 - New specs: `describe` / `it`. Playwright specs: `test.describe` / `test` (the library exports no `it`), English titles.
 - Layers: domain + HTTP in-process + React Testing Library + Playwright.
