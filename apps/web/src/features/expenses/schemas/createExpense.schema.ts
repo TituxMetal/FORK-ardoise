@@ -9,7 +9,7 @@ export const createExpenseSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Jour requis'),
   amount: eurosAmountSchema,
   payerId: z.string().min(1, 'Payeur requis'),
-  participantIds: z.array(z.string()).optional()
+  participantIds: z.array(z.string()).min(1, 'Au moins un participant requis')
 })
 
 export type CreateExpenseFormInput = z.infer<typeof createExpenseSchema>

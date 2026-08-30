@@ -15,6 +15,7 @@ export const ExpenseFields = ({ form, error, onSubmit, members }: Props) => {
   const dayError = form.formState.errors.day?.message
   const amountError = form.formState.errors.amount?.message
   const payerError = form.formState.errors.payerId?.message
+  const participantsError = form.formState.errors.participantIds?.message
 
   return (
     <form
@@ -56,6 +57,11 @@ export const ExpenseFields = ({ form, error, onSubmit, members }: Props) => {
             {member.name}
           </label>
         ))}
+        {participantsError ? (
+          <p className="text-sm text-negative" role="alert">
+            {participantsError}
+          </p>
+        ) : null}
       </fieldset>
       <Button type="submit">Constater la Dépense</Button>
     </form>

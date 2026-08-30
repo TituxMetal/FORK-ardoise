@@ -20,7 +20,8 @@ describe('createExpenseSchema', () => {
         label: 'Pizza',
         day: '2026-08-15',
         amount: '10,50',
-        payerId: 'lea'
+        payerId: 'lea',
+        participantIds: ['lea']
       }).amount
     ).toBe('10,50')
   })
@@ -31,15 +32,31 @@ describe('createExpenseSchema', () => {
         label: '  Pizza  ',
         day: ' 2026-08-15 ',
         amount: '10',
-        payerId: 'lea'
+        payerId: 'lea',
+        participantIds: ['lea']
       })
-    ).toEqual({ label: 'Pizza', day: '2026-08-15', amount: '10', payerId: 'lea' })
+    ).toEqual({
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: '10',
+      payerId: 'lea',
+      participantIds: ['lea']
+    })
   })
 
-  it('accepts an omitted participant list', () => {
-    expect(
-      createExpenseSchema.parse({ label: 'Pizza', day: '2026-08-15', amount: '10', payerId: 'lea' })
-    ).toEqual({ label: 'Pizza', day: '2026-08-15', amount: '10', payerId: 'lea' })
+  it('rejects an empty participant list with a French message', () => {
+    const result = createExpenseSchema.safeParse({
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: '10',
+      payerId: 'lea',
+      participantIds: []
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues[0]?.message).toBe('Au moins un participant requis')
   })
 
   it('rejects a blank label with a French message', () => {
@@ -47,7 +64,8 @@ describe('createExpenseSchema', () => {
       label: '   ',
       day: '2026-08-15',
       amount: '10',
-      payerId: 'lea'
+      payerId: 'lea',
+      participantIds: ['lea']
     })
 
     expect(result.success).toBe(false)
@@ -61,7 +79,8 @@ describe('createExpenseSchema', () => {
       label: 'Pizza',
       day: '15/08/2026',
       amount: '10',
-      payerId: 'lea'
+      payerId: 'lea',
+      participantIds: ['lea']
     })
 
     expect(result.success).toBe(false)
@@ -75,7 +94,8 @@ describe('createExpenseSchema', () => {
       label: 'Pizza',
       day: '2026-08-15',
       amount: '0',
-      payerId: 'lea'
+      payerId: 'lea',
+      participantIds: ['lea']
     })
 
     expect(result.success).toBe(false)

@@ -37,10 +37,7 @@ export const ExpenseForm = ({ client = expensesClient }: Props) => {
           day: values.day,
           amount: centsFromEuros(values.amount),
           payerId: values.payerId,
-          participantIds:
-            values.participantIds && values.participantIds.length > 0
-              ? values.participantIds
-              : undefined
+          participantIds: values.participantIds
         })
       )
       form.reset()

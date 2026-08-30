@@ -9,7 +9,7 @@ export const createServiceSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Jour requis'),
   amount: eurosAmountSchema,
   providerId: z.string().min(1, 'Prestataire requis'),
-  participantIds: z.array(z.string()).optional()
+  participantIds: z.array(z.string()).min(1, 'Au moins un participant requis')
 })
 
 export type CreateServiceFormInput = z.infer<typeof createServiceSchema>

@@ -93,4 +93,24 @@ describe('ServiceForm', () => {
     expect(alerts.map(alert => alert.textContent)).toContain('Libellé requis')
     expect(client.create).not.toHaveBeenCalled()
   })
+
+  it('rejects unchecking every participant without calling the API', async () => {
+    await openGroup()
+    const client = spyClient(api.services(testUsers.lea))
+    render(<ServiceForm client={client} />)
+
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Service' })
+    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
+    await user.type(within(form).getByLabelText('Montant'), '10')
+    for (const checkbox of screen.getAllByRole('checkbox')) {
+      await user.click(checkbox)
+    }
+    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
+
+    const alerts = await screen.findAllByRole('alert')
+    expect(alerts.map(alert => alert.textContent)).toContain('Au moins un participant requis')
+    expect(client.create).not.toHaveBeenCalled()
+  })
 })

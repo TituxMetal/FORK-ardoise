@@ -53,4 +53,13 @@ describe('eurosAmountSchema', () => {
 
     expect(result.error.issues[0]?.message).toBe('Montant invalide')
   })
+
+  it('rejects an amount with more than two decimal places', () => {
+    const result = eurosAmountSchema.safeParse('1.234')
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues[0]?.message).toBe('Montant invalide')
+  })
 })

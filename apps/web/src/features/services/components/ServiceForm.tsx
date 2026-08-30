@@ -37,10 +37,7 @@ export const ServiceForm = ({ client = servicesClient }: Props) => {
           day: values.day,
           amount: centsFromEuros(values.amount),
           providerId: values.providerId,
-          participantIds:
-            values.participantIds && values.participantIds.length > 0
-              ? values.participantIds
-              : undefined
+          participantIds: values.participantIds
         })
       )
       form.reset()

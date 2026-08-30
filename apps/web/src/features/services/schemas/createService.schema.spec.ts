@@ -20,7 +20,8 @@ describe('createServiceSchema', () => {
         label: 'Ordi Bob',
         day: '2026-08-15',
         amount: '0,90',
-        providerId: 'bob'
+        providerId: 'bob',
+        participantIds: ['bob']
       }).amount
     ).toBe('0,90')
   })
@@ -31,20 +32,31 @@ describe('createServiceSchema', () => {
         label: '  Ordi Bob  ',
         day: ' 2026-08-15 ',
         amount: '10',
-        providerId: 'bob'
+        providerId: 'bob',
+        participantIds: ['bob']
       })
-    ).toEqual({ label: 'Ordi Bob', day: '2026-08-15', amount: '10', providerId: 'bob' })
+    ).toEqual({
+      label: 'Ordi Bob',
+      day: '2026-08-15',
+      amount: '10',
+      providerId: 'bob',
+      participantIds: ['bob']
+    })
   })
 
-  it('accepts an omitted participant list', () => {
-    expect(
-      createServiceSchema.parse({
-        label: 'Ordi Bob',
-        day: '2026-08-15',
-        amount: '10',
-        providerId: 'bob'
-      })
-    ).toEqual({ label: 'Ordi Bob', day: '2026-08-15', amount: '10', providerId: 'bob' })
+  it('rejects an empty participant list with a French message', () => {
+    const result = createServiceSchema.safeParse({
+      label: 'Ordi Bob',
+      day: '2026-08-15',
+      amount: '10',
+      providerId: 'bob',
+      participantIds: []
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues[0]?.message).toBe('Au moins un participant requis')
   })
 
   it('rejects a blank label with a French message', () => {
@@ -52,7 +64,8 @@ describe('createServiceSchema', () => {
       label: '   ',
       day: '2026-08-15',
       amount: '10',
-      providerId: 'bob'
+      providerId: 'bob',
+      participantIds: ['bob']
     })
 
     expect(result.success).toBe(false)
@@ -66,7 +79,8 @@ describe('createServiceSchema', () => {
       label: 'Ordi Bob',
       day: '15/08/2026',
       amount: '10',
-      providerId: 'bob'
+      providerId: 'bob',
+      participantIds: ['bob']
     })
 
     expect(result.success).toBe(false)
@@ -80,7 +94,8 @@ describe('createServiceSchema', () => {
       label: 'Ordi Bob',
       day: '2026-08-15',
       amount: '0',
-      providerId: 'bob'
+      providerId: 'bob',
+      participantIds: ['bob']
     })
 
     expect(result.success).toBe(false)
