@@ -74,7 +74,7 @@ apps/web/src/
 
 The import architecture keeps layers apart by folder. Elements: **shared** (`src/lib/*`, `src/components/ui/*`, `src/components/icons/*`, `src/types/*`, `src/utils/*`, `src/layouts/*`, `src/config/*`), **feature** (`src/features/*`), **pages** (`src/pages/*`). Rules: `shared → shared`, `feature → shared | feature`, `pages → shared | feature | pages`.
 
-Every feature exposes a single public entry point — `~features/groups`, `~features/expenses`, … — that re-exports its components, its API client and its contract types (`import { GroupsList, groupsClient, type GroupDto } from '~features/groups'`). Consumers (pages, other features) import from the feature root, never from `~features/<name>/components` or `~features/<name>/api`. Contract types (DTOs and client interfaces, e.g. `GroupDto`, `GroupsClient`) live in `features/<name>/types/*.dto.ts` and are re-exported by the feature entry point. Within a feature, files import each other through the internal `components/` / `api/` / `types/` paths to keep the boundary clean.
+Every feature exposes a single public entry point — `~features/groups`, `~features/expenses`, … — that re-exports its components, its API client and its contract types (`import { GroupsList, groupsClient, type Group } from '~features/groups'`). Consumers (pages, other features) import from the feature root, never from `~features/<name>/components` or `~features/<name>/api`. Contract types (the API response shapes and client interfaces, e.g. `Group`, `GroupSummary`, `GroupsClient`) live in `features/<name>/types/*.types.ts` and are re-exported by the feature entry point. Within a feature, files import each other through relative internal paths (`../components`, `../api`, `../types`), never the `~features/<name>` alias.
 
 Icons are shared UI but do **not** live in `components/ui/` (form primitives only) and are **not** a feature. They sit at `components/icons/` as one `*Icon` component per file, decorative (`aria-hidden`), and are imported from the real file — never re-exported through a barrel, never `export *`.
 
@@ -91,17 +91,17 @@ Four layers, all kept:
 
 The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
 
-Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure type modules with no runtime behaviour (`*.dto.ts`, `*.port.ts`, `*.repository.ts` — DTOs and auth/persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
+Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure type modules with no runtime behaviour (`*.types.ts`, `*.dto.ts`, `*.port.ts`, `*.repository.ts` — contract shapes, DTOs and auth/persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
 
 Arrange / Act / Assert separated by a blank line. New specs use `describe` / `it`. Existing `test()` dies on the retrofit ticket. No browser suite as the _only_ contract: HTTP stays.
 
 ## Names
 
 - Folders kebab-case.
-- Component files PascalCase (`GroupPage.tsx`); exported type identifiers PascalCase (`GroupDto`); module files camelCase + role suffix. PascalCase is never a function file.
+- Component files PascalCase (`GroupPage.tsx`); exported type identifiers PascalCase (`Group`, `GroupSummary`); module files camelCase + role suffix. PascalCase is never a function file.
 - Function modules camelCase with a role suffix when the role exists.
 - The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
-- Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure type modules with no runtime behaviour (`*.dto.ts`, `*.port.ts`, `*.repository.ts` — DTOs and auth/persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
+  Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure type modules with no runtime behaviour (`*.types.ts`, `*.dto.ts`, `*.port.ts`, `*.repository.ts` — contract shapes, DTOs and auth/persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
 - Aliases: `~`, `~ui`, `~features`, `api/*`. Imports carry no extension.
 - Identifiers: `CONTEXT.md` English. No accents.
 
