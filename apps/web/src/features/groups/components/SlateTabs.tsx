@@ -1,4 +1,4 @@
-import { useRef, type KeyboardEvent } from 'react'
+import { useRef, type KeyboardEvent, type Ref } from 'react'
 import { useStore } from '@nanostores/react'
 import { PlusIcon } from '~/components/icons'
 import { $activeTab, openForm, setActiveTab } from '../store'
@@ -31,9 +31,7 @@ const ADD_LABELS: Record<SlateTab, string> = {
   paybacks: 'Ajouter un Remboursement'
 }
 
-// Full tabs pattern: roving tabIndex plus arrow/Home/End movement, and each
-// tab controls its panel (rendered by the page) through id/aria-controls.
-export const SlateTabs = () => {
+export const SlateTabs = ({ ref }: { ref?: Ref<HTMLButtonElement> }) => {
   const active = useStore($activeTab)
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
 
@@ -80,6 +78,7 @@ export const SlateTabs = () => {
         ))}
       </div>
       <button
+        ref={ref}
         type="button"
         aria-label={ADD_LABELS[active]}
         onClick={openForm}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useStore } from '@nanostores/react'
 import { Alert, Button } from '~ui'
 import { BackIcon } from '~/components/icons'
@@ -46,6 +46,12 @@ export const GroupPage = ({
   const error = useStore($error)
   const tab = useStore($activeTab)
   const formOpen = useStore($formOpen)
+  const addButtonRef = useRef<HTMLButtonElement>(null)
+
+  const cancelForm = () => {
+    closeForm()
+    requestAnimationFrame(() => addButtonRef.current?.focus())
+  }
 
   useEffect(() => {
     void loadGroup(groups, id)
@@ -79,7 +85,7 @@ export const GroupPage = ({
           </Button>
           <BalanceHero group={group} />
           <MemberChips group={group} />
-          <SlateTabs />
+          <SlateTabs ref={addButtonRef} />
           <div
             role="tabpanel"
             id="slate-panel-expenses"
@@ -89,7 +95,7 @@ export const GroupPage = ({
           >
             {tab === 'expenses' ? (
               <>
-                {formOpen ? <ExpenseForm client={expenses} onCancel={closeForm} /> : null}
+                {formOpen ? <ExpenseForm client={expenses} onCancel={cancelForm} /> : null}
                 <Expenses client={expenses} />
               </>
             ) : null}
@@ -103,7 +109,7 @@ export const GroupPage = ({
           >
             {tab === 'services' ? (
               <>
-                {formOpen ? <ServiceForm client={services} onCancel={closeForm} /> : null}
+                {formOpen ? <ServiceForm client={services} onCancel={cancelForm} /> : null}
                 <Services client={services} />
               </>
             ) : null}
@@ -117,7 +123,7 @@ export const GroupPage = ({
           >
             {tab === 'paybacks' ? (
               <>
-                {formOpen ? <PaybackForm client={paybacks} onCancel={closeForm} /> : null}
+                {formOpen ? <PaybackForm client={paybacks} onCancel={cancelForm} /> : null}
                 <Paybacks client={paybacks} />
               </>
             ) : null}

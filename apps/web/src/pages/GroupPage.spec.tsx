@@ -96,6 +96,21 @@ describe('GroupPage', () => {
     expect(screen.queryByRole('form', { name: 'Constater une Dépense' })).toBeNull()
   })
 
+  it('returns keyboard focus to the add trigger when a create form is cancelled', async () => {
+    await openGroup()
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Ajouter une Dépense' }))
+    expect(screen.getByRole('form', { name: 'Constater une Dépense' })).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(
+        screen.getByRole('button', { name: 'Ajouter une Dépense' })
+      )
+    })
+  })
+
   it('lets a Member copy the Invite link of the opened Group', async () => {
     const written: string[] = []
     const client = api.groups(testUsers.lea)
