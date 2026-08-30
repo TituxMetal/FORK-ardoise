@@ -45,7 +45,7 @@ No per-role subfolders (`entities/`, `value-objects/`, `use-cases/`): the layer 
 - Barrels: every folder that exports symbols has an `index.ts` (`api/`, `components/`, `types/`, `icons/`, `ui/`). A barrel re-exports its own directory via `./` only — never `../`, never an alias. Alias imports never append `/index` (`~ui`, not `~ui/index`).
 - Type re-exports live in `types/index.ts`. The feature barrel re-exports `./types` (types) and `./api` (clients only); `api/index.ts` never re-exports types.
 - `components/ui/`: shared reusable UI (Input, Button, FormWrapper…), barrel `index.ts`.
-- Component files PascalCase (`GroupPage.tsx`, `Input.tsx`); exported type identifiers PascalCase (`Group`, `GroupSummary`); type modules camelCase + suffix (`auth.types.ts`, `groups.types.ts`) — never `.dto.ts` (DTO is an API-only role).
+- Component files PascalCase (`GroupPage.tsx`, `Input.tsx`); exported type identifiers PascalCase (`Group`, `GroupSummary`); type modules camelCase + suffix (`expenses.types.ts`, `groups.types.ts`) — never `.dto.ts` (DTO is an API-only role).
 - Function modules camelCase with a role suffix when the role exists (`groups.client.ts`, `auth.schema.ts`, `auth.store.ts`); no invented suffix (`amounts.ts`, `errorMessage.ts`).
 - Specs colocated, `.spec.ts` / `.spec.tsx`.
 - Playwright specs: `apps/web/e2e/` — one suite over the whole product, not colocated.
