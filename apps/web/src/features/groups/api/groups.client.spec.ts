@@ -37,4 +37,55 @@ describe('groupsClient', () => {
     const joined = await lea.get(group.id)
     expect(joined.members.map(member => member.name)).toEqual(['Léa', 'Bob'])
   })
+
+  it('renames a Group and returns the summary', async () => {
+    const lea = api.groups(testUsers.lea)
+
+    const group = await lea.create('Potes de Bob')
+    const renamed = await lea.rename(group.id, 'Soirée de Bob')
+
+    expect(renamed).toEqual({ id: group.id, name: 'Soirée de Bob' })
+    expect(await lea.list()).toEqual([{ id: group.id, name: 'Soirée de Bob' }])
+  })
+
+  it('throws the API message when renaming a Group the User does not sit in', async () => {
+    const lea = api.groups(testUsers.lea)
+    const bob = api.groups(testUsers.bob)
+
+    const group = await lea.create('Potes de Bob')
+
+    await expect(bob.rename(group.id, 'Soirée')).rejects.toThrow('Groupe introuvable')
+  })
+
+  it('leaving a Group with other Members removes only the seat', async () => {
+    const lea = api.groups(testUsers.lea)
+    const bob = api.groups(testUsers.bob)
+
+    const group = await lea.create('Potes de Bob')
+    await bob.join(group.invite.secret)
+
+    await lea.leave(group.id)
+
+    expect(await lea.list()).toEqual([])
+    expect(await bob.list()).toEqual([{ id: group.id, name: 'Potes de Bob' }])
+  })
+
+  it('leaving a Group as the last Member deletes it', async () => {
+    const lea = api.groups(testUsers.lea)
+
+    const group = await lea.create('Potes de Bob')
+    await lea.leave(group.id)
+
+    expect(await lea.list()).toEqual([])
+    await expect(lea.get(group.id)).rejects.toThrow('Groupe introuvable')
+  })
+
+  it('throws the API message when leaving a Group the User does not sit in', async () => {
+    const lea = api.groups(testUsers.lea)
+    const bob = api.groups(testUsers.bob)
+
+    const group = await lea.create('Potes de Bob')
+
+    await expect(bob.leave(group.id)).rejects.toThrow('Groupe introuvable')
+  })
 })

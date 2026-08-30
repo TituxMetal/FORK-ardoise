@@ -38,4 +38,10 @@ describe('Button', () => {
 
     expect(screen.getByRole('button').className).toContain('bg-surface')
   })
+
+  it('styles the danger variant on request', () => {
+    render(<Button variant="danger">Quitter</Button>)
+
+    expect(screen.getByRole('button').className).toContain('bg-negative')
+  })
 })

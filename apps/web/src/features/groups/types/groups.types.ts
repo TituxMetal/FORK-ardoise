@@ -10,4 +10,6 @@ export type GroupsClient = {
   create: (name: string) => Promise<Group>
   get: (id: string) => Promise<Group>
   join: (secret: string) => Promise<Group>
+  rename: (id: string, name: string) => Promise<GroupSummary>
+  leave: (id: string) => Promise<void>
 }

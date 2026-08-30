@@ -82,4 +82,25 @@ test.describe('core journey', () => {
     await expect(form.getByLabel('Nom')).toHaveValue('Aline')
     await expectNoAxeViolations(ownerPage)
   })
+
+  test('renames the Group and leaves it behind a confirmation', async () => {
+    await ownerPage.goto('/')
+    await expect(ownerPage.getByRole('heading', { name: 'Mes Groupes' })).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
+
+    await ownerPage.getByRole('button', { name: 'Renommer Potes de Bob' }).click()
+    const renameForm = ownerPage.getByRole('form', { name: 'Renommer le Groupe' })
+    await renameForm.getByLabel('Nom').fill('Soirée de Bob')
+    await renameForm.getByRole('button', { name: 'Enregistrer' }).click()
+    await expect(ownerPage.getByRole('link', { name: 'Soirée de Bob' })).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
+
+    await ownerPage.getByRole('button', { name: 'Quitter Soirée de Bob' }).click()
+    await expect(ownerPage.getByRole('alertdialog', { name: 'Quitter le Groupe' })).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
+    await ownerPage.getByRole('button', { name: 'Quitter' }).click()
+
+    await expect(ownerPage.getByRole('link', { name: 'Soirée de Bob' })).toHaveCount(0)
+    await expectNoAxeViolations(ownerPage)
+  })
 })

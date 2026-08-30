@@ -15,10 +15,17 @@ export const createApiClient = (baseUrl: string, fetch?: ApiFetch): ApiClient =>
   hc<AppType>(baseUrl, fetch ? { fetch } : undefined)
 
 /** Reads the JSON body of an ok response; throws the API message otherwise. */
-export const unwrap = async <T>(response: { ok: boolean; json: () => Promise<T> }): Promise<T> => {
-  if (response.ok) {
-    return await response.json()
+export const unwrap = async <T>(response: {
+  ok: boolean
+  status: number
+  json: () => Promise<T>
+}): Promise<T> => {
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as { message?: string } | null
+    throw new Error(body?.message ?? 'Réponse inattendue du serveur')
   }
-  const body = (await response.json().catch(() => null)) as { message?: string } | null
-  throw new Error(body?.message ?? 'Réponse inattendue du serveur')
+  if (response.status === 204) {
+    return undefined as T
+  }
+  return await response.json()
 }
