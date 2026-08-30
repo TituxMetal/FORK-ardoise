@@ -10,6 +10,8 @@ import { prismaServiceAdapter } from '~/services/infrastructure/prismaService.ad
 import { createServicesRoutes } from '~/services/presentation/services.routes'
 import { prismaPaybackAdapter } from '~/paybacks/infrastructure/prismaPayback.adapter'
 import { createPaybacksRoutes } from '~/paybacks/presentation/paybacks.routes'
+import { prismaUserAdapter } from '~/users/infrastructure/prismaUser.adapter'
+import { createUsersRoutes } from '~/users/presentation/users.routes'
 import { createAuth, createPrismaClient } from '~/shared/infrastructure'
 import { mapException, requireSession } from '~/shared/presentation'
 import { getSlate } from '~/groups/application/getSlate.uc'
@@ -22,6 +24,7 @@ export const createApp = (
   const expenses = prismaExpenseAdapter(prisma)
   const services = prismaServiceAdapter(prisma)
   const paybacks = prismaPaybackAdapter(prisma)
+  const users = prismaUserAdapter(prisma)
   const view = getSlate(groups, expenses, services, paybacks)
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .onError(mapException)
@@ -30,10 +33,12 @@ export const createApp = (
     .use('/groups/*', requireSession(auth))
     .use('/groups', requireSession(auth))
     .use('/invites/*', requireSession(auth))
+    .use('/users/*', requireSession(auth))
     .route('/groups', createGroupsRoutes(groups, view))
     .route('/groups', createExpensesRoutes(expenses, view))
     .route('/groups', createServicesRoutes(services, view))
     .route('/groups', createPaybacksRoutes(paybacks, view))
     .route('/invites', createInvitesRoutes(groups, view))
+    .route('/users', createUsersRoutes(users))
 }
 export type AppType = ReturnType<typeof createApp>
