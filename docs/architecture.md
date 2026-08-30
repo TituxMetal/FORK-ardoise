@@ -66,7 +66,7 @@ apps/web/src/
   features/<name>/  components/ + api/ always; hooks/ schemas/ store/ types/ utils/ as needed
   components/ui/    shared form primitives (Input, Button, FormWrapper, Select, Alert)
   components/icons/ shared icon set — one `*Icon` component per file (UpIcon, PlusIcon, BackIcon…)
-  lib/              shared seams: http client, amounts, forms, errorMessage
+  lib/              shared seams: http client, amounts, router, errorMessage
   types/  utils/  config/  styles/  assets/  layouts/
 ```
 
