@@ -7,24 +7,21 @@ import { leaveGroup } from './leaveGroup.uc'
 
 const repository = (
   found: Group | null,
-  calls: { removeMember?: [string, string]; remove?: [string] } = {}
+  calls: { leave?: [string, string] } = {}
 ): GroupRepository => ({
   save: async () => undefined,
   findById: async () => found,
   findByUserId: async () => (found ? [found] : []),
   findByInviteSecret: async () => found,
   rename: async () => undefined,
-  removeMember: async (id, userId) => {
-    calls.removeMember = [id, userId]
-  },
-  remove: async id => {
-    calls.remove = [id]
+  leave: async (id, userId) => {
+    calls.leave = [id, userId]
   }
 })
 
 describe('leaveGroup', () => {
-  it('removes the Member seat when other Members stay', async () => {
-    const calls: { removeMember?: [string, string]; remove?: [string] } = {}
+  it('removes the Member seat through the atomic leave', async () => {
+    const calls: { leave?: [string, string] } = {}
     const groups = leaveGroup(
       repository(
         groupReconstitute(
@@ -39,32 +36,11 @@ describe('leaveGroup', () => {
 
     await groups.execute('u1', 'g1')
 
-    expect(calls.removeMember).toEqual(['g1', 'u1'])
-    expect(calls.remove).toBeUndefined()
-  })
-
-  it('deletes the Group when the leaver is the last Member', async () => {
-    const calls: { removeMember?: [string, string]; remove?: [string] } = {}
-    const groups = leaveGroup(
-      repository(
-        groupReconstitute(
-          'g1',
-          groupNameReconstitute('Potes de Bob'),
-          [memberOf('u1', 'Léa')],
-          'secret'
-        ),
-        calls
-      )
-    )
-
-    await groups.execute('u1', 'g1')
-
-    expect(calls.remove).toEqual(['g1'])
-    expect(calls.removeMember).toBeUndefined()
+    expect(calls.leave).toEqual(['g1', 'u1'])
   })
 
   it('refuses a Group the User does not sit in as not found', async () => {
-    const calls: { removeMember?: [string, string]; remove?: [string] } = {}
+    const calls: { leave?: [string, string] } = {}
     const groups = leaveGroup(
       repository(
         groupReconstitute(
@@ -87,7 +63,7 @@ describe('leaveGroup', () => {
   })
 
   it('refuses an unknown Group as not found', async () => {
-    const calls: { removeMember?: [string, string]; remove?: [string] } = {}
+    const calls: { leave?: [string, string] } = {}
     const groups = leaveGroup(repository(null, calls))
 
     const leave = groups.execute('u1', 'missing')

@@ -28,8 +28,7 @@ const repository = (saved: Group[], found: Group | null): GroupRepository => ({
   findByUserId: async () => (found ? [found] : []),
   findByInviteSecret: async () => found,
   rename: async () => undefined,
-  removeMember: async () => undefined,
-  remove: async () => undefined
+  leave: async () => undefined
 })
 
 describe('joinGroup', () => {

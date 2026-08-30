@@ -25,8 +25,7 @@ const repository = (groups: Group[]): GroupRepository => ({
   findByUserId: async () => groups,
   findByInviteSecret: async () => groups[0] ?? null,
   rename: async () => undefined,
-  removeMember: async () => undefined,
-  remove: async () => undefined
+  leave: async () => undefined
 })
 
 describe('listGroups', () => {

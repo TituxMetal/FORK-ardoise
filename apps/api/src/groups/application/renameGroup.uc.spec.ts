@@ -21,8 +21,7 @@ const repository = (found: Group | null, renamed: string[] = []): GroupRepositor
   rename: async (id, name) => {
     renamed.push(`${id}:${name}`)
   },
-  removeMember: async () => undefined,
-  remove: async () => undefined
+  leave: async () => undefined
 })
 
 describe('renameGroup', () => {

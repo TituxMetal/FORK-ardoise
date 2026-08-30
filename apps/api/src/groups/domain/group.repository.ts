@@ -7,8 +7,6 @@ export type GroupRepository = {
   findByInviteSecret: (secret: string) => Promise<Group | null>
   /** Renames the Group; the caller checked membership and the domain rule. */
   rename: (id: string, name: string) => Promise<void>
-  /** Removes one Member seat; the caller checked the Group is not emptied. */
-  removeMember: (id: string, userId: string) => Promise<void>
-  /** Deletes the whole Group with its Members, Expenses, Services and Paybacks. */
-  remove: (id: string) => Promise<void>
+  /** Atomically removes the Member seat, deleting the Group when it empties. */
+  leave: (id: string, userId: string) => Promise<void>
 }

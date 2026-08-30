@@ -71,11 +71,10 @@ export const prismaGroupAdapter = (prisma: PrismaClient): GroupRepository => ({
     await prisma.group.update({ where: { id }, data: { name } })
   },
 
-  async removeMember(id: string, userId: string) {
-    await prisma.member.deleteMany({ where: { groupId: id, userId } })
-  },
-
-  async remove(id: string) {
-    await prisma.group.delete({ where: { id } })
+  async leave(id: string, userId: string) {
+    await prisma.$transaction([
+      prisma.member.deleteMany({ where: { groupId: id, userId } }),
+      prisma.group.deleteMany({ where: { id, members: { none: {} } } })
+    ])
   }
 })

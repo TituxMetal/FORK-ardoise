@@ -137,22 +137,36 @@ describe('prismaGroupAdapter', () => {
     const adapter = prismaGroupAdapter(prisma)
     await adapter.save(potes)
 
-    await adapter.removeMember('g1', 'u-bob')
+    await adapter.leave('g1', 'u-bob')
 
     const remaining = await adapter.findById('g1')
     expect(remaining?.members).toEqual([memberOf('u-lea', 'Léa')])
   })
 
-  it('deletes the Group with its Members', async () => {
+  it('deletes the Group when the leaver was its last Member', async () => {
     const prisma = await createTestDb()
     await seedUser(prisma, 'u-lea', 'Léa')
     await seedUser(prisma, 'u-bob', 'Bob')
     const adapter = prismaGroupAdapter(prisma)
     await adapter.save(potes)
 
-    await adapter.remove('g1')
+    await adapter.leave('g1', 'u-bob')
+    await adapter.leave('g1', 'u-lea')
 
     expect(await adapter.findById('g1')).toBeNull()
     expect(await adapter.findByUserId('u-lea')).toEqual([])
+  })
+
+  it('deletes the Group when both Members leave concurrently', async () => {
+    const prisma = await createTestDb()
+    await seedUser(prisma, 'u-lea', 'Léa')
+    await seedUser(prisma, 'u-bob', 'Bob')
+    const adapter = prismaGroupAdapter(prisma)
+    await adapter.save(potes)
+
+    await Promise.all([adapter.leave('g1', 'u-lea'), adapter.leave('g1', 'u-bob')])
+
+    expect(await adapter.findById('g1')).toBeNull()
+    expect(await prisma.member.count({ where: { groupId: 'g1' } })).toBe(0)
   })
 })

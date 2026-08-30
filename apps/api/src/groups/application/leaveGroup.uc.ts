@@ -8,10 +8,6 @@ export const leaveGroup = (groups: GroupRepository) => ({
     if (!group || !groupHasMember(group, userId)) {
       throw notFound('Groupe introuvable')
     }
-    if (group.members.length === 1) {
-      await groups.remove(groupId)
-      return
-    }
-    await groups.removeMember(groupId, userId)
+    await groups.leave(groupId, userId)
   }
 })
