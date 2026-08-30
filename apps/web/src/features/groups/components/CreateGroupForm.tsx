@@ -1,9 +1,11 @@
-import { useState, type SubmitEventHandler } from 'react'
-import { Alert, Button, FormWrapper, Input } from '~ui'
+import { useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { errorMessage } from '~/lib/errorMessage'
-import { field } from '~/lib/forms'
 import { groupsClient } from '../api'
+import { createGroupSchema, type CreateGroupInput } from '../schemas'
 import type { GroupsClient } from '../types'
+import { CreateGroupFields } from './CreateGroupFields'
 
 type Props = {
   client?: GroupsClient
@@ -12,13 +14,15 @@ type Props = {
 
 export const CreateGroupForm = ({ client = groupsClient, onCreated }: Props) => {
   const [error, setError] = useState('')
+  const form = useForm<CreateGroupInput>({
+    resolver: zodResolver(createGroupSchema),
+    defaultValues: { name: '' }
+  })
 
-  const create: SubmitEventHandler<HTMLFormElement> = async event => {
-    event.preventDefault()
-    const name = field(new FormData(event.currentTarget), 'name')
-    event.currentTarget.reset()
+  const onSubmit: SubmitHandler<CreateGroupInput> = async ({ name }) => {
     try {
       await client.create(name)
+      form.reset()
       setError('')
       onCreated()
     } catch (error) {
@@ -26,14 +30,5 @@ export const CreateGroupForm = ({ client = groupsClient, onCreated }: Props) => 
     }
   }
 
-  return (
-    <form className="flex flex-col gap-3" onSubmit={create}>
-      {error ? <Alert message={error} /> : null}
-      <h2 className="text-lg font-medium">Créer un Groupe</h2>
-      <FormWrapper label="Nom">
-        <Input name="name" required />
-      </FormWrapper>
-      <Button type="submit">Créer le Groupe</Button>
-    </form>
-  )
+  return <CreateGroupFields form={form} error={error} onSubmit={onSubmit} />
 }

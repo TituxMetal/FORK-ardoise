@@ -53,4 +53,15 @@ describe('CreateGroupForm', () => {
 
     expect((await screen.findByRole('alert')).textContent).toBe('Groupe introuvable')
   })
+
+  it('rejects an empty name with a French message and does not create', async () => {
+    render(<CreateGroupForm client={api.groups(testUsers.lea)} onCreated={() => {}} />)
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Créer le Groupe' }))
+
+    expect((await screen.findByRole('alert')).textContent).toBe('Nom du Groupe requis')
+    const [group] = await api.groups(testUsers.lea).list()
+    expect(group).toBeUndefined()
+  })
 })

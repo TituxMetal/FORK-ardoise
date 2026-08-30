@@ -78,7 +78,15 @@ Every feature exposes a single public entry point — `~features/groups`, `~feat
 
 Icons are shared UI but do **not** live in `components/ui/` (form primitives only) and are **not** a feature. They sit at `components/icons/` as one `*Icon` component per file, decorative (`aria-hidden`), and are imported from the real file — never re-exported through a barrel, never `export *`.
 
-Routing is a Hono app in the browser: routes declared with `app.get('/groups/:id', c => …)`, dispatched via `app.fetch(new Request(location.pathname))`, history API + `Link` in the React layer. Stores are nanostores (`$atom` + actions), schemas are zod v4 colocated with the feature, forms are react-hook-form + zodResolver (container owns `useForm`, the form component is pure presentation). `GroupsScreen.tsx` holding every form is the shape we leave.
+Routing is a Hono app in the browser: routes declared with `app.get('/groups/:id', c => …)`, dispatched via `app.fetch(new Request(location.pathname))`, history API + `Link` in the React layer. Stores are nanostores (`$atom` + actions).
+
+Forms are react-hook-form + zodResolver on three roles, one file each:
+
+1. **Schema** — zod v4 colocated with the feature (`features/<name>/schemas/*.schema.ts`, barrel `index.ts`). Validates shape and trims; messages are French UI strings mirroring the API's domain rule (e.g. `'Nom du Groupe requis'`).
+2. **Container** — owns `useForm` wired to the schema through `zodResolver`, the submit handler, and the API-error state; renders the pure form. `CreateGroupForm` is the exemplar.
+3. **Pure presentation** — the form component; receives the `form` instance and the submit handler as props, renders French-labelled fields through the shared `FormWrapper`/`Input` primitives with `noValidate` (RHF owns validation). `CreateGroupFields` is the exemplar.
+
+`GroupsScreen.tsx` holding every form is the shape we leave: when the Groups screen lands, the container role moves to the screen and `CreateGroupForm` becomes the pure-presentation form. `components/` + `api/` are always present; `hooks/`, `schemas/`, `store/`, `types/`, `utils/` appear as the feature needs them.
 
 ## Tests
 
