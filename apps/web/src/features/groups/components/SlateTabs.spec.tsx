@@ -22,12 +22,18 @@ describe('SlateTabs', () => {
     expect(screen.getByRole('tab', { name: 'Services' }).getAttribute('aria-selected')).toBe('true')
   })
 
-  it('keeps the active tab in the tab order and the others out of it', () => {
+  it('keeps the tab-to-panel association on every tab', () => {
     render(<SlateTabs />)
 
-    expect(screen.getByRole('tab', { name: 'Dépenses' }).tabIndex).toBe(0)
-    expect(screen.getByRole('tab', { name: 'Services' }).tabIndex).toBe(-1)
-    expect(screen.getByRole('tab', { name: 'Remboursements' }).tabIndex).toBe(-1)
+    expect(screen.getByRole('tab', { name: 'Dépenses' }).getAttribute('aria-controls')).toBe(
+      'slate-panel-expenses'
+    )
+    expect(screen.getByRole('tab', { name: 'Services' }).getAttribute('aria-controls')).toBe(
+      'slate-panel-services'
+    )
+    expect(screen.getByRole('tab', { name: 'Remboursements' }).getAttribute('aria-controls')).toBe(
+      'slate-panel-paybacks'
+    )
   })
 
   it('moves focus and selection with the arrow keys and Home/End', async () => {

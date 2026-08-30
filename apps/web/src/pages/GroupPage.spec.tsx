@@ -40,6 +40,8 @@ describe('GroupPage', () => {
     expect(screen.getByText('Aucune Dépense')).toBeTruthy()
     expect(screen.queryByText('Aucun Service')).toBeNull()
     expect(screen.queryByText('Aucun Règlement')).toBeNull()
+    expect(screen.queryByRole('tabpanel', { name: 'Services' })).toBeNull()
+    expect(screen.queryByRole('tabpanel', { name: 'Remboursements' })).toBeNull()
   })
 
   it('switches the Slate between the three tabs', async () => {

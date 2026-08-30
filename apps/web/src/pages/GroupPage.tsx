@@ -84,6 +84,7 @@ export const GroupPage = ({
             role="tabpanel"
             id="slate-panel-expenses"
             aria-labelledby="slate-tab-expenses"
+            hidden={tab !== 'expenses'}
             className="space-y-4"
           >
             {tab === 'expenses' ? (
@@ -97,6 +98,7 @@ export const GroupPage = ({
             role="tabpanel"
             id="slate-panel-services"
             aria-labelledby="slate-tab-services"
+            hidden={tab !== 'services'}
             className="space-y-4"
           >
             {tab === 'services' ? (
@@ -110,6 +112,7 @@ export const GroupPage = ({
             role="tabpanel"
             id="slate-panel-paybacks"
             aria-labelledby="slate-tab-paybacks"
+            hidden={tab !== 'paybacks'}
             className="space-y-4"
           >
             {tab === 'paybacks' ? (

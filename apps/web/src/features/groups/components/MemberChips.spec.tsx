@@ -51,11 +51,15 @@ describe('MemberChips', () => {
     expect(screen.getByText('c’est vous')).toBeTruthy()
   })
 
-  it('announces the self once when the self Balance is negative', async () => {
-    const group = await groupWithExpense('bob')
+  it('separates the name, the amount and the self marker in the chip text', async () => {
+    const group = await groupWithExpense('lea')
 
     render(<MemberChips group={group} />)
 
-    expect(screen.getAllByText('c’est vous')).toHaveLength(1)
+    const chips = screen.getAllByRole('listitem')
+    const selfChip = chips.find(chip => chip.textContent?.includes('c’est vous'))
+    expect(selfChip?.textContent).toBe('Léa +0,66 € c’est vous')
+    const bobChip = chips.find(chip => chip.textContent?.includes('Bob'))
+    expect(bobChip?.textContent).toBe('Bob −0,33 €')
   })
 })

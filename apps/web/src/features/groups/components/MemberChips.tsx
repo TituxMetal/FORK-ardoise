@@ -19,9 +19,8 @@ export const MemberChips = ({ group }: Props) => (
           } ${isSelf ? '' : 'ring-1 ring-border'}`}
         >
           {positive ? <UpIcon className="h-4 w-4" /> : <DownIcon className="h-4 w-4" />}
-          {balance.name}
-          {signedEuros(balance.amount)}
-          {isSelf ? <span className="sr-only">c’est vous</span> : null}
+          {balance.name} {signedEuros(balance.amount)}
+          {isSelf ? <span className="sr-only"> c’est vous</span> : null}
         </li>
       )
     })}

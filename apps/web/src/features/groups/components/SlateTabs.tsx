@@ -68,7 +68,7 @@ export const SlateTabs = () => {
             role="tab"
             id={tab.tabId}
             aria-selected={active === tab.key}
-            aria-controls={active === tab.key ? tab.panelId : undefined}
+            aria-controls={tab.panelId}
             tabIndex={active === tab.key ? 0 : -1}
             onClick={() => setActiveTab(tab.key)}
             className={`h-11 shrink-0 whitespace-nowrap rounded-md px-2.5 text-[13px] font-medium transition-colors ${
