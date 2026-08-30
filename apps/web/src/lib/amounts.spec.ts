@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { centsFromEuros, euros } from './amounts'
+import { centsFromEuros, euros, eurosAmountSchema } from './amounts'
 
 describe('euros', () => {
   it('formats cents with a comma and the euro sign', () => {
@@ -26,5 +26,31 @@ describe('centsFromEuros', () => {
 
   it('parses a negative amount into cents', () => {
     expect(centsFromEuros('-3,25')).toBe(-325)
+  })
+})
+
+describe('eurosAmountSchema', () => {
+  it('accepts a positive amount written with a comma or a dot', () => {
+    expect(eurosAmountSchema.parse('0,20')).toBe('0,20')
+    expect(eurosAmountSchema.parse('0.90')).toBe('0.90')
+    expect(eurosAmountSchema.parse('12,5')).toBe('12,5')
+  })
+
+  it('rejects a non-positive amount with a French message', () => {
+    const result = eurosAmountSchema.safeParse('0')
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues[0]?.message).toBe('Montant > 0 requis')
+  })
+
+  it('rejects a non-numeric amount with a French message', () => {
+    const result = eurosAmountSchema.safeParse('abc')
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues[0]?.message).toBe('Montant invalide')
   })
 })
