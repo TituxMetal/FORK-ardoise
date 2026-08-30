@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { euros } from '~/lib/amounts'
-import type { GroupDto } from '~features/groups/api'
+import type { Group } from '~features/groups'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
-import { Expenses } from '~features/expenses/components'
+import { Expenses } from './Expenses'
 
 afterEach(cleanup)
 afterEach(async () => {
@@ -25,7 +25,7 @@ const openExpenses = async () => {
   await api.groups(testUsers.camille).join(group.invite.secret)
   const joined = await client.get(group.id)
   const Board = () => {
-    const [current, setCurrent] = useState<GroupDto>(joined)
+    const [current, setCurrent] = useState<Group>(joined)
     return (
       <>
         <Expenses group={current} client={api.expenses(testUsers.lea)} onChange={setCurrent} />

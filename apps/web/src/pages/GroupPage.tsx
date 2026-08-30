@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Alert, Button } from '~ui/index'
-import { BackIcon } from '~/components/icons/BackIcon'
+import { Alert, Button } from '~ui'
+import { BackIcon } from '~/components/icons'
 import { Expenses } from '~features/expenses'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups'
+import { groupsClient, type Group, type GroupsClient } from '~features/groups'
 import { Paybacks } from '~features/paybacks'
 import { Services } from '~features/services'
 import { Link } from '~/lib/router'
@@ -18,10 +18,10 @@ export const GroupPage = ({
   groups = groupsClient,
   copy = text => navigator.clipboard.writeText(text)
 }: Props) => {
-  const [group, setGroup] = useState<GroupDto | null>(null)
+  const [group, setGroup] = useState<Group | null>(null)
   const [error, setError] = useState('')
 
-  const apply = (next: GroupDto) => {
+  const apply = (next: Group) => {
     setGroup(next)
     setError('')
   }

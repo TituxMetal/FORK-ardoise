@@ -1,5 +1,5 @@
 import { createApiClient, unwrap, type HttpClientOptions } from '~/lib/http.client'
-import type { GroupsClient } from '../types/groups.dto'
+import type { GroupsClient } from '../types'
 
 export const createGroupsClient = (options: HttpClientOptions = {}): GroupsClient => {
   const http = createApiClient(options.baseUrl ?? '/api', options.fetch)

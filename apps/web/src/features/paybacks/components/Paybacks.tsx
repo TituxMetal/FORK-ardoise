@@ -1,15 +1,16 @@
 import { useState, type SubmitEventHandler } from 'react'
-import { Alert, Button, FormWrapper, Input, Select } from '~ui/index'
+import { Alert, Button, FormWrapper, Input, Select } from '~ui'
 import { centsFromEuros, euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import type { GroupDto } from '~features/groups'
-import { paybacksClient, type PaybacksClient } from '~features/paybacks/api'
+import type { Group } from '~features/groups'
+import { paybacksClient } from '../api'
+import type { PaybacksClient } from '../types'
 
 type Props = {
-  group: GroupDto
+  group: Group
   client?: PaybacksClient
-  onChange: (group: GroupDto) => void
+  onChange: (group: Group) => void
 }
 
 export const Paybacks = ({ group, client = paybacksClient, onChange }: Props) => {

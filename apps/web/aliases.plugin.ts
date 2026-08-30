@@ -31,6 +31,7 @@ export const aliases = (): Plugin => ({
   name: 'ardoise-aliases',
   enforce: 'pre',
   resolveId(source, importer) {
+    if (source === '~ui') return withExtension(webUi)
     if (source.startsWith('~ui/')) return withExtension(join(webUi, source.replace(/^~ui\//, '')))
     if (source.startsWith('~features/'))
       return withExtension(join(webFeatures, source.replace(/^~features\//, '')))

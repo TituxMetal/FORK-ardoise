@@ -1,0 +1,7 @@
+export { BackIcon } from './BackIcon'
+export { CopyIcon } from './CopyIcon'
+export { DownIcon } from './DownIcon'
+export { PersonIcon } from './PersonIcon'
+export { PlusIcon } from './PlusIcon'
+export { TrashIcon } from './TrashIcon'
+export { UpIcon } from './UpIcon'

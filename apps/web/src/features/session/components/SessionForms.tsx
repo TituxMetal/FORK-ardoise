@@ -1,6 +1,6 @@
 import { useState, type SubmitEventHandler } from 'react'
-import { Alert, Button, FormWrapper, Input } from '~ui/index'
-import { authClient } from '~features/session/api'
+import { Alert, Button, FormWrapper, Input } from '~ui'
+import { authClient } from '../api'
 import { field } from '~/lib/forms'
 
 export const SessionForms = () => {

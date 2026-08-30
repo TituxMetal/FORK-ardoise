@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups'
+import { groupsClient, type Group, type GroupsClient } from '~features/groups'
 import { errorMessage } from '~/lib/errorMessage'
 import { SessionForms } from '~features/session'
 
@@ -11,7 +11,7 @@ type Props = {
 
 export const InvitePage = ({ secret, session, client = groupsClient }: Props) => {
   const sessionName = session?.name
-  const [group, setGroup] = useState<GroupDto | null>(null)
+  const [group, setGroup] = useState<Group | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {

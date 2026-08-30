@@ -1,5 +1,5 @@
 import { createApiClient, unwrap, type HttpClientOptions } from '~/lib/http.client'
-import type { PaybacksClient } from '../types/paybacks.dto'
+import type { PaybacksClient } from '../types'
 
 export const createPaybacksClient = (options: HttpClientOptions = {}): PaybacksClient => {
   const http = createApiClient(options.baseUrl ?? '/api', options.fetch)

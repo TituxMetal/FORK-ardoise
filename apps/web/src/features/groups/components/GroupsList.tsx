@@ -1,5 +1,5 @@
 import { Link } from '~/lib/router'
-import type { GroupSummary } from '~features/groups/api'
+import type { GroupSummary } from '../types'
 
 export const GroupsList = ({ groups }: { groups: GroupSummary[] }) => (
   <div className="space-y-2">

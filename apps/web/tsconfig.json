@@ -17,6 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "~/*": ["./src/*", "../api/src/*"],
+      "~ui": ["./src/components/ui"],
       "~ui/*": ["./src/components/ui/*"],
       "~features/*": ["./src/features/*"],
       "api/*": ["../api/src/*"]

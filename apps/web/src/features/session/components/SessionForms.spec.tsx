@@ -2,10 +2,10 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
-import { authClient } from '~features/session/api'
+import { authClient } from '../api'
 import { SessionForms } from './SessionForms'
 
-vi.mock('~features/session/api', () => ({
+vi.mock('../api', () => ({
   authClient: {
     signUp: { email: vi.fn(async () => ({ data: null, error: null })) },
     signIn: { email: vi.fn(async () => ({ data: null, error: null })) }

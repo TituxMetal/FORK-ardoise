@@ -1,8 +1,9 @@
 import { useState, type SubmitEventHandler } from 'react'
-import { Alert, Button, FormWrapper, Input } from '~ui/index'
+import { Alert, Button, FormWrapper, Input } from '~ui'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import { groupsClient, type GroupsClient } from '~features/groups/api'
+import { groupsClient } from '../api'
+import type { GroupsClient } from '../types'
 
 type Props = {
   client?: GroupsClient

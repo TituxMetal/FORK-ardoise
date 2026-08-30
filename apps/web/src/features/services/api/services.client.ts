@@ -1,5 +1,5 @@
 import { createApiClient, unwrap, type HttpClientOptions } from '~/lib/http.client'
-import type { ServicesClient } from '../types/services.dto'
+import type { ServicesClient } from '../types'
 
 export const createServicesClient = (options: HttpClientOptions = {}): ServicesClient => {
   const http = createApiClient(options.baseUrl ?? '/api', options.fetch)

@@ -1,8 +1,8 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-import type { GroupSummary } from '~features/groups/api'
-import { GroupsList } from '~features/groups/components'
+import type { GroupSummary } from '../types'
+import { GroupsList } from './GroupsList'
 
 afterEach(cleanup)
 

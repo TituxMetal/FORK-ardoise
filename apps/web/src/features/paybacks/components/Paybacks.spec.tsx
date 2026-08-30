@@ -3,11 +3,11 @@ import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
-import type { GroupDto } from '~features/groups/api'
+import type { Group } from '~features/groups'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
-import { Expenses } from '~features/expenses/components'
-import { Services } from '~features/services/components'
-import { Paybacks } from '~features/paybacks/components'
+import { Expenses } from '~features/expenses'
+import { Services } from '~features/services'
+import { Paybacks } from './Paybacks'
 
 afterEach(cleanup)
 afterEach(async () => {
@@ -26,7 +26,7 @@ const openPaybacks = async () => {
   await api.groups(testUsers.camille).join(group.invite.secret)
   const joined = await client.get(group.id)
   const Board = () => {
-    const [current, setCurrent] = useState<GroupDto>(joined)
+    const [current, setCurrent] = useState<Group>(joined)
     return (
       <>
         <Expenses group={current} client={api.expenses(testUsers.lea)} onChange={setCurrent} />

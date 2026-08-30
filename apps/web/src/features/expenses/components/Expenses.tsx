@@ -1,15 +1,16 @@
 import { useState, type SubmitEventHandler } from 'react'
-import { Alert, Button, FormWrapper, Input, Select } from '~ui/index'
+import { Alert, Button, FormWrapper, Input, Select } from '~ui'
 import { centsFromEuros, euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import type { GroupDto } from '~features/groups'
-import { expensesClient, type ExpensesClient } from '~features/expenses/api'
+import type { Group } from '~features/groups'
+import { expensesClient } from '../api'
+import type { ExpensesClient } from '../types'
 
 type Props = {
-  group: GroupDto
+  group: Group
   client?: ExpensesClient
-  onChange: (group: GroupDto) => void
+  onChange: (group: Group) => void
 }
 
 export const Expenses = ({ group, client = expensesClient, onChange }: Props) => {

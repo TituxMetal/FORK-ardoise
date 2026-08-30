@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
-import { CreateGroupForm } from '~features/groups/components'
+import { CreateGroupForm } from './CreateGroupForm'
 
 afterEach(cleanup)
 afterEach(async () => {

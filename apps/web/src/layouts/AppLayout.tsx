@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Button } from '~ui/index'
+import { Button } from '~ui'
 import { authClient } from '~features/session'
 
 type Props = {
