@@ -18,3 +18,11 @@ export const loadGroup = async (groups: GroupsClient, id: string) => {
     $error.set('Groupe introuvable')
   }
 }
+
+export const refreshGroup = async (groups: GroupsClient, id: string) => {
+  try {
+    applyGroup(await groups.get(id))
+  } catch {
+    $error.set('Groupe introuvable')
+  }
+}

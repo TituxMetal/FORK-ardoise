@@ -3,7 +3,14 @@ import { useStore } from '@nanostores/react'
 import { Alert, Button } from '~ui'
 import { BackIcon } from '~/components/icons'
 import { Expenses } from '~features/expenses'
-import { $error, $group, groupsClient, loadGroup, type GroupsClient } from '~features/groups'
+import {
+  $error,
+  $group,
+  groupsClient,
+  loadGroup,
+  refreshGroup,
+  type GroupsClient
+} from '~features/groups'
 import { Paybacks } from '~features/paybacks'
 import { Services } from '~features/services'
 import { Link } from '~/lib/router'
@@ -24,10 +31,14 @@ export const GroupPage = ({
 
   useEffect(() => {
     void loadGroup(groups, id)
+    return () => {
+      $group.set(null)
+      $error.set('')
+    }
   }, [groups, id])
 
   useEffect(() => {
-    const onFocus = () => void loadGroup(groups, id)
+    const onFocus = () => void refreshGroup(groups, id)
     window.addEventListener('focus', onFocus)
     return () => window.removeEventListener('focus', onFocus)
   }, [groups, id])

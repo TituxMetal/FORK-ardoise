@@ -1,1 +1,1 @@
-export { $error, $group, applyGroup, loadGroup } from './group.store'
+export { $error, $group, applyGroup, loadGroup, refreshGroup } from './group.store'
