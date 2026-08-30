@@ -64,10 +64,19 @@ Root mirror of the feature structure — the same complete structure at `src/` f
 apps/web/src/
   pages/            one file per route, composes feature components
   features/<name>/  components/ + api/ always; hooks/ schemas/ store/ types/ utils/ as needed
-  components/ui/    shared reusable UI (Input, Button, FormWrapper…)
+  components/ui/    shared form primitives (Input, Button, FormWrapper, Select, Alert)
+  components/icons/ shared icon set — one `*Icon` component per file (UpIcon, PlusIcon, BackIcon…)
   lib/              shared seams: http client, amounts, forms, errorMessage
   types/  utils/  config/  styles/  assets/  layouts/
 ```
+
+### Dependency boundaries
+
+The import architecture keeps layers apart by folder. Elements: **shared** (`src/lib/*`, `src/components/ui/*`, `src/components/icons/*`, `src/types/*`, `src/utils/*`, `src/layouts/*`, `src/config/*`), **feature** (`src/features/*`), **pages** (`src/pages/*`). Rules: `shared → shared`, `feature → shared | feature`, `pages → shared | feature | pages`.
+
+Every feature exposes a single public entry point — `~features/groups`, `~features/expenses`, … — that re-exports its components, its API client and its contract types (`import { GroupsList, groupsClient, type GroupDto } from '~features/groups'`). Consumers (pages, other features) import from the feature root, never from `~features/<name>/components` or `~features/<name>/api`. Contract types (DTOs and client interfaces, e.g. `GroupDto`, `GroupsClient`) live in `features/<name>/types/*.dto.ts` and are re-exported by the feature entry point. Within a feature, files import each other through the internal `components/` / `api/` / `types/` paths to keep the boundary clean.
+
+Icons are shared UI but do **not** live in `components/ui/` (form primitives only) and are **not** a feature. They sit at `components/icons/` as one `*Icon` component per file, decorative (`aria-hidden`), and are imported from the real file — never re-exported through a barrel, never `export *`.
 
 Routing is a Hono app in the browser: routes declared with `app.get('/groups/:id', c => …)`, dispatched via `app.fetch(new Request(location.pathname))`, history API + `Link` in the React layer. Stores are nanostores (`$atom` + actions), schemas are zod v4 colocated with the feature, forms are react-hook-form + zodResolver (container owns `useForm`, the form component is pure presentation). `GroupsScreen.tsx` holding every form is the shape we leave.
 

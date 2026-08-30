@@ -4,6 +4,7 @@ import {
   captureInviteWrites,
   copyInvite,
   createGroup,
+  expectNoAxeViolations,
   joinInvite,
   signUp,
   uniqueEmail,
@@ -21,24 +22,30 @@ test.describe('core journey', () => {
   })
 
   test('signs up, creates a Group and copies its Invite link', async ({ browser }) => {
-    ownerPage = await browser.newPage()
+    const context = await browser.newContext()
+    ownerPage = await context.newPage()
     await captureInviteWrites(ownerPage)
     await ownerPage.goto('/')
+    await expectNoAxeViolations(ownerPage)
     await signUp(ownerPage, 'Alice', uniqueEmail('alice'))
     await expect(ownerPage.getByRole('heading', { name: 'Créer un Groupe' })).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
 
     await createGroup(ownerPage, 'Potes de Bob')
+    await expectNoAxeViolations(ownerPage)
 
     inviteUrl = await copyInvite(ownerPage)
     expect(inviteUrl).toMatch(/\/invites\/[^/]+$/)
   })
 
   test('joins the Group from another session via the Invite link', async ({ browser }) => {
-    const guestPage = await browser.newPage()
+    const context = await browser.newContext()
+    const guestPage = await context.newPage()
     await joinInvite(guestPage, inviteUrl, 'Bob', uniqueEmail('bob'), 'Potes de Bob')
 
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Alice' })).toBeVisible()
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Bob' })).toBeVisible()
+    await expectNoAxeViolations(guestPage)
   })
 
   test('adds an Expense then settles it with a Payback', async () => {
@@ -51,5 +58,6 @@ test.describe('core journey', () => {
     await paybackForm.getByLabel('Montant').fill('5')
     await paybackForm.getByRole('button', { name: 'Constater le Règlement' }).click()
     await expect(ownerPage.getByText('Bob → Alice 5,00 €')).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
   })
 })

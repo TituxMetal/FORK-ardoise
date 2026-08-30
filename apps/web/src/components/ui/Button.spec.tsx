@@ -30,12 +30,12 @@ describe('Button', () => {
   it('styles the primary variant by default', () => {
     render(<Button>Aller</Button>)
 
-    expect(screen.getByRole('button').className).toContain('bg-zinc-100')
+    expect(screen.getByRole('button').className).toContain('bg-accent')
   })
 
   it('styles the secondary variant on request', () => {
     render(<Button variant="secondary">Supprimer</Button>)
 
-    expect(screen.getByRole('button').className).toContain('bg-zinc-800')
+    expect(screen.getByRole('button').className).toContain('bg-surface')
   })
 })

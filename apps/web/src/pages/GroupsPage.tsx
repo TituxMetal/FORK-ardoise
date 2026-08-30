@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
-import { CreateGroupForm } from '~features/groups/components'
-import { GroupsList } from '~features/groups/components'
-import { groupsClient, type GroupsClient, type GroupSummary } from '~features/groups/api'
+import {
+  CreateGroupForm,
+  GroupsList,
+  groupsClient,
+  type GroupsClient,
+  type GroupSummary
+} from '~features/groups'
 
 type Props = {
   client?: GroupsClient
@@ -30,7 +34,7 @@ export const GroupsPage = ({ client = groupsClient }: Props) => {
   return (
     <section className="space-y-4">
       {error ? (
-        <p className="text-red-400" role="alert">
+        <p className="text-negative" role="alert">
           {error}
         </p>
       ) : null}

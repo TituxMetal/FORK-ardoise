@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Alert, Button } from '~ui/index'
-import { Expenses } from '~features/expenses/components'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api'
-import { Paybacks } from '~features/paybacks/components'
-import { Services } from '~features/services/components'
+import { BackIcon } from '~/components/icons/BackIcon'
+import { Expenses } from '~features/expenses'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups'
+import { Paybacks } from '~features/paybacks'
+import { Services } from '~features/services'
 import { Link } from '~/lib/router'
 
 type Props = {
@@ -39,8 +40,12 @@ export const GroupPage = ({
 
   return (
     <section className="space-y-4">
-      <Link to="/" className="inline-block rounded bg-zinc-800 px-3 py-2">
-        ← Retour aux Groupes
+      <Link
+        to="/"
+        className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-surface px-3 text-dim hover:bg-surface-2 hover:text-foreground"
+      >
+        <BackIcon />
+        Retour aux Groupes
       </Link>
       {error ? <Alert message={error} /> : null}
       {group ? (

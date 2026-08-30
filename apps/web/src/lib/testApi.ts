@@ -5,10 +5,10 @@ import { join } from 'node:path'
 import { createApp } from 'api/createApp'
 import { createPrismaClient } from 'api/shared/infrastructure'
 import type { Auth, SessionUser } from 'api/shared/application'
-import { createExpensesClient, type ExpensesClient } from '~features/expenses/api'
-import { createGroupsClient, type GroupsClient } from '~features/groups/api'
-import { createPaybacksClient, type PaybacksClient } from '~features/paybacks/api'
-import { createServicesClient, type ServicesClient } from '~features/services/api'
+import { createExpensesClient, type ExpensesClient } from '~features/expenses'
+import { createGroupsClient, type GroupsClient } from '~features/groups'
+import { createPaybacksClient, type PaybacksClient } from '~features/paybacks'
+import { createServicesClient, type ServicesClient } from '~features/services'
 
 export const testUsers = {
   lea: { id: 'lea', name: 'Léa' },

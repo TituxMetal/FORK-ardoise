@@ -7,7 +7,10 @@ export const GroupsList = ({ groups }: { groups: GroupSummary[] }) => (
     <ul className="space-y-1">
       {groups.map(group => (
         <li key={group.id}>
-          <Link to={`/groups/${group.id}`} className="inline-block rounded bg-zinc-800 px-3 py-2">
+          <Link
+            to={`/groups/${group.id}`}
+            className="inline-flex h-11 items-center rounded-lg bg-surface px-3 hover:bg-surface-2"
+          >
             {group.name}
           </Link>
         </li>

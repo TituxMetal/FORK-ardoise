@@ -1,3 +1,3 @@
-import { SessionForms } from '~features/session/components'
+import { SessionForms } from '~features/session'
 
 export const AuthPage = () => <SessionForms />

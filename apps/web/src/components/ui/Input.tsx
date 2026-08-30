@@ -4,7 +4,7 @@ type Props = InputHTMLAttributes<HTMLInputElement>
 
 export const Input = ({ className, ...rest }: Props) => (
   <input
-    className={`rounded border border-zinc-600 bg-zinc-800 px-2 py-1 ${className ?? ''}`}
+    className={`h-11 rounded-lg border border-border bg-surface px-3 text-foreground placeholder:text-dim disabled:opacity-50 ${className ?? ''}`}
     {...rest}
   />
 )

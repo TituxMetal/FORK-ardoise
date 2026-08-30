@@ -3,7 +3,7 @@ import { Alert, Button, FormWrapper, Input, Select } from '~ui/index'
 import { centsFromEuros, euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import type { GroupDto } from '~features/groups/api'
+import type { GroupDto } from '~features/groups'
 import { paybacksClient, type PaybacksClient } from '~features/paybacks/api'
 
 type Props = {

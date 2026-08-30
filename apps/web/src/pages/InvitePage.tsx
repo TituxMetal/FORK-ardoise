@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups/api'
+import { groupsClient, type GroupDto, type GroupsClient } from '~features/groups'
 import { errorMessage } from '~/lib/errorMessage'
-import { SessionForms } from '~features/session/components'
+import { SessionForms } from '~features/session'
 
 type Props = {
   secret: string
@@ -37,7 +37,7 @@ export const InvitePage = ({ secret, session, client = groupsClient }: Props) =>
 
   if (error) {
     return (
-      <p className="text-red-400" role="alert">
+      <p className="text-negative" role="alert">
         {error}
       </p>
     )

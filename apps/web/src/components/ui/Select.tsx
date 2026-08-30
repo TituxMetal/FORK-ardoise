@@ -4,7 +4,7 @@ type Props = SelectHTMLAttributes<HTMLSelectElement>
 
 export const Select = ({ className, ...rest }: Props) => (
   <select
-    className={`rounded border border-zinc-600 bg-zinc-800 px-2 py-1 ${className ?? ''}`}
+    className={`h-11 rounded-lg border border-border bg-surface px-3 text-foreground disabled:opacity-50 ${className ?? ''}`}
     {...rest}
   />
 )

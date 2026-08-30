@@ -1,15 +1,5 @@
-import type { InferRequestType } from 'hono/client'
-import type { GroupDto } from '~features/groups/api'
-import { createApiClient, unwrap, type ApiClient, type HttpClientOptions } from '~/lib/http.client'
-
-export type CreateServiceInput = InferRequestType<
-  ApiClient['groups'][':groupId']['services']['$post']
->['json']
-
-export type ServicesClient = {
-  create: (groupId: string, input: CreateServiceInput) => Promise<GroupDto>
-  delete: (groupId: string, serviceId: string) => Promise<GroupDto>
-}
+import { createApiClient, unwrap, type HttpClientOptions } from '~/lib/http.client'
+import type { ServicesClient } from '../types/services.dto'
 
 export const createServicesClient = (options: HttpClientOptions = {}): ServicesClient => {
   const http = createApiClient(options.baseUrl ?? '/api', options.fetch)

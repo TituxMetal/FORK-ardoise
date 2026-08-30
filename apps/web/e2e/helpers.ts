@@ -1,4 +1,5 @@
 import { expect, type APIRequestContext, type Page } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
 
 export const PASSWORD = 'password-123'
 
@@ -18,6 +19,12 @@ export const waitForApi = async (request: APIRequestContext) => {
       { timeout: 60_000, message: 'API did not answer /api/ping' }
     )
     .toBe(200)
+}
+
+export const expectNoAxeViolations = async (page: Page) => {
+  const results = await new AxeBuilder({ page }).analyze()
+  const violations = results.violations.map(v => `${v.id}: ${v.help}`)
+  expect(violations, 'axe-core must find no accessibility violations').toEqual([])
 }
 
 export const signUp = async (page: Page, name: string, email: string) => {

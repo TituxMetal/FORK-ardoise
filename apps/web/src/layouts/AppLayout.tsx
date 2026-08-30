@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Button } from '~ui/index'
-import { authClient } from '~features/session/api'
+import { authClient } from '~features/session'
 
 type Props = {
   session: { name: string } | null

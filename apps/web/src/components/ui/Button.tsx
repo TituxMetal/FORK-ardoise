@@ -6,10 +6,10 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export const Button = ({ className, variant = 'primary', ...rest }: Props) => (
   <button
-    className={`${
+    className={`inline-flex h-11 items-center justify-center gap-1.5 rounded-lg px-3 font-semibold transition-colors ${
       variant === 'primary'
-        ? 'rounded bg-zinc-100 px-3 py-2 text-zinc-900'
-        : 'rounded bg-zinc-800 px-3 py-2'
+        ? 'bg-accent text-on-accent hover:bg-accent/90'
+        : 'bg-surface text-foreground hover:bg-surface-2'
     } ${className ?? ''}`}
     {...rest}
   />

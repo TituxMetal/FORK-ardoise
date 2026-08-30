@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppLayout } from '~/layouts/AppLayout'
-import { authClient } from '~features/session/api'
+import { authClient } from '~features/session'
 import { useRoute } from '~/lib/router'
 import { AuthPage } from '~/pages/AuthPage'
 import { GroupsPage } from '~/pages/GroupsPage'

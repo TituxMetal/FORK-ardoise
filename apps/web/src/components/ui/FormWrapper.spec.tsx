@@ -16,4 +16,31 @@ describe('FormWrapper', () => {
 
     expect(screen.getByLabelText('Nom').getAttribute('name')).toBe('name')
   })
+
+  it('marks the control invalid and announces the French error message', () => {
+    render(
+      <FormWrapper label="Nom" error="Le nom est requis">
+        <Input name="name" />
+      </FormWrapper>
+    )
+
+    const input = screen.getByLabelText('Nom')
+    const message = screen.getByRole('alert')
+
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+    expect(message.textContent).toBe('Le nom est requis')
+    expect(input.getAttribute('aria-describedby')).toBe(message.getAttribute('id'))
+  })
+
+  it('renders no error message when the field is valid', () => {
+    render(
+      <FormWrapper label="Nom">
+        <Input name="name" />
+      </FormWrapper>
+    )
+
+    const input = screen.getByLabelText('Nom')
+    expect(input.getAttribute('aria-invalid')).toBeNull()
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
 })
