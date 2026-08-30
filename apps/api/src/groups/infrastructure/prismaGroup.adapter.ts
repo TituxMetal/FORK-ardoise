@@ -65,5 +65,17 @@ export const prismaGroupAdapter = (prisma: PrismaClient): GroupRepository => ({
       include
     })
     return rows.map(toGroup)
+  },
+
+  async rename(id: string, name: string) {
+    await prisma.group.update({ where: { id }, data: { name } })
+  },
+
+  async removeMember(id: string, userId: string) {
+    await prisma.member.deleteMany({ where: { groupId: id, userId } })
+  },
+
+  async remove(id: string) {
+    await prisma.group.delete({ where: { id } })
   }
 })

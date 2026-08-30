@@ -289,4 +289,188 @@ describe('groups', () => {
     expect(firstBody.invite.secret).toMatch(/^[0-9a-f-]{36}$/)
     expect(secondBody.invite.secret).toBe(firstBody.invite.secret)
   })
+
+  it('renames a Group for every Member', async () => {
+    const app = await createTestApp()
+    const opened = await signUp(app)
+    const cookie = cookieHeader(opened)
+    const created = await createGroup(app, cookie, 'Potes de Bob')
+    const { id } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${id}`, {
+      method: 'PATCH',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ name: '  Soirée de Bob  ' })
+    })
+
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({ id, name: 'Soirée de Bob' })
+
+    const read = await app.request(`/groups/${id}`, { headers: { cookie } })
+    expect(((await read.json()) as GroupDto).name).toBe('Soirée de Bob')
+  })
+
+  it('refuses a blank rename with the domain rule and a malformed one with Format invalide', async () => {
+    const app = await createTestApp()
+    const opened = await signUp(app)
+    const cookie = cookieHeader(opened)
+    const created = await createGroup(app, cookie, 'Potes de Bob')
+    const { id } = (await created.json()) as GroupDto
+
+    const malformed = await app.request(`/groups/${id}`, {
+      method: 'PATCH',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 42 })
+    })
+
+    expect(malformed.status).toBe(400)
+    expect(await malformed.json()).toEqual({
+      statusCode: 400,
+      code: 'INVALID_DATA',
+      message: 'Format invalide'
+    })
+
+    const blank = await app.request(`/groups/${id}`, {
+      method: 'PATCH',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ name: '   ' })
+    })
+
+    expect(blank.status).toBe(400)
+    expect(await blank.json()).toEqual({
+      statusCode: 400,
+      code: 'INVALID_DATA',
+      message: 'Nom du Groupe requis'
+    })
+  })
+
+  it('refuses to rename a Group the User does not sit in with 404', async () => {
+    const app = await createTestApp()
+    const lea = await signUp(app)
+    const bob = await signUp(app, {
+      email: 'bob@example.com',
+      password: 'password1234',
+      name: 'Bob'
+    })
+    const created = await createGroup(app, cookieHeader(lea), 'Potes de Bob')
+    const { id } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${id}`, {
+      method: 'PATCH',
+      headers: { cookie: cookieHeader(bob), 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Soirée' })
+    })
+
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({
+      statusCode: 404,
+      code: 'NOT_FOUND',
+      message: 'Groupe introuvable'
+    })
+  })
+
+  it('refuses to rename without a session with 401', async () => {
+    const app = await createTestApp()
+
+    const response = await app.request('/groups/g1', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Soirée' })
+    })
+
+    expect(response.status).toBe(401)
+    expect(await response.json()).toEqual({
+      statusCode: 401,
+      code: 'UNAUTHORIZED',
+      message: 'Session requise'
+    })
+  })
+
+  it('leaving a Group with other Members removes only the seat', async () => {
+    const app = await createTestApp()
+    const lea = await signUp(app)
+    const bob = await signUp(app, {
+      email: 'bob@example.com',
+      password: 'password1234',
+      name: 'Bob'
+    })
+    const leaCookie = cookieHeader(lea)
+    const bobCookie = cookieHeader(bob)
+    const created = await createGroup(app, leaCookie, 'Potes de Bob')
+    const { id, invite } = (await created.json()) as GroupDto
+    await app.request(`/invites/${invite.secret}`, {
+      method: 'POST',
+      headers: { cookie: bobCookie }
+    })
+
+    const response = await app.request(`/groups/${id}`, {
+      method: 'DELETE',
+      headers: { cookie: leaCookie }
+    })
+
+    expect(response.status).toBe(204)
+    const leaList = await app.request('/groups', { headers: { cookie: leaCookie } })
+    expect(await leaList.json()).toEqual([])
+    const bobList = await app.request('/groups', { headers: { cookie: bobCookie } })
+    expect(await bobList.json()).toEqual([{ id, name: 'Potes de Bob' }])
+    const read = await app.request(`/groups/${id}`, { headers: { cookie: bobCookie } })
+    const body = (await read.json()) as GroupDto
+    expect(body.members).toEqual([{ userId: expect.any(String), name: 'Bob' }])
+  })
+
+  it('leaving a Group as the last Member deletes it', async () => {
+    const app = await createTestApp()
+    const opened = await signUp(app)
+    const cookie = cookieHeader(opened)
+    const created = await createGroup(app, cookie, 'Potes de Bob')
+    const { id } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${id}`, {
+      method: 'DELETE',
+      headers: { cookie }
+    })
+
+    expect(response.status).toBe(204)
+    const read = await app.request(`/groups/${id}`, { headers: { cookie } })
+    expect(read.status).toBe(404)
+    const listed = await app.request('/groups', { headers: { cookie } })
+    expect(await listed.json()).toEqual([])
+  })
+
+  it('refuses to leave a Group the User does not sit in with 404', async () => {
+    const app = await createTestApp()
+    const lea = await signUp(app)
+    const bob = await signUp(app, {
+      email: 'bob@example.com',
+      password: 'password1234',
+      name: 'Bob'
+    })
+    const created = await createGroup(app, cookieHeader(lea), 'Potes de Bob')
+    const { id } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${id}`, {
+      method: 'DELETE',
+      headers: { cookie: cookieHeader(bob) }
+    })
+
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({
+      statusCode: 404,
+      code: 'NOT_FOUND',
+      message: 'Groupe introuvable'
+    })
+  })
+
+  it('refuses to leave without a session with 401', async () => {
+    const app = await createTestApp()
+
+    const response = await app.request('/groups/g1', { method: 'DELETE' })
+
+    expect(response.status).toBe(401)
+    expect(await response.json()).toEqual({
+      statusCode: 401,
+      code: 'UNAUTHORIZED',
+      message: 'Session requise'
+    })
+  })
 })

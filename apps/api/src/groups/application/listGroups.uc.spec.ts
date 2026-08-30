@@ -23,7 +23,10 @@ const repository = (groups: Group[]): GroupRepository => ({
   save: async () => undefined,
   findById: async () => groups[0] ?? null,
   findByUserId: async () => groups,
-  findByInviteSecret: async () => groups[0] ?? null
+  findByInviteSecret: async () => groups[0] ?? null,
+  rename: async () => undefined,
+  removeMember: async () => undefined,
+  remove: async () => undefined
 })
 
 describe('listGroups', () => {

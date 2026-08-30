@@ -116,15 +116,43 @@ describe('prismaGroupAdapter', () => {
     expect(await adapter.findById('g1')).toEqual(joined)
   })
 
-  it('keeps Members unchanged when saving an existing Group as-is', async () => {
+  it('renames the Group in the database', async () => {
     const prisma = await createTestDb()
     await seedUser(prisma, 'u-lea', 'Léa')
     await seedUser(prisma, 'u-bob', 'Bob')
     const adapter = prismaGroupAdapter(prisma)
     await adapter.save(potes)
 
+    await adapter.rename('g1', 'Soirée de Bob')
+
+    const renamed = await adapter.findById('g1')
+    expect(renamed?.name.value).toBe('Soirée de Bob')
+    expect(renamed?.members).toEqual(potes.members)
+  })
+
+  it('removes one Member seat and keeps the others', async () => {
+    const prisma = await createTestDb()
+    await seedUser(prisma, 'u-lea', 'Léa')
+    await seedUser(prisma, 'u-bob', 'Bob')
+    const adapter = prismaGroupAdapter(prisma)
     await adapter.save(potes)
 
-    expect(await adapter.findById('g1')).toEqual(potes)
+    await adapter.removeMember('g1', 'u-bob')
+
+    const remaining = await adapter.findById('g1')
+    expect(remaining?.members).toEqual([memberOf('u-lea', 'Léa')])
+  })
+
+  it('deletes the Group with its Members', async () => {
+    const prisma = await createTestDb()
+    await seedUser(prisma, 'u-lea', 'Léa')
+    await seedUser(prisma, 'u-bob', 'Bob')
+    const adapter = prismaGroupAdapter(prisma)
+    await adapter.save(potes)
+
+    await adapter.remove('g1')
+
+    expect(await adapter.findById('g1')).toBeNull()
+    expect(await adapter.findByUserId('u-lea')).toEqual([])
   })
 })
