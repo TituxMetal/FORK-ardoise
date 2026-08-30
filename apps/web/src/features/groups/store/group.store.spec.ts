@@ -1,12 +1,11 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test'
 import type { Group, GroupsClient } from '../types'
-import { $error, $group, applyGroup, loadGroup, refreshGroup } from './group.store'
+import { $error, $group, applyGroup, clearGroup, loadGroup, refreshGroup } from './group.store'
 
 const group = { id: 'g1', name: 'Potes de Bob' } as Group
 
 afterEach(() => {
-  $group.set(null)
-  $error.set('')
+  clearGroup()
 })
 
 describe('group.store', () => {
@@ -29,7 +28,6 @@ describe('group.store', () => {
   })
 
   it('reports a load failure without leaving a stale Group', async () => {
-    $group.set(group)
     const groups = {
       get: async () => {
         throw new Error('nope')
@@ -65,5 +63,58 @@ describe('group.store', () => {
 
     expect($group.get()).toBe(group)
     expect($error.get()).toBe('Groupe introuvable')
+  })
+
+  it('ignores a load that resolves after a newer one', async () => {
+    let resolveA!: (value: Group) => void
+    const loadA = loadGroup(
+      { get: () => new Promise<Group>(settle => (resolveA = settle)) } as unknown as GroupsClient,
+      'g1'
+    )
+    const bGroup = { id: 'g2', name: 'Collègues' } as Group
+    await loadGroup({ get: async () => bGroup } as unknown as GroupsClient, 'g2')
+
+    resolveA(group)
+    await loadA
+
+    expect($group.get()).toBe(bGroup)
+    expect($error.get()).toBe('')
+  })
+
+  it('clears the Group and ignores in-flight loads', async () => {
+    let resolve!: (value: Group) => void
+    const pending = loadGroup(
+      {
+        get: () => new Promise<Group>(settle => (resolve = settle))
+      } as unknown as GroupsClient,
+      'g1'
+    )
+
+    clearGroup()
+
+    resolve(group)
+    await pending
+
+    expect($group.get()).toBeNull()
+    expect($error.get()).toBe('')
+  })
+
+  it('does not surface an error from a stale refresh', async () => {
+    applyGroup(group)
+    let reject!: (reason: Error) => void
+    const pending = refreshGroup(
+      {
+        get: () => new Promise<Group>((_, settle) => (reject = settle))
+      } as unknown as GroupsClient,
+      'g1'
+    )
+    const refreshed = { id: 'g1', name: 'Potes de Bob renommé' } as Group
+    await loadGroup({ get: async () => refreshed } as unknown as GroupsClient, 'g1')
+
+    reject(new Error('nope'))
+    await pending
+
+    expect($group.get()).toBe(refreshed)
+    expect($error.get()).toBe('')
   })
 })

@@ -6,6 +6,7 @@ import { Expenses } from '~features/expenses'
 import {
   $error,
   $group,
+  clearGroup,
   groupsClient,
   loadGroup,
   refreshGroup,
@@ -31,10 +32,7 @@ export const GroupPage = ({
 
   useEffect(() => {
     void loadGroup(groups, id)
-    return () => {
-      $group.set(null)
-      $error.set('')
-    }
+    return () => clearGroup()
   }, [groups, id])
 
   useEffect(() => {
