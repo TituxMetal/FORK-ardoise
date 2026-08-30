@@ -3,7 +3,7 @@ import { amountFromCents, PARTICIPANTS_REQUIRED } from '~/shared/domain'
 
 import { dayReconstitute } from '~/expenses/domain/day.vo'
 import { labelReconstitute } from '~/expenses/domain/label.vo'
-import { serviceCreate, serviceReconstitute } from './service.entity'
+import { serviceCreate, serviceReconstitute, serviceUpdate } from './service.entity'
 
 const label = labelReconstitute('Cours de guitare')
 const day = dayReconstitute('2026-08-15')
@@ -65,5 +65,25 @@ describe('Service', () => {
       participantIds: ['u-bob'],
       parts: [{ userId: 'u-bob', amount: amountFromCents(100) }]
     })
+  })
+  it('keeps the id and re-derives the split when updated', () => {
+    const service = serviceUpdate('s1', 'g1', label, day, amountFromCents(200), 'u-bob', [
+      'u-bob',
+      'u-camille'
+    ])
+
+    expect(service.id).toBe('s1')
+    expect(service.providerId).toBe('u-bob')
+    expect(service.participantIds).toEqual(['u-bob', 'u-camille'])
+    expect(service.parts).toEqual([
+      { userId: 'u-bob', amount: amountFromCents(100) },
+      { userId: 'u-camille', amount: amountFromCents(100) }
+    ])
+  })
+
+  it('refuses zero Participants when updated', () => {
+    expect(() => serviceUpdate('s1', 'g1', label, day, amountFromCents(100), 'u-lea', [])).toThrow(
+      PARTICIPANTS_REQUIRED
+    )
   })
 })

@@ -35,6 +35,7 @@ const repository = (deleted: string[], found: Expense | null): ExpenseRepository
   save: async () => undefined,
   findById: async () => found,
   findByGroupId: async () => [],
+  update: async () => undefined,
   delete: async id => {
     deleted.push(id)
   }

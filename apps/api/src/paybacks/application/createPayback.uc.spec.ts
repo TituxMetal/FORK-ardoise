@@ -31,6 +31,7 @@ const repository = (saved: Payback[] = []): PaybackRepository => ({
   },
   findById: async () => null,
   findByGroupId: async () => [],
+  update: async () => undefined,
   delete: async () => undefined
 })
 

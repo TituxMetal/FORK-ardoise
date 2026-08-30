@@ -88,4 +88,17 @@ describe('prismaPaybackAdapter', () => {
 
     expect(await adapter.findById('p1')).toBeNull()
   })
+  it('updates a Payback', async () => {
+    const prisma = await createTestDb()
+    await prisma.group.create({
+      data: { id: 'g1', name: 'Potes de Bob', inviteSecret: 'secret-1' }
+    })
+    const adapter = prismaPaybackAdapter(prisma)
+    await adapter.save(payback)
+    const edited = paybackReconstitute('p1', 'g1', 'u-lea', 'u-bob', amountFromCents(400))
+
+    await adapter.update(edited)
+
+    expect(await adapter.findById('p1')).toEqual(edited)
+  })
 })

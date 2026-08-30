@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { amountFromCents, PARTICIPANTS_REQUIRED } from '~/shared/domain'
 
+import { expenseCreate, expenseUpdate } from '~/expenses/domain/expense.entity'
 import { dayReconstitute } from '~/expenses/domain/day.vo'
-import { expenseCreate } from '~/expenses/domain/expense.entity'
 import { labelReconstitute } from '~/expenses/domain/label.vo'
 
 const label = labelReconstitute('Pizza')
@@ -39,6 +39,26 @@ describe('Expense', () => {
 
   it('refuses zero Participants', () => {
     expect(() => expenseCreate('group', label, day, amountFromCents(100), 'lea', [])).toThrow(
+      PARTICIPANTS_REQUIRED
+    )
+  })
+  it('keeps the id and re-derives the split when updated', () => {
+    const expense = expenseUpdate('e1', 'group', label, day, amountFromCents(200), 'bob', [
+      'bob',
+      'camille'
+    ])
+
+    expect(expense.id).toBe('e1')
+    expect(expense.payerId).toBe('bob')
+    expect(expense.participantIds).toEqual(['bob', 'camille'])
+    expect(expense.parts).toEqual([
+      { userId: 'bob', amount: amountFromCents(100) },
+      { userId: 'camille', amount: amountFromCents(100) }
+    ])
+  })
+
+  it('refuses zero Participants when updated', () => {
+    expect(() => expenseUpdate('e1', 'group', label, day, amountFromCents(100), 'lea', [])).toThrow(
       PARTICIPANTS_REQUIRED
     )
   })

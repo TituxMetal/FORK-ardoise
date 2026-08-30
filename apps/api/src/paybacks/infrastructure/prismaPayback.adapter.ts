@@ -21,6 +21,17 @@ export const prismaPaybackAdapter = (prisma: PrismaClient): PaybackRepository =>
     return row ? toPayback(row) : null
   },
 
+  async update(payback: Payback) {
+    await prisma.payback.update({
+      where: { id: payback.id },
+      data: {
+        debtorId: payback.debtorId,
+        creditorId: payback.creditorId,
+        amount: payback.amount.value
+      }
+    })
+  },
+
   async findByGroupId(groupId: string) {
     const rows = await prisma.payback.findMany({
       where: { groupId }

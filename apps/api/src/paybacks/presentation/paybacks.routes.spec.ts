@@ -326,4 +326,80 @@ describe('paybacks', () => {
       message: 'Règlement introuvable'
     })
   })
+
+  it('edits a Payback with PATCH up to the remaining debt', async () => {
+    const { app, group, lea, bob, camille } = await pizza()
+    const created = await createPayback(app, lea.cookie, group.id, {
+      debtorId: bob.userId,
+      creditorId: lea.userId,
+      amount: 20
+    })
+    const { paybacks } = (await created.json()) as GroupDto
+
+    // The Balances include the existing 20; without it Bob owes 33, so 30 fits.
+    const response = await app.request(`/groups/${group.id}/paybacks/${paybacks[0]!.id}`, {
+      method: 'PATCH',
+      headers: { cookie: bob.cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ debtorId: bob.userId, creditorId: lea.userId, amount: 30 })
+    })
+
+    expect(response.status).toBe(200)
+    const body = (await response.json()) as GroupDto
+    expect(body.paybacks).toEqual([
+      { id: paybacks[0]!.id, debtorId: bob.userId, creditorId: lea.userId, amount: 30 }
+    ])
+    expect(body.balances).toEqual([
+      { userId: lea.userId, name: 'Léa', amount: 36 },
+      { userId: bob.userId, name: 'Bob', amount: -3 },
+      { userId: camille.userId, name: 'Camille', amount: -33 }
+    ])
+  })
+
+  it('refuses a PATCH above the remaining debt with 400', async () => {
+    const { app, group, lea, bob } = await pizza()
+    const created = await createPayback(app, lea.cookie, group.id, {
+      debtorId: bob.userId,
+      creditorId: lea.userId,
+      amount: 20
+    })
+    const { paybacks } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${group.id}/paybacks/${paybacks[0]!.id}`, {
+      method: 'PATCH',
+      headers: { cookie: lea.cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ debtorId: bob.userId, creditorId: lea.userId, amount: 34 })
+    })
+
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({
+      statusCode: 400,
+      code: 'INVALID_DATA',
+      message: PAYBACK_ABOVE_CAP
+    })
+  })
+
+  it('refuses to edit a Payback of another Group with 404', async () => {
+    const { app, group, lea, bob } = await pizza()
+    const other = await createGroup(app, lea.cookie, 'Collègues')
+    const otherBody = (await other.json()) as GroupDto
+    const created = await createPayback(app, lea.cookie, group.id, {
+      debtorId: bob.userId,
+      creditorId: lea.userId,
+      amount: 20
+    })
+    const { paybacks } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${otherBody.id}/paybacks/${paybacks[0]!.id}`, {
+      method: 'PATCH',
+      headers: { cookie: lea.cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ debtorId: bob.userId, creditorId: lea.userId, amount: 10 })
+    })
+
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({
+      statusCode: 404,
+      code: 'NOT_FOUND',
+      message: 'Règlement introuvable'
+    })
+  })
 })

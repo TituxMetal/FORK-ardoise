@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
 import { amountFromCents } from '~/shared/domain'
 
+import { expenseCreate, expenseUpdate } from '~/expenses/domain/expense.entity'
 import { dayReconstitute } from '~/expenses/domain/day.vo'
-import { expenseCreate } from '~/expenses/domain/expense.entity'
 import { labelReconstitute } from '~/expenses/domain/label.vo'
 import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
 import { prismaExpenseAdapter } from './prismaExpense.adapter'
@@ -103,5 +103,26 @@ describe('prismaExpenseAdapter', () => {
     await adapter.delete(pizza.id)
 
     expect(await adapter.findById(pizza.id)).toBeNull()
+  })
+  it('updates an Expense and replaces its Participants and Parts', async () => {
+    const prisma = await createTestDb()
+    await prisma.group.create({
+      data: { id: 'g1', name: 'Potes de Bob', inviteSecret: 'secret-1' }
+    })
+    const adapter = prismaExpenseAdapter(prisma)
+    await adapter.save(pizza)
+    const edited = expenseUpdate(
+      pizza.id,
+      'g1',
+      labelReconstitute('Pizza plus'),
+      dayReconstitute('2026-08-16'),
+      amountFromCents(200),
+      'u-bob',
+      ['u-bob']
+    )
+
+    await adapter.update(edited)
+
+    expect(await adapter.findById(pizza.id)).toEqual(edited)
   })
 })

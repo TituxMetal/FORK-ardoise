@@ -15,14 +15,15 @@ export const PAYBACK_CREDITOR_NOT_POSITIVE = 'Créancier au Solde non positif'
 export const paybackCap = (debtorBalance: number, creditorBalance: number) =>
   Math.min(-debtorBalance, creditorBalance)
 
-export const paybackCreate = (
+// Create and update share the cap rule; only the id assignment differs.
+const paybackValidated = (
   groupId: string,
   debtorId: string,
   creditorId: string,
   amount: Amount,
   debtorBalance: number,
   creditorBalance: number
-): Payback => {
+): Omit<Payback, 'id'> => {
   if (debtorBalance >= 0) {
     throw invalidData(PAYBACK_DEBTOR_NOT_NEGATIVE)
   }
@@ -33,8 +34,35 @@ export const paybackCreate = (
   if (amount.value > cap) {
     throw invalidData(PAYBACK_ABOVE_CAP)
   }
-  return { id: crypto.randomUUID(), groupId, debtorId, creditorId, amount }
+  return { groupId, debtorId, creditorId, amount }
 }
+
+export const paybackCreate = (
+  groupId: string,
+  debtorId: string,
+  creditorId: string,
+  amount: Amount,
+  debtorBalance: number,
+  creditorBalance: number
+): Payback => ({
+  id: crypto.randomUUID(),
+  ...paybackValidated(groupId, debtorId, creditorId, amount, debtorBalance, creditorBalance)
+})
+
+// An edit re-validates against the Balances without the Payback being edited
+// and keeps the id, so a Payback at the cap stays editable.
+export const paybackUpdate = (
+  id: string,
+  groupId: string,
+  debtorId: string,
+  creditorId: string,
+  amount: Amount,
+  debtorBalance: number,
+  creditorBalance: number
+): Payback => ({
+  id,
+  ...paybackValidated(groupId, debtorId, creditorId, amount, debtorBalance, creditorBalance)
+})
 
 export const paybackReconstitute = (
   id: string,

@@ -8,7 +8,7 @@ import { amountFromCents } from '~/shared/domain'
 
 import { dayReconstitute } from '~/expenses/domain/day.vo'
 import { labelReconstitute } from '~/expenses/domain/label.vo'
-import { serviceCreate } from '~/services/domain/service.entity'
+import { serviceCreate, serviceUpdate } from '~/services/domain/service.entity'
 import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
 import { prismaServiceAdapter } from './prismaService.adapter'
 
@@ -103,5 +103,26 @@ describe('prismaServiceAdapter', () => {
     await adapter.delete(guitar.id)
 
     expect(await adapter.findById(guitar.id)).toBeNull()
+  })
+  it('updates a Service and replaces its Participants and Parts', async () => {
+    const prisma = await createTestDb()
+    await prisma.group.create({
+      data: { id: 'g1', name: 'Potes de Bob', inviteSecret: 'secret-1' }
+    })
+    const adapter = prismaServiceAdapter(prisma)
+    await adapter.save(guitar)
+    const edited = serviceUpdate(
+      guitar.id,
+      'g1',
+      labelReconstitute('Cours de batterie'),
+      dayReconstitute('2026-08-16'),
+      amountFromCents(200),
+      'u-bob',
+      ['u-bob']
+    )
+
+    await adapter.update(edited)
+
+    expect(await adapter.findById(guitar.id)).toEqual(edited)
   })
 })

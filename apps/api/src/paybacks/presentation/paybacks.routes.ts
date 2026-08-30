@@ -4,6 +4,7 @@ import { validateBody } from '~/shared/presentation'
 import type { SlateView } from '~/groups/application/getSlate.uc'
 import { createPayback } from '~/paybacks/application/createPayback.uc'
 import { deletePayback } from '~/paybacks/application/deletePayback.uc'
+import { updatePayback } from '~/paybacks/application/updatePayback.uc'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 
 const createPaybackBody = z.object({
@@ -15,6 +16,7 @@ const createPaybackBody = z.object({
 export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateView) => {
   const createPaybackUseCase = createPayback(paybacks, view)
   const deletePaybackUseCase = deletePayback(paybacks, view)
+  const updatePaybackUseCase = updatePayback(paybacks, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post('/:groupId/paybacks', validateBody(createPaybackBody), async c => {
@@ -25,6 +27,16 @@ export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateVie
       )
       return c.json(group, 201)
     })
+    .patch('/:groupId/paybacks/:id', validateBody(createPaybackBody), async c =>
+      c.json(
+        await updatePaybackUseCase.execute(
+          c.get('userId'),
+          c.req.param('groupId'),
+          c.req.param('id'),
+          c.req.valid('json')
+        )
+      )
+    )
     .delete('/:groupId/paybacks/:id', async c =>
       c.json(
         await deletePaybackUseCase.execute(

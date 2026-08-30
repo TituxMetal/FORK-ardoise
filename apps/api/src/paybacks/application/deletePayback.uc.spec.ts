@@ -24,6 +24,7 @@ const repository = (deleted: string[], found: Payback | null): PaybackRepository
   save: async () => undefined,
   findById: async () => found,
   findByGroupId: async () => [],
+  update: async () => undefined,
   delete: async id => {
     deleted.push(id)
   }

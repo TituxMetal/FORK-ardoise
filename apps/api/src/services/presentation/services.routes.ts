@@ -4,6 +4,7 @@ import { validateBody } from '~/shared/presentation'
 import type { SlateView } from '~/groups/application/getSlate.uc'
 import { createService } from '~/services/application/createService.uc'
 import { deleteService } from '~/services/application/deleteService.uc'
+import { updateService } from '~/services/application/updateService.uc'
 import type { ServiceRepository } from '~/services/domain/service.repository'
 
 const createServiceBody = z.object({
@@ -17,6 +18,7 @@ const createServiceBody = z.object({
 export const createServicesRoutes = (services: ServiceRepository, view: SlateView) => {
   const createServiceUseCase = createService(services, view)
   const deleteServiceUseCase = deleteService(services, view)
+  const updateServiceUseCase = updateService(services, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post('/:groupId/services', validateBody(createServiceBody), async c => {
@@ -27,6 +29,16 @@ export const createServicesRoutes = (services: ServiceRepository, view: SlateVie
       )
       return c.json(group, 201)
     })
+    .patch('/:groupId/services/:id', validateBody(createServiceBody), async c =>
+      c.json(
+        await updateServiceUseCase.execute(
+          c.get('userId'),
+          c.req.param('groupId'),
+          c.req.param('id'),
+          c.req.valid('json')
+        )
+      )
+    )
     .delete('/:groupId/services/:id', async c =>
       c.json(
         await deleteServiceUseCase.execute(

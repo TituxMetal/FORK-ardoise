@@ -303,6 +303,133 @@ describe('expenses', () => {
     })
   })
 
+  it('edits an Expense with PATCH, re-deriving the split and the Balances', async () => {
+    const { app, group, lea, bob, camille } = await openApp()
+    const created = await createExpense(app, lea.cookie, group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: lea.userId,
+      participantIds: [lea.userId, bob.userId, camille.userId]
+    })
+    const { expenses } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${group.id}/expenses/${expenses[0]!.id}`, {
+      method: 'PATCH',
+      headers: { cookie: lea.cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        label: 'Pizza Famiglia',
+        day: '2026-08-16',
+        amount: 200,
+        payerId: bob.userId,
+        participantIds: [bob.userId, camille.userId]
+      })
+    })
+
+    expect(response.status).toBe(200)
+    const body = (await response.json()) as GroupDto
+    expect(body.expenses).toEqual([
+      {
+        id: expenses[0]!.id,
+        label: 'Pizza Famiglia',
+        day: '2026-08-16',
+        amount: 200,
+        payerId: bob.userId,
+        participantIds: [bob.userId, camille.userId],
+        parts: [
+          { userId: bob.userId, amount: 100 },
+          { userId: camille.userId, amount: 100 }
+        ]
+      }
+    ])
+    expect(body.balances).toEqual([
+      { userId: lea.userId, name: 'Léa', amount: 0 },
+      { userId: bob.userId, name: 'Bob', amount: 100 },
+      { userId: camille.userId, name: 'Camille', amount: -100 }
+    ])
+  })
+
+  it('refuses to edit an Expense of another Group with 404', async () => {
+    const { app, group, lea, bob, camille } = await openApp()
+    const other = await createGroup(app, lea.cookie, 'Collègues')
+    const otherBody = (await other.json()) as GroupDto
+    const created = await createExpense(app, lea.cookie, group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: lea.userId,
+      participantIds: [lea.userId, bob.userId, camille.userId]
+    })
+    const { expenses } = (await created.json()) as GroupDto
+
+    const response = await app.request(`/groups/${otherBody.id}/expenses/${expenses[0]!.id}`, {
+      method: 'PATCH',
+      headers: { cookie: lea.cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        label: 'Pizza',
+        day: '2026-08-15',
+        amount: 100,
+        payerId: lea.userId,
+        participantIds: [lea.userId]
+      })
+    })
+
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({
+      statusCode: 404,
+      code: 'NOT_FOUND',
+      message: 'Dépense introuvable'
+    })
+  })
+
+  it('refuses a malformed PATCH body or an unknown Member with 400', async () => {
+    const { app, group, lea, bob, camille } = await openApp()
+    const created = await createExpense(app, lea.cookie, group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: lea.userId,
+      participantIds: [lea.userId, bob.userId, camille.userId]
+    })
+    const { expenses } = (await created.json()) as GroupDto
+    const refusals = [
+      {
+        body: { day: '2026-08-15', amount: 100, payerId: lea.userId },
+        message: 'Format invalide'
+      },
+      {
+        body: {
+          label: 'Pizza',
+          day: '2026-08-15',
+          amount: 100,
+          payerId: 'inconnu',
+          participantIds: [lea.userId]
+        },
+        message: 'Membre introuvable'
+      }
+    ]
+
+    for (const refusal of refusals) {
+      const response = await app.request(`/groups/${group.id}/expenses/${expenses[0]!.id}`, {
+        method: 'PATCH',
+        headers: { cookie: lea.cookie, 'content-type': 'application/json' },
+        body: JSON.stringify(refusal.body)
+      })
+
+      expect(response.status).toBe(400)
+      expect(await response.json()).toEqual({
+        statusCode: 400,
+        code: 'INVALID_DATA',
+        message: refusal.message
+      })
+    }
+
+    const listed = await app.request(`/groups/${group.id}`, { headers: { cookie: bob.cookie } })
+    expect(((await listed.json()) as GroupDto).expenses).toEqual([
+      expect.objectContaining({ label: 'Pizza' })
+    ])
+  })
+
   it('refuses malformed shape, a non-integer or non-positive Amount, or zero Participants with 400', async () => {
     const { app, group, lea, bob } = await openApp()
     const cookie = lea.cookie

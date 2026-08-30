@@ -5,7 +5,8 @@ import {
   PAYBACK_CREDITOR_NOT_POSITIVE,
   PAYBACK_DEBTOR_NOT_NEGATIVE,
   paybackCap,
-  paybackCreate
+  paybackCreate,
+  paybackUpdate
 } from '~/paybacks/domain/payback.entity'
 
 describe('Payback', () => {
@@ -49,6 +50,18 @@ describe('Payback', () => {
     )
     expect(() => paybackCreate('group', 'bob', 'lea', amountFromCents(10), -33, -10)).toThrow(
       PAYBACK_CREDITOR_NOT_POSITIVE
+    )
+  })
+  it('keeps the id and re-validates the cap when updated', () => {
+    const payback = paybackUpdate('p1', 'group', 'bob', 'lea', amountFromCents(30), -33, 66)
+
+    expect(payback.id).toBe('p1')
+    expect(payback.amount.value).toBe(30)
+  })
+
+  it('refuses an update above the cap', () => {
+    expect(() => paybackUpdate('p1', 'group', 'bob', 'lea', amountFromCents(34), -33, 66)).toThrow(
+      PAYBACK_ABOVE_CAP
     )
   })
 })
