@@ -1,29 +1,30 @@
 import { useState, type SubmitEventHandler } from 'react'
+import { useStore } from '@nanostores/react'
 import { Alert, Button, FormWrapper, Input, Select } from '~ui'
 import { centsFromEuros, euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import type { Group } from '~features/groups'
+import { $group, applyGroup } from '~features/groups'
 import { paybacksClient } from '../api'
 import type { PaybacksClient } from '../types'
 
 type Props = {
-  group: Group
   client?: PaybacksClient
-  onChange: (group: Group) => void
 }
 
-export const Paybacks = ({ group, client = paybacksClient, onChange }: Props) => {
+export const Paybacks = ({ client = paybacksClient }: Props) => {
+  const group = useStore($group)
   const [error, setError] = useState('')
   const [debtorId, setDebtorId] = useState('')
   const [creditorId, setCreditorId] = useState('')
 
   const createPayback: SubmitEventHandler<HTMLFormElement> = async event => {
     event.preventDefault()
+    if (!group) return
     const form = new FormData(event.currentTarget)
     event.currentTarget.reset()
     try {
-      onChange(
+      applyGroup(
         await client.create(group.id, {
           debtorId: field(form, 'debtorId'),
           creditorId: field(form, 'creditorId'),
@@ -37,13 +38,16 @@ export const Paybacks = ({ group, client = paybacksClient, onChange }: Props) =>
   }
 
   const deletePayback = async (paybackId: string) => {
+    if (!group) return
     try {
-      onChange(await client.delete(group.id, paybackId))
+      applyGroup(await client.delete(group.id, paybackId))
       setError('')
     } catch (error) {
       setError(errorMessage(error, 'Règlement introuvable'))
     }
   }
+
+  if (!group) return null
 
   const creditors = group.balances
     .filter(balance => balance.amount > 0)

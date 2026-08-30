@@ -1,28 +1,29 @@
 import { useState, type SubmitEventHandler } from 'react'
+import { useStore } from '@nanostores/react'
 import { Alert, Button, FormWrapper, Input, Select } from '~ui'
 import { centsFromEuros, euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { field } from '~/lib/forms'
-import type { Group } from '~features/groups'
+import { $group, applyGroup } from '~features/groups'
 import { servicesClient } from '../api'
 import type { ServicesClient } from '../types'
 
 type Props = {
-  group: Group
   client?: ServicesClient
-  onChange: (group: Group) => void
 }
 
-export const Services = ({ group, client = servicesClient, onChange }: Props) => {
+export const Services = ({ client = servicesClient }: Props) => {
+  const group = useStore($group)
   const [error, setError] = useState('')
 
   const createService: SubmitEventHandler<HTMLFormElement> = async event => {
     event.preventDefault()
+    if (!group) return
     const form = new FormData(event.currentTarget)
     const selected = form.getAll('participantIds').filter(value => typeof value === 'string')
     event.currentTarget.reset()
     try {
-      onChange(
+      applyGroup(
         await client.create(group.id, {
           label: field(form, 'label'),
           day: field(form, 'day'),
@@ -38,13 +39,16 @@ export const Services = ({ group, client = servicesClient, onChange }: Props) =>
   }
 
   const deleteService = async (serviceId: string) => {
+    if (!group) return
     try {
-      onChange(await client.delete(group.id, serviceId))
+      applyGroup(await client.delete(group.id, serviceId))
       setError('')
     } catch (error) {
       setError(errorMessage(error, 'Service introuvable'))
     }
   }
+
+  if (!group) return null
 
   return (
     <>

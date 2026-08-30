@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useStore } from '@nanostores/react'
 import { Alert, Button } from '~ui'
 import { BackIcon } from '~/components/icons'
 import { Expenses } from '~features/expenses'
-import { groupsClient, type Group, type GroupsClient } from '~features/groups'
+import { $error, $group, groupsClient, loadGroup, type GroupsClient } from '~features/groups'
 import { Paybacks } from '~features/paybacks'
 import { Services } from '~features/services'
 import { Link } from '~/lib/router'
@@ -18,24 +19,17 @@ export const GroupPage = ({
   groups = groupsClient,
   copy = text => navigator.clipboard.writeText(text)
 }: Props) => {
-  const [group, setGroup] = useState<Group | null>(null)
-  const [error, setError] = useState('')
-
-  const apply = (next: Group) => {
-    setGroup(next)
-    setError('')
-  }
+  const group = useStore($group)
+  const error = useStore($error)
 
   useEffect(() => {
-    setGroup(null)
-    setError('')
-    void groups
-      .get(id)
-      .then(fetched => {
-        setGroup(fetched)
-        setError('')
-      })
-      .catch(() => setError('Groupe introuvable'))
+    void loadGroup(groups, id)
+  }, [groups, id])
+
+  useEffect(() => {
+    const onFocus = () => void loadGroup(groups, id)
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
   }, [groups, id])
 
   return (
@@ -57,9 +51,9 @@ export const GroupPage = ({
           >
             Copier le lien d’Invitation
           </Button>
-          <Expenses group={group} onChange={apply} />
-          <Services group={group} onChange={apply} />
-          <Paybacks group={group} onChange={apply} />
+          <Expenses />
+          <Services />
+          <Paybacks />
         </article>
       ) : error ? null : (
         <p>Chargement…</p>

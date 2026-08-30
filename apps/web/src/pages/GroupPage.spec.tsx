@@ -72,4 +72,24 @@ describe('GroupPage', () => {
     expect(screen.queryByRole('heading', { name: 'Potes de Bob' })).toBeNull()
     expect(await screen.findByRole('heading', { name: 'Collègues' })).toBeTruthy()
   })
+
+  it('refreshes the Slate when the window regains focus', async () => {
+    const client = api.groups(testUsers.lea)
+    const group = await client.create('Potes de Bob')
+    render(<GroupPage id={group.id} groups={client} />)
+    await screen.findByRole('heading', { name: 'Potes de Bob' })
+    expect(screen.getByText('Aucune Dépense')).toBeTruthy()
+
+    await api.groups(testUsers.bob).join(group.invite.secret)
+    await api.expenses(testUsers.lea).create(group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: 'lea'
+    })
+
+    window.dispatchEvent(new Event('focus'))
+
+    expect(await screen.findByText('Pizza')).toBeTruthy()
+  })
 })

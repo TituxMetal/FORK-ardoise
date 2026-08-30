@@ -1,10 +1,10 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
+import { useStore } from '@nanostores/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { euros } from '~/lib/amounts'
-import type { Group } from '~features/groups'
+import { $group, applyGroup } from '~features/groups'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { Expenses } from './Expenses'
 
@@ -18,28 +18,31 @@ beforeEach(async () => {
   api = await createTestApi()
 })
 
+const Balances = () => {
+  const group = useStore($group)
+  return (
+    <ul>
+      {group?.balances.map(balance => (
+        <li key={balance.userId}>
+          {balance.name} {euros(balance.amount)}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 const openExpenses = async () => {
   const client = api.groups(testUsers.lea)
   const group = await client.create('Potes de Bob')
   await api.groups(testUsers.bob).join(group.invite.secret)
   await api.groups(testUsers.camille).join(group.invite.secret)
-  const joined = await client.get(group.id)
-  const Board = () => {
-    const [current, setCurrent] = useState<Group>(joined)
-    return (
-      <>
-        <Expenses group={current} client={api.expenses(testUsers.lea)} onChange={setCurrent} />
-        <ul>
-          {current.balances.map(balance => (
-            <li key={balance.userId}>
-              {balance.name} {euros(balance.amount)}
-            </li>
-          ))}
-        </ul>
-      </>
-    )
-  }
-  render(<Board />)
+  applyGroup(await client.get(group.id))
+  render(
+    <>
+      <Expenses client={api.expenses(testUsers.lea)} />
+      <Balances />
+    </>
+  )
 }
 
 describe('Expenses', () => {

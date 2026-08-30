@@ -1,9 +1,8 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
-import type { Group } from '~features/groups'
+import { applyGroup } from '~features/groups'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { Expenses } from '~features/expenses'
 import { Services } from '~features/services'
@@ -24,18 +23,14 @@ const openPaybacks = async () => {
   const group = await client.create('Potes de Bob')
   await api.groups(testUsers.bob).join(group.invite.secret)
   await api.groups(testUsers.camille).join(group.invite.secret)
-  const joined = await client.get(group.id)
-  const Board = () => {
-    const [current, setCurrent] = useState<Group>(joined)
-    return (
-      <>
-        <Expenses group={current} client={api.expenses(testUsers.lea)} onChange={setCurrent} />
-        <Services group={current} client={api.services(testUsers.lea)} onChange={setCurrent} />
-        <Paybacks group={current} client={api.paybacks(testUsers.lea)} onChange={setCurrent} />
-      </>
-    )
-  }
-  render(<Board />)
+  applyGroup(await client.get(group.id))
+  render(
+    <>
+      <Expenses client={api.expenses(testUsers.lea)} />
+      <Services client={api.services(testUsers.lea)} />
+      <Paybacks client={api.paybacks(testUsers.lea)} />
+    </>
+  )
 }
 
 const recordPizza = async () => {
