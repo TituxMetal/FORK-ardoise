@@ -26,7 +26,7 @@ export const FormWrapper = ({ label, error, children }: Props) => {
       <label htmlFor={id}>{label}</label>
       {cloneElement(control, {
         id,
-        'aria-invalid': error ? true : undefined,
+        'aria-invalid': error ? true : control.props['aria-invalid'],
         'aria-describedby': describedBy || undefined
       })}
       {error ? (

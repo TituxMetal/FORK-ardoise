@@ -5,7 +5,6 @@ import {
   copyInvite,
   createGroup,
   expectNoAxeViolations,
-  joinInvite,
   signUp,
   uniqueEmail,
   waitForApi
@@ -26,6 +25,7 @@ test.describe('core journey', () => {
     ownerPage = await context.newPage()
     await captureInviteWrites(ownerPage)
     await ownerPage.goto('/')
+    await expect(ownerPage.getByRole('heading', { name: 'Créer un User' })).toBeVisible()
     await expectNoAxeViolations(ownerPage)
     await signUp(ownerPage, 'Alice', uniqueEmail('alice'))
     await expect(ownerPage.getByRole('heading', { name: 'Créer un Groupe' })).toBeVisible()
@@ -41,7 +41,11 @@ test.describe('core journey', () => {
   test('joins the Group from another session via the Invite link', async ({ browser }) => {
     const context = await browser.newContext()
     const guestPage = await context.newPage()
-    await joinInvite(guestPage, inviteUrl, 'Bob', uniqueEmail('bob'), 'Potes de Bob')
+    await guestPage.goto(inviteUrl)
+    await expect(guestPage.getByRole('heading', { name: 'Invitation' })).toBeVisible()
+    await expectNoAxeViolations(guestPage)
+    await signUp(guestPage, 'Bob', uniqueEmail('bob'))
+    await expect(guestPage.getByRole('heading', { name: 'Potes de Bob' })).toBeVisible()
 
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Alice' })).toBeVisible()
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Bob' })).toBeVisible()

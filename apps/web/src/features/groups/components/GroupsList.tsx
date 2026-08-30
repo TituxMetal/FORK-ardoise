@@ -9,7 +9,7 @@ export const GroupsList = ({ groups }: { groups: GroupSummary[] }) => (
         <li key={group.id}>
           <Link
             to={`/groups/${group.id}`}
-            className="inline-flex h-11 items-center rounded-lg bg-surface px-3 hover:bg-surface-2"
+            className="inline-flex min-h-11 w-full items-center break-words rounded-lg bg-surface px-3 hover:bg-surface-2"
           >
             {group.name}
           </Link>
