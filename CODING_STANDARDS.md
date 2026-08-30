@@ -42,7 +42,7 @@ No per-role subfolders (`entities/`, `value-objects/`, `use-cases/`): the layer 
 - Folders kebab-case.
 - `pages/` one file per route, composes feature components.
 - `features/<name>/`: `components/` + `api/` always; `hooks/`, `schemas/`, `store/`, `types/`, `utils/` as the feature needs them. Never an empty folder.
-- Barrels: every folder that exports symbols has an `index.ts` (`api/`, `components/`, `types/`, `icons/`, `ui/`). A barrel re-exports its own directory via `./` only — never `../`, never an alias. Alias imports never append `/index` (`~ui`, not `~ui/index`).
+- Barrels: every folder that exports symbols has an `index.ts` (`api/`, `components/`, `types/`, `icons/`, `ui/`). A barrel re-exports its own directory via `./` only — never `../`, never an alias. Alias imports never append `/index` (`~ui`, not `~ui/index`). Consumers import from the folder barrel, never from a member file: `import { TrashIcon } from '~/components/icons'`, not `~/components/icons/TrashIcon`.
 - Type re-exports live in `types/index.ts`. The feature barrel re-exports `./types` (types) and `./api` (clients only); `api/index.ts` never re-exports types. Exception: a schema's inferred form-input type (`z.infer<…>`, e.g. `CreateGroupInput`) colocates with its schema and rides the `schemas/` barrel — it is not an API contract type.
 - `components/ui/`: shared reusable UI (Input, Button, FormWrapper…), barrel `index.ts`.
 - Component files PascalCase (`GroupPage.tsx`, `Input.tsx`); exported type identifiers PascalCase (`Group`, `GroupSummary`); type modules camelCase + suffix (`expenses.types.ts`, `groups.types.ts`) — never `.dto.ts` (DTO is an API-only role).

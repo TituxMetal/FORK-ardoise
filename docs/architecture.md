@@ -76,7 +76,7 @@ The import architecture keeps layers apart by folder. Elements: **shared** (`src
 
 Every feature exposes a single public entry point — `~features/groups`, `~features/expenses`, … — that re-exports its components, its API client and its contract types (`import { GroupsList, groupsClient, type Group } from '~features/groups'`). Consumers (pages, other features) import from the feature root, never from `~features/<name>/components` or `~features/<name>/api`. Contract types (the API response shapes and client interfaces, e.g. `Group`, `GroupSummary`, `GroupsClient`) live in `features/<name>/types/*.types.ts` and are re-exported by the feature entry point. Within a feature, files import each other through relative internal paths (`../components`, `../api`, `../types`), never the `~features/<name>` alias.
 
-Icons are shared UI but do **not** live in `components/ui/` (form primitives only) and are **not** a feature. They sit at `components/icons/` as one `*Icon` component per file, decorative (`aria-hidden`), and are imported from the real file — never re-exported through a barrel, never `export *`.
+Icons are shared UI but do **not** live in `components/ui/` (form primitives only) and are **not** a feature. They sit at `components/icons/` as one `*Icon` component per file, decorative (`aria-hidden`), re-exported through the folder barrel (`components/icons/index.ts`) and imported from it — `import { TrashIcon } from '~/components/icons'`, never from a component file.
 
 Routing is a Hono app in the browser: routes declared with `app.get('/groups/:id', c => …)`, dispatched via `app.fetch(new Request(location.pathname))`, history API + `Link` in the React layer. Stores are nanostores (`$atom` + actions).
 
