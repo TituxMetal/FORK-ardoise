@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { centsFromEuros, euros, eurosAmountSchema } from './amounts'
+import { centsFromEuros, euros, eurosAmountSchema, signedEuros } from './amounts'
 
 describe('euros', () => {
   it('formats cents with a comma and the euro sign', () => {
@@ -12,6 +12,20 @@ describe('euros', () => {
 
   it('formats zero', () => {
     expect(euros(0)).toBe('0,00 €')
+  })
+})
+
+describe('signedEuros', () => {
+  it('prefixes a positive Amount with a plus sign', () => {
+    expect(signedEuros(3850)).toBe('+38,50 €')
+  })
+
+  it('prefixes a negative Amount with the minus sign', () => {
+    expect(signedEuros(-1425)).toBe('−14,25 €')
+  })
+
+  it('leaves zero unsigned', () => {
+    expect(signedEuros(0)).toBe('0,00 €')
   })
 })
 

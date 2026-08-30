@@ -6,7 +6,6 @@ import { errorMessage } from '~/lib/errorMessage'
 import { $group, applyGroup } from '~features/groups'
 import { servicesClient } from '../api'
 import type { ServicesClient } from '../types'
-import { ServiceForm } from './ServiceForm'
 
 type Props = {
   client?: ServicesClient
@@ -31,7 +30,6 @@ export const Services = ({ client = servicesClient }: Props) => {
   return (
     <>
       {error ? <Alert message={error} /> : null}
-      <ServiceForm client={client} />
       {group.services.length === 0 ? (
         <p>Aucun Service</p>
       ) : (

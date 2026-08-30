@@ -79,10 +79,19 @@ export const joinInvite = async (
 }
 
 export const addExpense = async (page: Page, label: string, amount: string) => {
+  await page.getByRole('button', { name: 'Ajouter une Dépense' }).click()
   const form = page.getByRole('form', { name: 'Constater une Dépense' })
   await form.getByLabel('Libellé').fill(label)
   await form.getByLabel('Jour').fill('2026-08-18')
   await form.getByLabel('Montant').fill(amount)
   await form.getByRole('button', { name: 'Constater la Dépense' }).click()
   await expect(page.getByText(label, { exact: true })).toBeVisible()
+}
+
+export const addPayback = async (page: Page, amount: string) => {
+  await page.getByRole('tab', { name: 'Remboursements' }).click()
+  await page.getByRole('button', { name: 'Ajouter un Remboursement' }).click()
+  const form = page.getByRole('form', { name: 'Constater un Règlement' })
+  await form.getByLabel('Montant').fill(amount)
+  await form.getByRole('button', { name: 'Constater le Règlement' }).click()
 }

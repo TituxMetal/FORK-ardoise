@@ -1,3 +1,6 @@
 export { BackIcon } from './BackIcon'
+export { DownIcon } from './DownIcon'
 export { PencilIcon } from './PencilIcon'
+export { PlusIcon } from './PlusIcon'
 export { TrashIcon } from './TrashIcon'
+export { UpIcon } from './UpIcon'

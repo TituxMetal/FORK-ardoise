@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import {
   addExpense,
+  addPayback,
   captureInviteWrites,
   copyInvite,
   createGroup,
@@ -29,9 +30,7 @@ test.describe('refused writes', () => {
     await owner.reload()
     await addExpense(owner, 'Resteau', '10')
 
-    const paybackForm = owner.getByRole('form', { name: 'Constater un Règlement' })
-    await paybackForm.getByLabel('Montant').fill('10')
-    await paybackForm.getByRole('button', { name: 'Constater le Règlement' }).click()
+    await addPayback(owner, '10')
 
     await expect(owner.getByRole('alert')).toHaveText('Montant au-dessus du plafond')
   })

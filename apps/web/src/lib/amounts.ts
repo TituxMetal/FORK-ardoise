@@ -3,6 +3,10 @@ import { z } from 'zod'
 export const euros = (cents: number) =>
   `${cents < 0 ? '−' : ''}${(Math.abs(cents) / 100).toFixed(2).replace('.', ',')} €`
 
+// Signed display for member balance chips: an explicit sign so a Member reads
+// at a glance who is in credit (+) and who is in debit (−). Zero stays unsigned.
+export const signedEuros = (cents: number) => (cents > 0 ? '+' : '') + euros(cents)
+
 export const centsFromEuros = (value: string) => Math.round(Number(value.replace(',', '.')) * 100)
 
 // Mirrors the API Amount rule (positive) for the euro string a form types in.

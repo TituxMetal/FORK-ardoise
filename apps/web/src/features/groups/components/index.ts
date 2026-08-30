@@ -1,4 +1,8 @@
+export { BalanceHero } from './BalanceHero'
 export { CreateGroupFields } from './CreateGroupFields'
 export { GroupsList } from './GroupsList'
 export { LeaveGroupConfirmation } from './LeaveGroupConfirmation'
+export { MemberChips } from './MemberChips'
 export { RenameGroupFields } from './RenameGroupFields'
+export { SlateTabs } from './SlateTabs'
+export type { SlateTab } from './SlateTabs'

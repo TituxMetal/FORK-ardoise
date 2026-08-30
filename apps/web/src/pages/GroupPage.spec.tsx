@@ -18,18 +18,56 @@ beforeEach(async () => {
 const openGroup = async () => {
   const client = api.groups(testUsers.lea)
   const group = await client.create('Potes de Bob')
-  render(<GroupPage id={group.id} groups={client} />)
+  render(
+    <GroupPage
+      id={group.id}
+      groups={client}
+      expenses={api.expenses(testUsers.lea)}
+      services={api.services(testUsers.lea)}
+      paybacks={api.paybacks(testUsers.lea)}
+    />
+  )
   await screen.findByRole('heading', { name: 'Potes de Bob' })
+  return group
 }
 
 describe('GroupPage', () => {
-  it('opens an empty board', async () => {
+  it('opens the empty Slate on the Dépenses tab with a balance hero and self chip', async () => {
     await openGroup()
 
+    expect(screen.getByText('On te doit 0,00 €')).toBeTruthy()
+    expect(screen.getAllByRole('listitem')).toHaveLength(1)
     expect(screen.getByText('Aucune Dépense')).toBeTruthy()
+    expect(screen.queryByText('Aucun Service')).toBeNull()
+    expect(screen.queryByText('Aucun Règlement')).toBeNull()
+  })
+
+  it('switches the Slate between the three tabs', async () => {
+    await openGroup()
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('tab', { name: 'Services' }))
     expect(screen.getByText('Aucun Service')).toBeTruthy()
+    expect(screen.queryByText('Aucune Dépense')).toBeNull()
+
+    await user.click(screen.getByRole('tab', { name: 'Remboursements' }))
     expect(screen.getByText('Aucun Règlement')).toBeTruthy()
-    expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
+    expect(screen.queryByText('Aucun Service')).toBeNull()
+  })
+
+  it('lets the + open the create form of the active tab and closes it on tab change', async () => {
+    await openGroup()
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Ajouter une Dépense' }))
+    expect(screen.getByRole('form', { name: 'Constater une Dépense' })).toBeTruthy()
+
+    await user.click(screen.getByRole('tab', { name: 'Services' }))
+    expect(screen.queryByRole('form', { name: 'Constater une Dépense' })).toBeNull()
+    expect(screen.getByText('Aucun Service')).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Ajouter un Service' }))
+    expect(screen.getByRole('form', { name: 'Constater un Service' })).toBeTruthy()
   })
 
   it('lets a Member copy the Invite link of the opened Group', async () => {

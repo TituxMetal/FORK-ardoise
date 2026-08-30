@@ -6,7 +6,6 @@ import { errorMessage } from '~/lib/errorMessage'
 import { $group, applyGroup } from '~features/groups'
 import { expensesClient } from '../api'
 import type { ExpensesClient } from '../types'
-import { ExpenseForm } from './ExpenseForm'
 
 type Props = {
   client?: ExpensesClient
@@ -31,7 +30,6 @@ export const Expenses = ({ client = expensesClient }: Props) => {
   return (
     <>
       {error ? <Alert message={error} /> : null}
-      <ExpenseForm client={client} />
       {group.expenses.length === 0 ? (
         <p>Aucune Dépense</p>
       ) : (

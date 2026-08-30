@@ -1,0 +1,1 @@
+export { selfBalanceLabel } from './balance'

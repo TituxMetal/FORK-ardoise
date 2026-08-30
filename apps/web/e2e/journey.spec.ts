@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import {
   addExpense,
+  addPayback,
   captureInviteWrites,
   copyInvite,
   createGroup,
@@ -57,11 +58,11 @@ test.describe('core journey', () => {
     await expect(ownerPage.getByRole('heading', { name: 'Potes de Bob' })).toBeVisible()
 
     await addExpense(ownerPage, 'Resteau', '10')
+    await expect(ownerPage.getByText('On te doit 5,00 €')).toBeVisible()
 
-    const paybackForm = ownerPage.getByRole('form', { name: 'Constater un Règlement' })
-    await paybackForm.getByLabel('Montant').fill('5')
-    await paybackForm.getByRole('button', { name: 'Constater le Règlement' }).click()
+    await addPayback(ownerPage, '5')
     await expect(ownerPage.getByText('Bob → Alice 5,00 €')).toBeVisible()
+    await expect(ownerPage.getByText('On te doit 0,00 €')).toBeVisible()
     await expectNoAxeViolations(ownerPage)
   })
 

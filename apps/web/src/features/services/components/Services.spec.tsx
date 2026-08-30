@@ -1,11 +1,8 @@
 /** @vitest-environment happy-dom */
-import { cleanup, render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useStore } from '@nanostores/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
-import { euros } from '~/lib/amounts'
-import { $group, applyGroup } from '~features/groups'
-import { Expenses } from '~features/expenses'
+import { applyGroup } from '~features/groups'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { Services } from './Services'
 
@@ -19,66 +16,46 @@ beforeEach(async () => {
   api = await createTestApi()
 })
 
-const Balances = () => {
-  const group = useStore($group)
-  return (
-    <ul>
-      {group?.balances.map(balance => (
-        <li key={balance.userId}>
-          {balance.name} {euros(balance.amount)}
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-const openServices = async () => {
+const openWithOrdi = async () => {
   const client = api.groups(testUsers.lea)
   const group = await client.create('Potes de Bob')
   await api.groups(testUsers.bob).join(group.invite.secret)
-  await api.groups(testUsers.camille).join(group.invite.secret)
+  await api.services(testUsers.lea).create(group.id, {
+    label: 'Ordi Bob',
+    day: '2026-08-16',
+    amount: 100,
+    providerId: 'lea',
+    participantIds: ['lea', 'bob']
+  })
   applyGroup(await client.get(group.id))
-  render(
-    <>
-      <Expenses client={api.expenses(testUsers.lea)} />
-      <Services client={api.services(testUsers.lea)} />
-      <Balances />
-    </>
-  )
+  render(<Services client={api.services(testUsers.lea)} />)
 }
 
 describe('Services', () => {
-  it('records a Service, lists it apart from Expenses and updates Balances', async () => {
-    await openServices()
+  it('lists the Services of the Slate', async () => {
+    await openWithOrdi()
 
-    const user = userEvent.setup()
-    const form = screen.getByRole('form', { name: 'Constater un Service' })
-    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
-    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-    await user.type(within(form).getByLabelText('Montant'), '1')
-    await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
-    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
+    expect(screen.getByText('Ordi Bob')).toBeTruthy()
+    expect(screen.getByText('2026-08-16')).toBeTruthy()
+    expect(screen.getByText('1,00 €')).toBeTruthy()
+  })
 
-    expect(await screen.findByText('Ordi Bob')).toBeTruthy()
-    expect(screen.getByText('Aucune Dépense')).toBeTruthy()
-    expect(screen.getByText('Léa 0,66 €')).toBeTruthy()
-    expect(screen.getByText('Bob −0,33 €')).toBeTruthy()
-    expect(screen.getByText('Camille −0,33 €')).toBeTruthy()
+  it('shows an empty Slate when the Group has no Service', async () => {
+    const client = api.groups(testUsers.lea)
+    const group = await client.create('Potes de Bob')
+    applyGroup(await client.get(group.id))
+    render(<Services client={api.services(testUsers.lea)} />)
+
+    expect(screen.getByText('Aucun Service')).toBeTruthy()
   })
 
   it('lets any Member delete a Service from the list', async () => {
-    await openServices()
+    await openWithOrdi()
 
     const user = userEvent.setup()
-    const form = screen.getByRole('form', { name: 'Constater un Service' })
-    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
-    await user.type(within(form).getByLabelText('Jour'), '2026-08-15')
-    await user.type(within(form).getByLabelText('Montant'), '1')
-    await user.selectOptions(within(form).getByLabelText('Prestataire'), 'lea')
-    await user.click(screen.getByRole('button', { name: 'Constater le Service' }))
-    await user.click(await screen.findByRole('button', { name: 'Supprimer Ordi Bob' }))
+    await user.click(screen.getByRole('button', { name: 'Supprimer Ordi Bob' }))
 
     expect(await screen.findByText('Aucun Service')).toBeTruthy()
-    expect(screen.getByText('Léa 0,00 €')).toBeTruthy()
+    expect(screen.queryByText('Ordi Bob')).toBeNull()
   })
 })

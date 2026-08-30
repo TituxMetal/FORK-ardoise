@@ -1,34 +1,49 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '@nanostores/react'
 import { Alert, Button } from '~ui'
 import { BackIcon } from '~/components/icons'
-import { Expenses } from '~features/expenses'
+import { ExpenseForm, Expenses } from '~features/expenses'
+import type { ExpensesClient } from '~features/expenses'
 import {
+  BalanceHero,
   $error,
   $group,
   clearGroup,
   groupsClient,
   loadGroup,
+  MemberChips,
   refreshGroup,
-  type GroupsClient
+  SlateTabs,
+  type GroupsClient,
+  type SlateTab
 } from '~features/groups'
-import { Paybacks } from '~features/paybacks'
-import { Services } from '~features/services'
+import { PaybackForm, Paybacks } from '~features/paybacks'
+import type { PaybacksClient } from '~features/paybacks'
+import { ServiceForm, Services } from '~features/services'
+import type { ServicesClient } from '~features/services'
 import { Link } from '~/lib/router'
 
 type Props = {
   id: string
   groups?: GroupsClient
+  expenses?: ExpensesClient
+  services?: ServicesClient
+  paybacks?: PaybacksClient
   copy?: (text: string) => Promise<void>
 }
 
 export const GroupPage = ({
   id,
   groups = groupsClient,
+  expenses,
+  services,
+  paybacks,
   copy = text => navigator.clipboard.writeText(text)
 }: Props) => {
   const group = useStore($group)
   const error = useStore($error)
+  const [tab, setTab] = useState<SlateTab>('expenses')
+  const [formOpen, setFormOpen] = useState(false)
 
   useEffect(() => {
     void loadGroup(groups, id)
@@ -40,6 +55,11 @@ export const GroupPage = ({
     window.addEventListener('focus', onFocus)
     return () => window.removeEventListener('focus', onFocus)
   }, [groups, id])
+
+  const changeTab = (next: SlateTab) => {
+    setTab(next)
+    setFormOpen(false)
+  }
 
   return (
     <section className="space-y-4">
@@ -60,9 +80,25 @@ export const GroupPage = ({
           >
             Copier le lien d’Invitation
           </Button>
-          <Expenses />
-          <Services />
-          <Paybacks />
+          <BalanceHero group={group} />
+          <MemberChips group={group} />
+          <SlateTabs active={tab} onChange={changeTab} onAdd={() => setFormOpen(open => !open)} />
+          {tab === 'expenses' ? (
+            <>
+              {formOpen ? <ExpenseForm client={expenses} /> : null}
+              <Expenses client={expenses} />
+            </>
+          ) : tab === 'services' ? (
+            <>
+              {formOpen ? <ServiceForm client={services} /> : null}
+              <Services client={services} />
+            </>
+          ) : (
+            <>
+              {formOpen ? <PaybackForm client={paybacks} /> : null}
+              <Paybacks client={paybacks} />
+            </>
+          )}
         </article>
       ) : error ? null : (
         <p>Chargement…</p>

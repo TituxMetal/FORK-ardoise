@@ -6,7 +6,6 @@ import { errorMessage } from '~/lib/errorMessage'
 import { $group, applyGroup } from '~features/groups'
 import { paybacksClient } from '../api'
 import type { PaybacksClient } from '../types'
-import { PaybackForm } from './PaybackForm'
 
 type Props = {
   client?: PaybacksClient
@@ -34,7 +33,6 @@ export const Paybacks = ({ client = paybacksClient }: Props) => {
   return (
     <>
       {error ? <Alert message={error} /> : null}
-      <PaybackForm client={client} />
       {group.paybacks.length === 0 ? (
         <p>Aucun Règlement</p>
       ) : (
@@ -55,13 +53,6 @@ export const Paybacks = ({ client = paybacksClient }: Props) => {
           ))}
         </ul>
       )}
-      <ul>
-        {group.balances.map(balance => (
-          <li key={balance.userId}>
-            {balance.name} {euros(balance.amount)}
-          </li>
-        ))}
-      </ul>
     </>
   )
 }
