@@ -28,7 +28,8 @@ describe('CreateGroupFields', () => {
     render(<Harness />)
 
     expect(screen.getByRole('heading', { name: 'Créer un Groupe' })).toBeTruthy()
-    expect(screen.getByLabelText('Nom')).toBeTruthy()
+    const name = screen.getByLabelText('Nom') as HTMLInputElement
+    expect(name.required).toBe(true)
     expect(screen.getByRole('button', { name: 'Créer le Groupe' })).toBeTruthy()
   })
 

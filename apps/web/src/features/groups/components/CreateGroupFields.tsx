@@ -16,7 +16,7 @@ export const CreateGroupFields = ({ form, error, onSubmit }: Props) => {
       {error ? <Alert message={error} /> : null}
       <h2 className="text-lg font-medium">Créer un Groupe</h2>
       <FormWrapper label="Nom" error={nameError}>
-        <Input {...form.register('name')} />
+        <Input {...form.register('name')} required />
       </FormWrapper>
       <Button type="submit">Créer le Groupe</Button>
     </form>

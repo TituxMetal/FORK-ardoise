@@ -82,7 +82,7 @@ Routing is a Hono app in the browser: routes declared with `app.get('/groups/:id
 
 Forms are react-hook-form + zodResolver on three roles, one file each:
 
-1. **Schema** — zod v4 colocated with the feature (`features/<name>/schemas/*.schema.ts`, barrel `index.ts`). Validates shape and trims; messages are French UI strings mirroring the API's domain rule (e.g. `'Nom du Groupe requis'`).
+1. **Schema** — zod v4 colocated with the feature (`features/<name>/schemas/*.schema.ts`, barrel `index.ts`). Validates shape and trims; messages are French UI strings mirroring the API's domain rule (e.g. `'Nom du Groupe requis'`). The schema's inferred form-input type (`z.infer<…>`, e.g. `CreateGroupInput`) colocates with the schema; it is not an API contract type and does not ride the `types/` barrel.
 2. **Container** — owns `useForm` wired to the schema through `zodResolver`, the submit handler, and the API-error state; renders the pure form. `CreateGroupForm` is the exemplar.
 3. **Pure presentation** — the form component; receives the `form` instance and the submit handler as props, renders French-labelled fields through the shared `FormWrapper`/`Input` primitives with `noValidate` (RHF owns validation). `CreateGroupFields` is the exemplar.
 
