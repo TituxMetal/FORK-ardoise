@@ -9,6 +9,7 @@ import { createExpensesClient, type ExpensesClient } from '~features/expenses'
 import { createGroupsClient, type GroupsClient } from '~features/groups'
 import { createPaybacksClient, type PaybacksClient } from '~features/paybacks'
 import { createServicesClient, type ServicesClient } from '~features/services'
+import { createUsersClient, type UsersClient } from '~features/users'
 
 export const testUsers = {
   lea: { id: 'lea', name: 'Léa' },
@@ -47,6 +48,7 @@ export type TestApi = {
   expenses: (user: SessionUser) => ExpensesClient
   services: (user: SessionUser) => ServicesClient
   paybacks: (user: SessionUser) => PaybacksClient
+  users: (user: SessionUser) => UsersClient
   close: () => Promise<void>
 }
 
@@ -76,6 +78,7 @@ export const createTestApi = async (): Promise<TestApi> => {
     groups: user => createGroupsClient({ baseUrl: '', fetch: asUser(user) }),
     expenses: user => createExpensesClient({ baseUrl: '', fetch: asUser(user) }),
     services: user => createServicesClient({ baseUrl: '', fetch: asUser(user) }),
-    paybacks: user => createPaybacksClient({ baseUrl: '', fetch: asUser(user) })
+    paybacks: user => createPaybacksClient({ baseUrl: '', fetch: asUser(user) }),
+    users: user => createUsersClient({ baseUrl: '', fetch: asUser(user) })
   }
 }

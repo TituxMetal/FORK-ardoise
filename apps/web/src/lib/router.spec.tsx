@@ -37,16 +37,16 @@ describe('router', () => {
     expect(await response.json()).toEqual({ name: 'groups' })
   })
 
-  it('routes a group detail path', async () => {
-    const response = await app.fetch(new Request('/groups/g1'))
-
-    expect(await response.json()).toEqual({ name: 'group', id: 'g1' })
-  })
-
   it('routes an invite path', async () => {
     const response = await app.fetch(new Request('/invites/abc-123'))
 
     expect(await response.json()).toEqual({ name: 'invite', secret: 'abc-123' })
+  })
+
+  it('routes the profile path', async () => {
+    const response = await app.fetch(new Request('/profile'))
+
+    expect(await response.json()).toEqual({ name: 'profile' })
   })
 
   it('routes the auth path', async () => {

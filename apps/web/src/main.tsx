@@ -7,11 +7,12 @@ import { AuthPage } from '~/pages/AuthPage'
 import { GroupsPage } from '~/pages/GroupsPage'
 import { GroupPage } from '~/pages/GroupPage'
 import { InvitePage } from '~/pages/InvitePage'
+import { ProfilePage } from '~/pages/ProfilePage'
 import '~/index.css'
 
 const App = () => {
   const route = useRoute()
-  const { data: session, isPending } = authClient.useSession()
+  const { data: session, isPending, refetch } = authClient.useSession()
 
   if (route === null || isPending) {
     return (
@@ -21,25 +22,26 @@ const App = () => {
     )
   }
 
-  const signedIn = session !== null
   const page =
     route.name === 'invite' ? (
-      <InvitePage secret={route.secret} session={signedIn ? { name: session.user.name } : null} />
+      <InvitePage secret={route.secret} session={session ? { name: session.user.name } : null} />
     ) : route.name === 'auth' ? (
-      signedIn ? (
+      session ? (
         <GroupsPage />
       ) : (
         <AuthPage />
       )
-    ) : !signedIn ? (
+    ) : session === null ? (
       <AuthPage />
     ) : route.name === 'group' ? (
       <GroupPage id={route.id} />
+    ) : route.name === 'profile' ? (
+      <ProfilePage session={{ name: session.user.name }} onRenamed={() => void refetch()} />
     ) : (
       <GroupsPage />
     )
 
-  return <AppLayout session={signedIn ? { name: session.user.name } : null}>{page}</AppLayout>
+  return <AppLayout session={session ? { name: session.user.name } : null}>{page}</AppLayout>
 }
 
 createRoot(document.getElementById('root')!).render(

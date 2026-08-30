@@ -11,6 +11,7 @@ export type Route =
   | { name: 'groups' }
   | { name: 'group'; id: string }
   | { name: 'invite'; secret: string }
+  | { name: 'profile' }
   | { name: 'auth' }
 
 const groupsRoute = { name: 'groups' } satisfies Route
@@ -21,6 +22,7 @@ export const app = new Hono()
   .get('/invites/:secret', c =>
     c.json({ name: 'invite', secret: c.req.param('secret') } satisfies Route)
   )
+  .get('/profile', c => c.json({ name: 'profile' } satisfies Route))
   .get('/session', c => c.json({ name: 'auth' } satisfies Route))
   .notFound(c => c.json(groupsRoute))
 

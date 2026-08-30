@@ -64,4 +64,21 @@ test.describe('core journey', () => {
     await expect(ownerPage.getByText('Bob → Alice 5,00 €')).toBeVisible()
     await expectNoAxeViolations(ownerPage)
   })
+
+  test('renames the profile and keeps the new name across reloads', async () => {
+    await ownerPage.goto('/profile')
+    await expect(ownerPage.getByRole('heading', { name: 'Profil' })).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
+
+    const form = ownerPage.getByRole('form', { name: 'Modifier mon nom' })
+    await form.getByLabel('Nom').fill('Aline')
+    await form.getByRole('button', { name: 'Enregistrer' }).click()
+
+    await expect(ownerPage.getByText('Nom modifié')).toBeVisible()
+    await expect(ownerPage.getByText('Session ouverte : Aline')).toBeVisible()
+
+    await ownerPage.goto('/profile')
+    await expect(form.getByLabel('Nom')).toHaveValue('Aline')
+    await expectNoAxeViolations(ownerPage)
+  })
 })
