@@ -12,6 +12,7 @@ const potes = () =>
 const slate = (): GroupDto => ({
   id: 'g1',
   name: 'Potes de Bob',
+  selfMemberId: 'u1',
   members: [{ userId: 'u1', name: 'Léa' }],
   invite: { secret: 'secret' },
   expenses: [],

@@ -44,6 +44,7 @@ export type PaybackDto = {
 export type GroupDto = {
   id: string
   name: string
+  selfMemberId: string
   members: MemberDto[]
   invite: {
     secret: string

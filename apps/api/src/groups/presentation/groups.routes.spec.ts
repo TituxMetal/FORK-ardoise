@@ -137,6 +137,7 @@ describe('groups', () => {
     expect(body.members).toEqual([{ userId: expect.any(String), name: 'Léa' }])
     expect(body).not.toHaveProperty('admin')
     expect(body.members[0]).not.toHaveProperty('admin')
+    expect(body.selfMemberId).toBe(body.members[0]?.userId)
   })
 
   it('listing Groups returns only memberships of the session', async () => {
@@ -173,6 +174,7 @@ describe('groups', () => {
     expect(await response.json()).toEqual({
       id,
       name: 'Potes de Bob',
+      selfMemberId: members[0]?.userId ?? '',
       members,
       invite,
       expenses: [],

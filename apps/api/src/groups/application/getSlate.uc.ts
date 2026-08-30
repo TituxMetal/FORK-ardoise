@@ -28,7 +28,8 @@ export const getSlate = (
       group,
       await expenses.findByGroupId(groupId),
       await services.findByGroupId(groupId),
-      await paybacks.findByGroupId(groupId)
+      await paybacks.findByGroupId(groupId),
+      userId
     )
   }
 })
@@ -37,7 +38,8 @@ const toGroupDto = (
   group: Group,
   expenses: Expense[] = [],
   services: Service[] = [],
-  paybacks: Payback[] = []
+  paybacks: Payback[] = [],
+  selfMemberId: string
 ): GroupDto => {
   const members = group.members.map(member => ({
     userId: member.userId,
@@ -46,6 +48,7 @@ const toGroupDto = (
   return {
     id: group.id,
     name: group.name.value,
+    selfMemberId,
     members,
     invite: { secret: group.inviteSecret },
     expenses: expenses.map(expense => ({

@@ -14,6 +14,7 @@ const members = [
 const slate = (): GroupDto => ({
   id: 'g1',
   name: 'Potes de Bob',
+  selfMemberId: 'u1',
   members,
   invite: { secret: 'secret' },
   expenses: [],

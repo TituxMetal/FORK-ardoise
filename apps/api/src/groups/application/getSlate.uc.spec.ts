@@ -173,6 +173,7 @@ describe('getSlate', () => {
     expect(slate).toEqual({
       id: group.id,
       name: 'Potes de Bob',
+      selfMemberId: 'u1',
       members: [
         { userId: 'u1', name: 'Léa' },
         { userId: 'u2', name: 'Bob' },
