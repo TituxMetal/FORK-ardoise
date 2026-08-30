@@ -66,7 +66,8 @@ test.describe('core journey', () => {
   })
 
   test('renames the profile and keeps the new name across reloads', async () => {
-    await ownerPage.goto('/profile')
+    await ownerPage.getByRole('link', { name: 'Profil' }).click()
+    await expect(ownerPage).toHaveURL(/\/profile/)
     await expect(ownerPage.getByRole('heading', { name: 'Profil' })).toBeVisible()
     await expectNoAxeViolations(ownerPage)
 

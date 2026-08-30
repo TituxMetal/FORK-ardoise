@@ -28,14 +28,14 @@ describe('AppLayout', () => {
     expect(screen.getByText('Contenu')).toBeTruthy()
   })
 
-  it('welcomes the Member of an open session', () => {
+  it('links the signed-in Member to the Profile page', () => {
     render(
       <AppLayout session={{ name: 'Léa' }}>
         <p>Contenu</p>
       </AppLayout>
     )
 
-    expect(screen.getByText('Session ouverte : Léa')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Profil' }).getAttribute('href')).toBe('/profile')
   })
 
   it('closes the session when the Member asks to', async () => {
