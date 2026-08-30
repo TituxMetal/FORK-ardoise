@@ -5,8 +5,7 @@ export {
   LeaveGroupConfirmation,
   MemberChips,
   RenameGroupFields,
-  SlateTabs,
-  type SlateTab
+  SlateTabs
 } from './components'
 export { createGroupsClient, groupsClient } from './api'
 export {
@@ -15,6 +14,18 @@ export {
   type CreateGroupInput,
   type RenameGroupInput
 } from './schemas'
-export { $error, $group, applyGroup, clearGroup, loadGroup, refreshGroup } from './store'
+export {
+  $activeTab,
+  $error,
+  $formOpen,
+  $group,
+  applyGroup,
+  clearGroup,
+  closeForm,
+  loadGroup,
+  openForm,
+  refreshGroup,
+  setActiveTab
+} from './store'
 export { selfBalanceLabel } from './utils'
-export type { Group, GroupsClient, GroupSummary } from './types'
+export type { Group, GroupsClient, GroupSummary, SlateTab } from './types'

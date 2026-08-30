@@ -21,9 +21,10 @@ const creditors: Group['balances'] = [{ userId: 'lea', name: 'Léa', amount: 66 
 type HarnessProps = {
   error?: string
   onSubmit?: (values: CreatePaybackFormInput) => void
+  onCancel?: () => void
 }
 
-const Harness = ({ error = '', onSubmit = () => {} }: HarnessProps) => {
+const Harness = ({ error = '', onSubmit = () => {}, onCancel = () => {} }: HarnessProps) => {
   const form = useForm<CreatePaybackFormInput>({
     resolver: zodResolver(createPaybackSchema),
     defaultValues: { debtorId: '', creditorId: '', amount: '' }
@@ -39,6 +40,7 @@ const Harness = ({ error = '', onSubmit = () => {} }: HarnessProps) => {
       debtorId="bob"
       creditorId="lea"
       cap={33}
+      onCancel={onCancel}
     />
   )
 }

@@ -13,6 +13,7 @@ type Props = {
   debtorId: string
   creditorId: string
   cap: number
+  onCancel: () => void
 }
 
 export const PaybackFields = ({
@@ -23,7 +24,8 @@ export const PaybackFields = ({
   creditors,
   debtorId,
   creditorId,
-  cap
+  cap,
+  onCancel
 }: Props) => {
   const amountError = form.formState.errors.amount?.message
 
@@ -67,6 +69,9 @@ export const PaybackFields = ({
         <Input {...form.register('amount')} required />
       </FormWrapper>
       <Button type="submit">Constater le Règlement</Button>
+      <Button type="button" variant="secondary" onClick={onCancel}>
+        Annuler
+      </Button>
     </form>
   )
 }

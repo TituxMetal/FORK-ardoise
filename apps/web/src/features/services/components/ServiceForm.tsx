@@ -12,9 +12,10 @@ import { ServiceFields } from './ServiceFields'
 
 type Props = {
   client?: ServicesClient
+  onCancel?: () => void
 }
 
-export const ServiceForm = ({ client = servicesClient }: Props) => {
+export const ServiceForm = ({ client = servicesClient, onCancel }: Props) => {
   const group = useStore($group)
   const [error, setError] = useState('')
   const form = useForm<CreateServiceFormInput>({
@@ -49,5 +50,16 @@ export const ServiceForm = ({ client = servicesClient }: Props) => {
 
   if (!group) return null
 
-  return <ServiceFields form={form} error={error} onSubmit={onSubmit} members={group.members} />
+  return (
+    <ServiceFields
+      form={form}
+      error={error}
+      onSubmit={onSubmit}
+      members={group.members}
+      onCancel={() => {
+        form.reset()
+        onCancel?.()
+      }}
+    />
+  )
 }

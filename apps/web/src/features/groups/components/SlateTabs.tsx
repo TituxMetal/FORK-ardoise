@@ -1,11 +1,28 @@
+import { useRef, type KeyboardEvent } from 'react'
+import { useStore } from '@nanostores/react'
 import { PlusIcon } from '~/components/icons'
+import { $activeTab, openForm, setActiveTab } from '../store'
+import type { SlateTab } from '../types'
 
-export type SlateTab = 'expenses' | 'services' | 'paybacks'
-
-const TABS: { key: SlateTab; label: string }[] = [
-  { key: 'expenses', label: 'Dépenses' },
-  { key: 'services', label: 'Services' },
-  { key: 'paybacks', label: 'Remboursements' }
+const TABS: { key: SlateTab; label: string; tabId: string; panelId: string }[] = [
+  {
+    key: 'expenses',
+    label: 'Dépenses',
+    tabId: 'slate-tab-expenses',
+    panelId: 'slate-panel-expenses'
+  },
+  {
+    key: 'services',
+    label: 'Services',
+    tabId: 'slate-tab-services',
+    panelId: 'slate-panel-services'
+  },
+  {
+    key: 'paybacks',
+    label: 'Remboursements',
+    tabId: 'slate-tab-paybacks',
+    panelId: 'slate-panel-paybacks'
+  }
 ]
 
 const ADD_LABELS: Record<SlateTab, string> = {
@@ -14,41 +31,62 @@ const ADD_LABELS: Record<SlateTab, string> = {
   paybacks: 'Ajouter un Remboursement'
 }
 
-type Props = {
-  active: SlateTab
-  onChange: (tab: SlateTab) => void
-  onAdd: () => void
-}
+// Full tabs pattern: roving tabIndex plus arrow/Home/End movement, and each
+// tab controls its panel (rendered by the page) through id/aria-controls.
+export const SlateTabs = () => {
+  const active = useStore($activeTab)
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
 
-export const SlateTabs = ({ active, onChange, onAdd }: Props) => (
-  <div className="flex items-stretch gap-2">
-    <div
-      role="tablist"
-      aria-label="Entrées"
-      className="flex min-w-0 flex-1 gap-1 overflow-x-auto rounded-lg bg-surface p-1"
-    >
-      {TABS.map(tab => (
-        <button
-          key={tab.key}
-          type="button"
-          role="tab"
-          aria-selected={active === tab.key}
-          onClick={() => onChange(tab.key)}
-          className={`h-11 shrink-0 whitespace-nowrap rounded-md px-2.5 text-[13px] font-medium transition-colors ${
-            active === tab.key ? 'bg-accent text-on-accent' : 'text-dim hover:text-foreground'
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const index = TABS.findIndex(tab => tab.key === active)
+    let next: number | null = null
+    if (event.key === 'ArrowRight') next = (index + 1) % TABS.length
+    else if (event.key === 'ArrowLeft') next = (index - 1 + TABS.length) % TABS.length
+    else if (event.key === 'Home') next = 0
+    else if (event.key === 'End') next = TABS.length - 1
+    if (next === null) return
+    event.preventDefault()
+    setActiveTab(TABS[next].key)
+    tabRefs.current[next]?.focus()
+  }
+
+  return (
+    <div className="flex items-stretch gap-2">
+      <div
+        role="tablist"
+        aria-label="Entrées"
+        onKeyDown={onKeyDown}
+        className="flex min-w-0 flex-1 gap-1 overflow-x-auto rounded-lg bg-surface p-1"
+      >
+        {TABS.map((tab, index) => (
+          <button
+            key={tab.key}
+            ref={node => {
+              tabRefs.current[index] = node
+            }}
+            type="button"
+            role="tab"
+            id={tab.tabId}
+            aria-selected={active === tab.key}
+            aria-controls={active === tab.key ? tab.panelId : undefined}
+            tabIndex={active === tab.key ? 0 : -1}
+            onClick={() => setActiveTab(tab.key)}
+            className={`h-11 shrink-0 whitespace-nowrap rounded-md px-2.5 text-[13px] font-medium transition-colors ${
+              active === tab.key ? 'bg-accent text-on-accent' : 'text-dim hover:text-foreground'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <button
+        type="button"
+        aria-label={ADD_LABELS[active]}
+        onClick={openForm}
+        className="flex w-11 shrink-0 items-center justify-center rounded-lg bg-accent text-on-accent hover:opacity-90"
+      >
+        <PlusIcon />
+      </button>
     </div>
-    <button
-      type="button"
-      aria-label={ADD_LABELS[active]}
-      onClick={onAdd}
-      className="flex w-11 shrink-0 items-center justify-center rounded-lg bg-accent text-on-accent hover:opacity-90"
-    >
-      <PlusIcon />
-    </button>
-  </div>
-)
+  )
+}

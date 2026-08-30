@@ -1,1 +1,13 @@
-export { $error, $group, applyGroup, clearGroup, loadGroup, refreshGroup } from './group.store'
+export {
+  $activeTab,
+  $error,
+  $formOpen,
+  $group,
+  applyGroup,
+  clearGroup,
+  closeForm,
+  loadGroup,
+  openForm,
+  refreshGroup,
+  setActiveTab
+} from './group.store'

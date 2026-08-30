@@ -94,4 +94,18 @@ describe('PaybackForm', () => {
     expect((await screen.findByRole('alert')).textContent).toBe('Montant > 0 requis')
     expect(spy.create).not.toHaveBeenCalled()
   })
+
+  it('lets Annuler discard the draft and report the close', async () => {
+    await openForm()
+    const onCancel = vi.fn()
+    render(<PaybackForm client={api.paybacks(testUsers.lea)} onCancel={onCancel} />)
+
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.type(within(form).getByLabelText('Montant'), '0,20')
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+
+    expect(onCancel).toHaveBeenCalled()
+    expect((within(form).getByLabelText('Montant') as HTMLInputElement).value).toBe('')
+  })
 })

@@ -47,10 +47,12 @@ describe('GroupPage', () => {
 
     const user = userEvent.setup()
     await user.click(screen.getByRole('tab', { name: 'Services' }))
+    expect(screen.getByRole('tabpanel', { name: 'Services' })).toBeTruthy()
     expect(screen.getByText('Aucun Service')).toBeTruthy()
     expect(screen.queryByText('Aucune Dépense')).toBeNull()
 
     await user.click(screen.getByRole('tab', { name: 'Remboursements' }))
+    expect(screen.getByRole('tabpanel', { name: 'Remboursements' })).toBeTruthy()
     expect(screen.getByText('Aucun Règlement')).toBeTruthy()
     expect(screen.queryByText('Aucun Service')).toBeNull()
   })
@@ -68,6 +70,28 @@ describe('GroupPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Ajouter un Service' }))
     expect(screen.getByRole('form', { name: 'Constater un Service' })).toBeTruthy()
+  })
+
+  it('keeps an open create form when the active tab is re-clicked', async () => {
+    await openGroup()
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Ajouter une Dépense' }))
+    expect(screen.getByRole('form', { name: 'Constater une Dépense' })).toBeTruthy()
+
+    await user.click(screen.getByRole('tab', { name: 'Dépenses' }))
+    expect(screen.getByRole('form', { name: 'Constater une Dépense' })).toBeTruthy()
+  })
+
+  it('closes an open create form with Annuler', async () => {
+    await openGroup()
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Ajouter une Dépense' }))
+    expect(screen.getByRole('form', { name: 'Constater une Dépense' })).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+    expect(screen.queryByRole('form', { name: 'Constater une Dépense' })).toBeNull()
   })
 
   it('lets a Member copy the Invite link of the opened Group', async () => {

@@ -113,4 +113,18 @@ describe('ServiceForm', () => {
     expect(alerts.map(alert => alert.textContent)).toContain('Au moins un participant requis')
     expect(client.create).not.toHaveBeenCalled()
   })
+
+  it('lets Annuler discard the draft and report the close', async () => {
+    await openGroup()
+    const onCancel = vi.fn()
+    render(<ServiceForm client={api.services(testUsers.lea)} onCancel={onCancel} />)
+
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Service' })
+    await user.type(within(form).getByLabelText('Libellé'), 'Ordi Bob')
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+
+    expect(onCancel).toHaveBeenCalled()
+    expect((within(form).getByLabelText('Libellé') as HTMLInputElement).value).toBe('')
+  })
 })

@@ -12,9 +12,10 @@ import { ExpenseFields } from './ExpenseFields'
 
 type Props = {
   client?: ExpensesClient
+  onCancel?: () => void
 }
 
-export const ExpenseForm = ({ client = expensesClient }: Props) => {
+export const ExpenseForm = ({ client = expensesClient, onCancel }: Props) => {
   const group = useStore($group)
   const [error, setError] = useState('')
   const form = useForm<CreateExpenseFormInput>({
@@ -49,5 +50,16 @@ export const ExpenseForm = ({ client = expensesClient }: Props) => {
 
   if (!group) return null
 
-  return <ExpenseFields form={form} error={error} onSubmit={onSubmit} members={group.members} />
+  return (
+    <ExpenseFields
+      form={form}
+      error={error}
+      onSubmit={onSubmit}
+      members={group.members}
+      onCancel={() => {
+        form.reset()
+        onCancel?.()
+      }}
+    />
+  )
 }

@@ -1,6 +1,18 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test'
 import type { Group, GroupsClient } from '../types'
-import { $error, $group, applyGroup, clearGroup, loadGroup, refreshGroup } from './group.store'
+import {
+  $activeTab,
+  $error,
+  $formOpen,
+  $group,
+  applyGroup,
+  clearGroup,
+  closeForm,
+  loadGroup,
+  openForm,
+  refreshGroup,
+  setActiveTab
+} from './group.store'
 
 const group = { id: 'g1', name: 'Potes de Bob' } as Group
 
@@ -116,5 +128,40 @@ describe('group.store', () => {
 
     expect($group.get()).toBe(refreshed)
     expect($error.get()).toBe('')
+  })
+
+  it('switches the active tab and closes an open form', () => {
+    openForm()
+    setActiveTab('services')
+
+    expect($activeTab.get()).toBe('services')
+    expect($formOpen.get()).toBe(false)
+  })
+
+  it('ignores a click on the already-active tab and keeps an open form', () => {
+    openForm()
+    setActiveTab('expenses')
+
+    expect($activeTab.get()).toBe('expenses')
+    expect($formOpen.get()).toBe(true)
+  })
+
+  it('keeps the form open after openForm and closes it with closeForm', () => {
+    openForm()
+    openForm()
+    expect($formOpen.get()).toBe(true)
+
+    closeForm()
+    expect($formOpen.get()).toBe(false)
+  })
+
+  it('resets the slate state with the Group', () => {
+    setActiveTab('paybacks')
+    openForm()
+
+    clearGroup()
+
+    expect($activeTab.get()).toBe('expenses')
+    expect($formOpen.get()).toBe(false)
   })
 })

@@ -12,9 +12,10 @@ import { PaybackFields } from './PaybackFields'
 
 type Props = {
   client?: PaybacksClient
+  onCancel?: () => void
 }
 
-export const PaybackForm = ({ client = paybacksClient }: Props) => {
+export const PaybackForm = ({ client = paybacksClient, onCancel }: Props) => {
   const group = useStore($group)
   const [error, setError] = useState('')
   const form = useForm<CreatePaybackFormInput>({
@@ -71,6 +72,10 @@ export const PaybackForm = ({ client = paybacksClient }: Props) => {
       debtorId={effectiveDebtorId}
       creditorId={effectiveCreditorId}
       cap={cap}
+      onCancel={() => {
+        form.reset()
+        onCancel?.()
+      }}
     />
   )
 }

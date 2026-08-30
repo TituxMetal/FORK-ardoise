@@ -18,9 +18,10 @@ const members: Group['members'] = [
 type HarnessProps = {
   error?: string
   onSubmit?: (values: CreateServiceFormInput) => void
+  onCancel?: () => void
 }
 
-const Harness = ({ error = '', onSubmit = () => {} }: HarnessProps) => {
+const Harness = ({ error = '', onSubmit = () => {}, onCancel = () => {} }: HarnessProps) => {
   const form = useForm<CreateServiceFormInput>({
     resolver: zodResolver(createServiceSchema),
     defaultValues: {
@@ -32,7 +33,15 @@ const Harness = ({ error = '', onSubmit = () => {} }: HarnessProps) => {
     }
   })
 
-  return <ServiceFields form={form} error={error} onSubmit={onSubmit} members={members} />
+  return (
+    <ServiceFields
+      form={form}
+      error={error}
+      onSubmit={onSubmit}
+      members={members}
+      onCancel={onCancel}
+    />
+  )
 }
 
 describe('ServiceFields', () => {

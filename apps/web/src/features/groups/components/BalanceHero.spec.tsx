@@ -1,7 +1,7 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
-import type { Group } from '~features/groups'
+import type { Group } from '../types'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { BalanceHero } from './BalanceHero'
 

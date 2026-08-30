@@ -8,9 +8,10 @@ type Props = {
   error: string
   onSubmit: SubmitHandler<CreateServiceFormInput>
   members: Group['members']
+  onCancel: () => void
 }
 
-export const ServiceFields = ({ form, error, onSubmit, members }: Props) => {
+export const ServiceFields = ({ form, error, onSubmit, members, onCancel }: Props) => {
   const labelError = form.formState.errors.label?.message
   const dayError = form.formState.errors.day?.message
   const amountError = form.formState.errors.amount?.message
@@ -64,6 +65,9 @@ export const ServiceFields = ({ form, error, onSubmit, members }: Props) => {
         ) : null}
       </fieldset>
       <Button type="submit">Constater le Service</Button>
+      <Button type="button" variant="secondary" onClick={onCancel}>
+        Annuler
+      </Button>
     </form>
   )
 }

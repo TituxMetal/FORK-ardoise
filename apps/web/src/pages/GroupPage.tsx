@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useStore } from '@nanostores/react'
 import { Alert, Button } from '~ui'
 import { BackIcon } from '~/components/icons'
 import { ExpenseForm, Expenses } from '~features/expenses'
 import type { ExpensesClient } from '~features/expenses'
 import {
+  $activeTab,
   BalanceHero,
+  closeForm,
   $error,
+  $formOpen,
   $group,
   clearGroup,
   groupsClient,
@@ -14,8 +17,7 @@ import {
   MemberChips,
   refreshGroup,
   SlateTabs,
-  type GroupsClient,
-  type SlateTab
+  type GroupsClient
 } from '~features/groups'
 import { PaybackForm, Paybacks } from '~features/paybacks'
 import type { PaybacksClient } from '~features/paybacks'
@@ -42,8 +44,8 @@ export const GroupPage = ({
 }: Props) => {
   const group = useStore($group)
   const error = useStore($error)
-  const [tab, setTab] = useState<SlateTab>('expenses')
-  const [formOpen, setFormOpen] = useState(false)
+  const tab = useStore($activeTab)
+  const formOpen = useStore($formOpen)
 
   useEffect(() => {
     void loadGroup(groups, id)
@@ -55,11 +57,6 @@ export const GroupPage = ({
     window.addEventListener('focus', onFocus)
     return () => window.removeEventListener('focus', onFocus)
   }, [groups, id])
-
-  const changeTab = (next: SlateTab) => {
-    setTab(next)
-    setFormOpen(false)
-  }
 
   return (
     <section className="space-y-4">
@@ -82,23 +79,46 @@ export const GroupPage = ({
           </Button>
           <BalanceHero group={group} />
           <MemberChips group={group} />
-          <SlateTabs active={tab} onChange={changeTab} onAdd={() => setFormOpen(open => !open)} />
-          {tab === 'expenses' ? (
-            <>
-              {formOpen ? <ExpenseForm client={expenses} /> : null}
-              <Expenses client={expenses} />
-            </>
-          ) : tab === 'services' ? (
-            <>
-              {formOpen ? <ServiceForm client={services} /> : null}
-              <Services client={services} />
-            </>
-          ) : (
-            <>
-              {formOpen ? <PaybackForm client={paybacks} /> : null}
-              <Paybacks client={paybacks} />
-            </>
-          )}
+          <SlateTabs />
+          <div
+            role="tabpanel"
+            id="slate-panel-expenses"
+            aria-labelledby="slate-tab-expenses"
+            className="space-y-4"
+          >
+            {tab === 'expenses' ? (
+              <>
+                {formOpen ? <ExpenseForm client={expenses} onCancel={closeForm} /> : null}
+                <Expenses client={expenses} />
+              </>
+            ) : null}
+          </div>
+          <div
+            role="tabpanel"
+            id="slate-panel-services"
+            aria-labelledby="slate-tab-services"
+            className="space-y-4"
+          >
+            {tab === 'services' ? (
+              <>
+                {formOpen ? <ServiceForm client={services} onCancel={closeForm} /> : null}
+                <Services client={services} />
+              </>
+            ) : null}
+          </div>
+          <div
+            role="tabpanel"
+            id="slate-panel-paybacks"
+            aria-labelledby="slate-tab-paybacks"
+            className="space-y-4"
+          >
+            {tab === 'paybacks' ? (
+              <>
+                {formOpen ? <PaybackForm client={paybacks} onCancel={closeForm} /> : null}
+                <Paybacks client={paybacks} />
+              </>
+            ) : null}
+          </div>
         </article>
       ) : error ? null : (
         <p>Chargement…</p>
