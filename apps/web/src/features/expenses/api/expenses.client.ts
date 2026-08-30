@@ -6,6 +6,13 @@ export const createExpensesClient = (options: HttpClientOptions = {}): ExpensesC
   return {
     create: async (groupId, input) =>
       unwrap(await http.groups[':groupId'].expenses.$post({ param: { groupId }, json: input })),
+    update: async (groupId, expenseId, input) =>
+      unwrap(
+        await http.groups[':groupId'].expenses[':id'].$patch({
+          param: { groupId, id: expenseId },
+          json: input
+        })
+      ),
     delete: async (groupId, expenseId) =>
       unwrap(
         await http.groups[':groupId'].expenses[':id'].$delete({

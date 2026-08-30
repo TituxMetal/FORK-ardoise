@@ -1,5 +1,6 @@
 export { Alert } from './Alert'
 export { Button } from './Button'
+export { EntryRow } from './EntryRow'
 export { FormWrapper } from './FormWrapper'
 export { Input } from './Input'
 export { Select } from './Select'

@@ -2,11 +2,12 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
-import { applyGroup } from '~features/groups'
+import { applyGroup, cancelEdit } from '~features/groups'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { Paybacks } from './Paybacks'
 
 afterEach(cleanup)
+afterEach(() => cancelEdit())
 afterEach(async () => {
   await api.close()
 })
@@ -37,10 +38,12 @@ const openWithPayback = async () => {
 }
 
 describe('Paybacks', () => {
-  it('lists the Paybacks of the Slate with the creditor direction', async () => {
+  it('lists the Paybacks of the Slate as shared rows with the creditor direction', async () => {
     await openWithPayback()
 
-    expect(screen.getByText('Bob → Léa 0,20 €')).toBeTruthy()
+    expect(screen.getByText('BO')).toBeTruthy()
+    expect(screen.getByText('Bob → Léa')).toBeTruthy()
+    expect(screen.getByText('0,20 €')).toBeTruthy()
   })
 
   it('shows an empty Slate when the Group has no Payback', async () => {
@@ -52,13 +55,37 @@ describe('Paybacks', () => {
     expect(screen.getByText('Aucun Règlement')).toBeTruthy()
   })
 
-  it('lets any Member delete a Payback from the list', async () => {
+  it('deletes a Payback only after the confirmation is confirmed', async () => {
     await openWithPayback()
 
     const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: 'Supprimer le Règlement Bob → Léa' }))
+    await user.click(screen.getByRole('button', { name: 'Supprimer Bob → Léa' }))
+
+    expect(screen.getByRole('group', { name: 'Supprimer « Bob → Léa » ?' })).toBeTruthy()
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+    expect(screen.getByText('Bob → Léa')).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Supprimer Bob → Léa' }))
+    await user.click(screen.getByRole('button', { name: 'Supprimer' }))
 
     expect(await screen.findByText('Aucun Règlement')).toBeTruthy()
-    expect(screen.queryByText('Bob → Léa 0,20 €')).toBeNull()
+    expect(screen.queryByText('Bob → Léa')).toBeNull()
+  })
+
+  it('edits a Payback from its row with the pre-filled form and the cap without it', async () => {
+    await openWithPayback()
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Modifier Bob → Léa' }))
+
+    expect(screen.getByRole('form', { name: 'Modifier le Règlement' })).toBeTruthy()
+    expect((screen.getByLabelText('Montant') as HTMLInputElement).value).toBe('0,20')
+    expect(screen.getByText('Plafond 0,50 €')).toBeTruthy()
+    await user.clear(screen.getByLabelText('Montant'))
+    await user.type(screen.getByLabelText('Montant'), '0,30')
+    await user.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+    expect(await screen.findByText('0,30 €')).toBeTruthy()
+    expect(screen.queryByText('0,20 €')).toBeNull()
   })
 })

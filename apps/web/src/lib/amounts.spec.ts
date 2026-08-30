@@ -1,5 +1,5 @@
+import { centsFromEuros, euros, eurosAmountSchema, eurosFromCents, signedEuros } from './amounts'
 import { describe, expect, it } from 'vite-plus/test'
-import { centsFromEuros, euros, eurosAmountSchema, signedEuros } from './amounts'
 
 describe('euros', () => {
   it('formats cents with a comma and the euro sign', () => {
@@ -40,6 +40,15 @@ describe('centsFromEuros', () => {
 
   it('parses a negative amount into cents', () => {
     expect(centsFromEuros('-3,25')).toBe(-325)
+  })
+})
+describe('eurosFromCents', () => {
+  it('formats cents as a comma euro string without the sign or mark', () => {
+    expect(eurosFromCents(1234)).toBe('12,34')
+  })
+
+  it('pads to two decimals', () => {
+    expect(eurosFromCents(700)).toBe('7,00')
   })
 })
 

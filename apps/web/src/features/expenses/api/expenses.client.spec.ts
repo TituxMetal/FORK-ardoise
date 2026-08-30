@@ -37,6 +37,24 @@ describe('expensesClient', () => {
 
     expect(updated.expenses).toEqual([])
   })
+  it('edits an Expense and returns the updated Group', async () => {
+    const groups = api.groups(testUsers.lea)
+    const expenses = api.expenses(testUsers.lea)
+    const group = await groups.create('Potes de Bob')
+    const withExpense = await expenses.create(group.id, pizza)
+
+    const updated = await expenses.update(withExpense.id, withExpense.expenses[0].id, {
+      label: 'Pizza géante',
+      day: '2026-08-16',
+      amount: 200,
+      payerId: 'lea',
+      participantIds: ['lea']
+    })
+
+    expect(updated.expenses).toEqual([
+      expect.objectContaining({ label: 'Pizza géante', day: '2026-08-16', amount: 200 })
+    ])
+  })
 
   it('throws the API message when a Member is unknown', async () => {
     const groups = api.groups(testUsers.lea)

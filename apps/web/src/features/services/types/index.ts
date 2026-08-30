@@ -1,1 +1,1 @@
-export type { CreateServiceInput, ServicesClient } from './services.types'
+export type { CreateServiceInput, ServicesClient, UpdateServiceInput } from './services.types'

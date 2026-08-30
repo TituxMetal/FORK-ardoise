@@ -31,6 +31,10 @@ const spyClient = (
   create: vi.fn(async (groupId: string, input: Parameters<ServicesClient['create']>[1]) =>
     real.create(groupId, input)
   ),
+  update: vi.fn(
+    async (groupId: string, id: string, input: Parameters<ServicesClient['update']>[2]) =>
+      real.update(groupId, id, input)
+  ),
   delete: vi.fn(async (groupId: string, id: string) => real.delete(groupId, id))
 })
 
@@ -63,6 +67,9 @@ describe('ServiceForm', () => {
     await openGroup()
     const client: ServicesClient = {
       create: async () => {
+        throw new Error('Groupe introuvable')
+      },
+      update: async () => {
         throw new Error('Groupe introuvable')
       },
       delete: async () => {

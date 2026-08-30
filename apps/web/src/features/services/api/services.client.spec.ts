@@ -37,6 +37,24 @@ describe('servicesClient', () => {
 
     expect(updated.services).toEqual([])
   })
+  it('edits a Service and returns the updated Group', async () => {
+    const groups = api.groups(testUsers.lea)
+    const services = api.services(testUsers.lea)
+    const group = await groups.create('Potes de Bob')
+    const withService = await services.create(group.id, laptop)
+
+    const updated = await services.update(withService.id, withService.services[0].id, {
+      label: 'Ordi Neuf',
+      day: '2026-08-16',
+      amount: 200,
+      providerId: 'lea',
+      participantIds: ['lea']
+    })
+
+    expect(updated.services).toEqual([
+      expect.objectContaining({ label: 'Ordi Neuf', day: '2026-08-16', amount: 200 })
+    ])
+  })
 
   it('throws the API message when a Member is unknown', async () => {
     const groups = api.groups(testUsers.lea)

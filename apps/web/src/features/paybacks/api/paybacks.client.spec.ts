@@ -53,6 +53,25 @@ describe('paybacksClient', () => {
 
     expect(updated.paybacks).toEqual([])
   })
+  it('edits a Payback and returns the updated Group', async () => {
+    const group = await openGroupWithBalances()
+    const paybacks = api.paybacks(testUsers.lea)
+    const withPayback = await paybacks.create(group.id, {
+      debtorId: 'bob',
+      creditorId: 'lea',
+      amount: 20
+    })
+
+    const updated = await paybacks.update(withPayback.id, withPayback.paybacks[0].id, {
+      debtorId: 'bob',
+      creditorId: 'lea',
+      amount: 30
+    })
+
+    expect(updated.paybacks).toEqual([
+      expect.objectContaining({ debtorId: 'bob', creditorId: 'lea', amount: 30 })
+    ])
+  })
 
   it('throws the API message when a Member is unknown', async () => {
     const group = await openGroupWithBalances()

@@ -37,6 +37,10 @@ const spyClient = (
   create: vi.fn(async (groupId: string, input: Parameters<PaybacksClient['create']>[1]) =>
     real.create(groupId, input)
   ),
+  update: vi.fn(
+    async (groupId: string, id: string, input: Parameters<PaybacksClient['update']>[2]) =>
+      real.update(groupId, id, input)
+  ),
   delete: vi.fn(async (groupId: string, id: string) => real.delete(groupId, id))
 })
 
@@ -67,6 +71,9 @@ describe('PaybackForm', () => {
     await openForm()
     const client: PaybacksClient = {
       create: async () => {
+        throw new Error('Groupe introuvable')
+      },
+      update: async () => {
         throw new Error('Groupe introuvable')
       },
       delete: async () => {

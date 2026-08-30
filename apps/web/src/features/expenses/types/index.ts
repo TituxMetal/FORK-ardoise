@@ -1,1 +1,1 @@
-export type { CreateExpenseInput, ExpensesClient } from './expenses.types'
+export type { CreateExpenseInput, ExpensesClient, UpdateExpenseInput } from './expenses.types'

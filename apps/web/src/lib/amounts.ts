@@ -8,6 +8,9 @@ export const euros = (cents: number) =>
 export const signedEuros = (cents: number) => (cents > 0 ? '+' : '') + euros(cents)
 
 export const centsFromEuros = (value: string) => Math.round(Number(value.replace(',', '.')) * 100)
+// Inverse of centsFromEuros: the euro string an Amount input is pre-filled
+// with when editing (no sign, no euro mark).
+export const eurosFromCents = (cents: number) => (cents / 100).toFixed(2).replace('.', ',')
 
 // Mirrors the API Amount rule (positive) for the euro string a form types in.
 // Restricts to whole euros or one/two decimals so every accepted value maps

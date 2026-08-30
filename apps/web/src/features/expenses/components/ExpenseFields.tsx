@@ -9,24 +9,34 @@ type Props = {
   onSubmit: SubmitHandler<CreateExpenseFormInput>
   members: Group['members']
   onCancel: () => void
+  mode?: 'create' | 'edit'
 }
 
-export const ExpenseFields = ({ form, error, onSubmit, members, onCancel }: Props) => {
+export const ExpenseFields = ({
+  form,
+  error,
+  onSubmit,
+  members,
+  onCancel,
+  mode = 'create'
+}: Props) => {
   const labelError = form.formState.errors.label?.message
   const dayError = form.formState.errors.day?.message
   const amountError = form.formState.errors.amount?.message
   const payerError = form.formState.errors.payerId?.message
   const participantsError = form.formState.errors.participantIds?.message
+  const title = mode === 'edit' ? 'Modifier une Dépense' : 'Constater une Dépense'
+  const submitLabel = mode === 'edit' ? 'Enregistrer' : 'Constater la Dépense'
 
   return (
     <form
       className="flex flex-col gap-3"
-      aria-label="Constater une Dépense"
+      aria-label={title}
       onSubmit={form.handleSubmit(onSubmit)}
       noValidate
     >
       {error ? <Alert message={error} /> : null}
-      <h3 className="font-medium">Constater une Dépense</h3>
+      <h3 className="font-medium">{title}</h3>
       <FormWrapper label="Libellé" error={labelError}>
         <Input {...form.register('label')} required />
       </FormWrapper>
@@ -52,7 +62,7 @@ export const ExpenseFields = ({ form, error, onSubmit, members, onCancel }: Prop
             <input
               type="checkbox"
               value={member.userId}
-              defaultChecked
+              defaultChecked={form.getValues('participantIds')?.includes(member.userId)}
               {...form.register('participantIds')}
             />
             {member.name}
@@ -64,7 +74,7 @@ export const ExpenseFields = ({ form, error, onSubmit, members, onCancel }: Prop
           </p>
         ) : null}
       </fieldset>
-      <Button type="submit">Constater la Dépense</Button>
+      <Button type="submit">{submitLabel}</Button>
       <Button type="button" variant="secondary" onClick={onCancel}>
         Annuler
       </Button>

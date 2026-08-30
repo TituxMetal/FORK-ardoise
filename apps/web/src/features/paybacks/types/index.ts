@@ -1,1 +1,1 @@
-export type { CreatePaybackInput, PaybacksClient } from './paybacks.types'
+export type { CreatePaybackInput, PaybacksClient, UpdatePaybackInput } from './paybacks.types'

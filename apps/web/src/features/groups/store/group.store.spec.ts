@@ -2,16 +2,19 @@ import { afterEach, describe, expect, it } from 'vite-plus/test'
 import type { Group, GroupsClient } from '../types'
 import {
   $activeTab,
+  $editing,
   $error,
   $formOpen,
   $group,
   applyGroup,
+  cancelEdit,
   clearGroup,
   closeForm,
   loadGroup,
   openForm,
   refreshGroup,
-  setActiveTab
+  setActiveTab,
+  startEdit
 } from './group.store'
 
 const group = { id: 'g1', name: 'Potes de Bob' } as Group
@@ -163,5 +166,42 @@ describe('group.store', () => {
 
     expect($activeTab.get()).toBe('expenses')
     expect($formOpen.get()).toBe(false)
+  })
+  it('starts an edit and closes the create form', () => {
+    openForm()
+    startEdit({ kind: 'expenses', id: 'e1' })
+
+    expect($editing.get()).toEqual({ kind: 'expenses', id: 'e1' })
+    expect($formOpen.get()).toBe(false)
+  })
+
+  it('opens the create form and closes any edit', () => {
+    startEdit({ kind: 'expenses', id: 'e1' })
+    openForm()
+
+    expect($editing.get()).toBeNull()
+    expect($formOpen.get()).toBe(true)
+  })
+
+  it('cancels an edit', () => {
+    startEdit({ kind: 'expenses', id: 'e1' })
+    cancelEdit()
+
+    expect($editing.get()).toBeNull()
+  })
+
+  it('closes an edit when the tab changes', () => {
+    startEdit({ kind: 'expenses', id: 'e1' })
+    setActiveTab('services')
+
+    expect($editing.get()).toBeNull()
+  })
+
+  it('resets the editing state with the Group', () => {
+    startEdit({ kind: 'expenses', id: 'e1' })
+
+    clearGroup()
+
+    expect($editing.get()).toBeNull()
   })
 })

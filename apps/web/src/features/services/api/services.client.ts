@@ -6,6 +6,13 @@ export const createServicesClient = (options: HttpClientOptions = {}): ServicesC
   return {
     create: async (groupId, input) =>
       unwrap(await http.groups[':groupId'].services.$post({ param: { groupId }, json: input })),
+    update: async (groupId, serviceId, input) =>
+      unwrap(
+        await http.groups[':groupId'].services[':id'].$patch({
+          param: { groupId, id: serviceId },
+          json: input
+        })
+      ),
     delete: async (groupId, serviceId) =>
       unwrap(
         await http.groups[':groupId'].services[':id'].$delete({

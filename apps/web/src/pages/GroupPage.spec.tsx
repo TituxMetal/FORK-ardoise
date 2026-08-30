@@ -1,5 +1,5 @@
 /** @vitest-environment happy-dom */
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
@@ -170,5 +170,75 @@ describe('GroupPage', () => {
     window.dispatchEvent(new Event('focus'))
 
     expect(await screen.findByText('Pizza')).toBeTruthy()
+  })
+  it('edits an Expense from its row with the pre-filled form', async () => {
+    const group = await openGroup()
+    await api.expenses(testUsers.lea).create(group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: 'lea',
+      participantIds: ['lea']
+    })
+    window.dispatchEvent(new Event('focus'))
+    await screen.findByText('Pizza')
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Modifier Pizza' }))
+
+    const form = screen.getByRole('form', { name: 'Modifier une Dépense' })
+    expect((within(form).getByLabelText('Libellé') as HTMLInputElement).value).toBe('Pizza')
+    expect((within(form).getByLabelText('Jour') as HTMLInputElement).value).toBe('2026-08-15')
+    await user.clear(within(form).getByLabelText('Libellé'))
+    await user.type(within(form).getByLabelText('Libellé'), 'Pizza géante')
+    await user.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+    expect(await screen.findByText('Pizza géante')).toBeTruthy()
+    expect(screen.queryByText('Pizza')).toBeNull()
+  })
+
+  it('deletes an Expense only after the confirmation is confirmed', async () => {
+    const group = await openGroup()
+    await api.expenses(testUsers.lea).create(group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: 'lea',
+      participantIds: ['lea']
+    })
+    window.dispatchEvent(new Event('focus'))
+    await screen.findByText('Pizza')
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Supprimer Pizza' }))
+    expect(screen.getByRole('group', { name: 'Supprimer « Pizza » ?' })).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+    expect(screen.getByText('Pizza')).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Supprimer Pizza' }))
+    await user.click(screen.getByRole('button', { name: 'Supprimer' }))
+
+    expect(await screen.findByText('Aucune Dépense')).toBeTruthy()
+  })
+
+  it('closes an open edit when the tab changes', async () => {
+    const group = await openGroup()
+    await api.expenses(testUsers.lea).create(group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: 'lea',
+      participantIds: ['lea']
+    })
+    window.dispatchEvent(new Event('focus'))
+    await screen.findByText('Pizza')
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Modifier Pizza' }))
+    expect(screen.getByRole('form', { name: 'Modifier une Dépense' })).toBeTruthy()
+
+    await user.click(screen.getByRole('tab', { name: 'Services' }))
+    expect(screen.queryByRole('form', { name: 'Modifier une Dépense' })).toBeNull()
   })
 })

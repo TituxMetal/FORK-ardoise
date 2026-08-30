@@ -61,8 +61,30 @@ test.describe('core journey', () => {
     await expect(ownerPage.getByText('On te doit 5,00 €')).toBeVisible()
 
     await addPayback(ownerPage, '5')
-    await expect(ownerPage.getByText('Bob → Alice 5,00 €')).toBeVisible()
+    await expect(ownerPage.getByText('Bob → Alice')).toBeVisible()
+    await expect(ownerPage.getByText('5,00 €')).toBeVisible()
     await expect(ownerPage.getByText('On te doit 0,00 €')).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
+  })
+
+  test('edits an Expense from its row and deletes it behind a confirmation', async () => {
+    await ownerPage.getByRole('tab', { name: 'Dépenses' }).click()
+    await ownerPage.getByRole('button', { name: 'Modifier Resteau' }).click()
+    const editForm = ownerPage.getByRole('form', { name: 'Modifier une Dépense' })
+    await editForm.getByLabel('Libellé').fill('Resteau des familles')
+    await editForm.getByRole('button', { name: 'Enregistrer' }).click()
+    await expect(ownerPage.getByText('Resteau des familles')).toBeVisible()
+
+    await ownerPage.getByRole('button', { name: 'Supprimer Resteau des familles' }).click()
+    await expect(
+      ownerPage.getByRole('group', { name: 'Supprimer « Resteau des familles » ?' })
+    ).toBeVisible()
+    await ownerPage.getByRole('button', { name: 'Annuler' }).click()
+    await expect(ownerPage.getByText('Resteau des familles')).toBeVisible()
+
+    await ownerPage.getByRole('button', { name: 'Supprimer Resteau des familles' }).click()
+    await ownerPage.getByRole('button', { name: 'Supprimer' }).click()
+    await expect(ownerPage.getByText('Aucune Dépense')).toBeVisible()
     await expectNoAxeViolations(ownerPage)
   })
 

@@ -14,6 +14,7 @@ type Props = {
   creditorId: string
   cap: number
   onCancel: () => void
+  mode?: 'create' | 'edit'
 }
 
 export const PaybackFields = ({
@@ -25,19 +26,21 @@ export const PaybackFields = ({
   debtorId,
   creditorId,
   cap,
-  onCancel
+  onCancel,
+  mode = 'create'
 }: Props) => {
   const amountError = form.formState.errors.amount?.message
+  const title = mode === 'edit' ? 'Modifier le Règlement' : 'Constater un Règlement'
 
   return (
     <form
       className="flex flex-col gap-3"
-      aria-label="Constater un Règlement"
+      aria-label={title}
       onSubmit={form.handleSubmit(onSubmit)}
       noValidate
     >
       {error ? <Alert message={error} /> : null}
-      <h3 className="font-medium">Qui doit quoi</h3>
+      <h3 className="font-medium">{mode === 'edit' ? 'Modifier le Règlement' : 'Qui doit quoi'}</h3>
       <FormWrapper label="Débiteur">
         <Select
           value={debtorId}
@@ -68,7 +71,7 @@ export const PaybackFields = ({
       <FormWrapper label="Montant" error={amountError}>
         <Input {...form.register('amount')} required />
       </FormWrapper>
-      <Button type="submit">Constater le Règlement</Button>
+      <Button type="submit">{mode === 'edit' ? 'Enregistrer' : 'Constater le Règlement'}</Button>
       <Button type="button" variant="secondary" onClick={onCancel}>
         Annuler
       </Button>

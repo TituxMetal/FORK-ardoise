@@ -7,6 +7,9 @@ export const $error = atom('')
 // screen level, per the #76 state contract; the page and SlateTabs subscribe.
 export const $activeTab = atom<SlateTab>('expenses')
 export const $formOpen = atom(false)
+// The entry being edited (by kind and id), owned here at the screen level like
+// the create form; create and edit are mutually exclusive.
+export const $editing = atom<{ kind: SlateTab; id: string } | null>(null)
 
 // Generation guard: every load/refresh/apply bumps it, so a stale async
 // result (a load that resolves after the route changed or the page
@@ -19,6 +22,7 @@ export const clearGroup = () => {
   $error.set('')
   $activeTab.set('expenses')
   $formOpen.set(false)
+  $editing.set(null)
 }
 
 export const applyGroup = (group: Group) => {
@@ -27,18 +31,31 @@ export const applyGroup = (group: Group) => {
   $error.set('')
 }
 
-// Switching tab closes an open create form; clicking the already-active tab
-// is a no-op so an open draft is never discarded by a tab re-click.
+// Switching tab closes an open create form and an open edit; clicking the
+// already-active tab is a no-op so an open draft is never discarded by a tab
+// re-click.
 export const setActiveTab = (next: SlateTab) => {
   if (next === $activeTab.get()) return
   $activeTab.set(next)
   $formOpen.set(false)
+  $editing.set(null)
 }
 
 // The + is open-only: its announced action ("Ajouter…") always matches what
 // it does. Closing an open form is the form's Annuler button.
-export const openForm = () => $formOpen.set(true)
+export const openForm = () => {
+  $editing.set(null)
+  $formOpen.set(true)
+}
 export const closeForm = () => $formOpen.set(false)
+
+// Opening an edit closes the create form; the edit form's Annuler and its
+// successful save both cancel the edit.
+export const startEdit = (entry: { kind: SlateTab; id: string }) => {
+  $formOpen.set(false)
+  $editing.set(entry)
+}
+export const cancelEdit = () => $editing.set(null)
 
 export const loadGroup = async (groups: GroupsClient, id: string) => {
   const current = ++requestId

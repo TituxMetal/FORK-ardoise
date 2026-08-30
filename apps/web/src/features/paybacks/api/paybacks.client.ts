@@ -6,6 +6,13 @@ export const createPaybacksClient = (options: HttpClientOptions = {}): PaybacksC
   return {
     create: async (groupId, input) =>
       unwrap(await http.groups[':groupId'].paybacks.$post({ param: { groupId }, json: input })),
+    update: async (groupId, paybackId, input) =>
+      unwrap(
+        await http.groups[':groupId'].paybacks[':id'].$patch({
+          param: { groupId, id: paybackId },
+          json: input
+        })
+      ),
     delete: async (groupId, paybackId) =>
       unwrap(
         await http.groups[':groupId'].paybacks[':id'].$delete({

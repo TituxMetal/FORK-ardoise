@@ -16,16 +16,19 @@ export {
 } from './schemas'
 export {
   $activeTab,
+  $editing,
   $error,
   $formOpen,
   $group,
   applyGroup,
+  cancelEdit,
   clearGroup,
   closeForm,
   loadGroup,
   openForm,
   refreshGroup,
-  setActiveTab
+  setActiveTab,
+  startEdit
 } from './store'
 export { selfBalanceLabel } from './utils'
 export type { Group, GroupsClient, GroupSummary, SlateTab } from './types'
