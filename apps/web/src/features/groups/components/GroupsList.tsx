@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
-import { PencilIcon } from '~/components/icons/PencilIcon'
-import { TrashIcon } from '~/components/icons/TrashIcon'
+import { PencilIcon, TrashIcon } from '~/components/icons'
 import { Link } from '~/lib/router'
 import type { RenameGroupInput } from '../schemas'
 import type { GroupSummary } from '../types'
