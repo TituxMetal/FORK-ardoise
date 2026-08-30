@@ -96,7 +96,7 @@ test.describe('core journey', () => {
     await expectNoAxeViolations(ownerPage)
 
     await ownerPage.getByRole('button', { name: 'Quitter Soirée de Bob' }).click()
-    await expect(ownerPage.getByRole('alertdialog', { name: 'Quitter le Groupe' })).toBeVisible()
+    await expect(ownerPage.getByRole('group', { name: 'Quitter le Groupe' })).toBeVisible()
     await expectNoAxeViolations(ownerPage)
     await ownerPage.getByRole('button', { name: 'Quitter' }).click()
 

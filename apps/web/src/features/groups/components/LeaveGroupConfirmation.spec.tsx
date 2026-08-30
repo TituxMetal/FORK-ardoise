@@ -13,7 +13,7 @@ describe('LeaveGroupConfirmation', () => {
   it('asks for confirmation with the Group name and the deletion rule', () => {
     render(<LeaveGroupConfirmation group={group} onConfirm={() => {}} onCancel={() => {}} />)
 
-    expect(screen.getByRole('alertdialog', { name: 'Quitter le Groupe' })).toBeTruthy()
+    expect(screen.getByRole('group', { name: 'Quitter le Groupe' })).toBeTruthy()
     expect(screen.getByText(/Quitter « Potes de Bob »/)).toBeTruthy()
     expect(screen.getByText(/dernier Membre/)).toBeTruthy()
   })

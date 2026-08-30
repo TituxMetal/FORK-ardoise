@@ -150,7 +150,7 @@ describe('GroupsPage', () => {
     await createNamed('Potes de Bob')
     await userEvent.click(screen.getByRole('button', { name: 'Quitter Potes de Bob' }))
 
-    expect(screen.getByRole('alertdialog', { name: 'Quitter le Groupe' })).toBeTruthy()
+    expect(screen.getByRole('group', { name: 'Quitter le Groupe' })).toBeTruthy()
     expect(screen.getByText(/Quitter « Potes de Bob »/)).toBeTruthy()
 
     await userEvent.click(screen.getByRole('button', { name: 'Quitter' }))

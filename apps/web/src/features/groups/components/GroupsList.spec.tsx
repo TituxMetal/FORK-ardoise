@@ -1,6 +1,7 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -36,6 +37,8 @@ const Harness = ({
   onLeave = () => {},
   onCancelLeave = () => {}
 }: HarnessProps) => {
+  const [renaming, setRenaming] = useState<string | null>(renamingId)
+  const [confirming, setConfirming] = useState<string | null>(confirmingId)
   const renameForm = useForm<RenameGroupInput>({
     resolver: zodResolver(renameGroupSchema),
     defaultValues: { name: 'Potes de Bob' }
@@ -44,15 +47,27 @@ const Harness = ({
   return (
     <GroupsList
       groups={groups}
-      renamingId={renamingId}
-      confirmingId={confirmingId}
+      renamingId={renaming}
+      confirmingId={confirming}
       renameForm={renameForm}
       renameError=""
-      onStartRename={onStartRename}
-      onCancelRename={onCancelRename}
+      onStartRename={group => {
+        onStartRename(group)
+        setRenaming(group.id)
+      }}
+      onCancelRename={() => {
+        onCancelRename()
+        setRenaming(null)
+      }}
       onRename={onRename}
-      onStartLeave={onStartLeave}
-      onCancelLeave={onCancelLeave}
+      onStartLeave={group => {
+        onStartLeave(group)
+        setConfirming(group.id)
+      }}
+      onCancelLeave={() => {
+        onCancelLeave()
+        setConfirming(null)
+      }}
       onLeave={onLeave}
     />
   )
@@ -120,7 +135,7 @@ describe('GroupsList', () => {
   it('shows the leave confirmation for the leaving Group', async () => {
     render(<Harness confirmingId="g2" />)
 
-    expect(screen.getByRole('alertdialog', { name: 'Quitter le Groupe' })).toBeTruthy()
+    expect(screen.getByRole('group', { name: 'Quitter le Groupe' })).toBeTruthy()
     expect(screen.getByText(/Quitter « Collègues »/)).toBeTruthy()
     expect(screen.queryByRole('link', { name: 'Potes de Bob' })).toBeTruthy()
     expect(screen.queryByRole('link', { name: 'Collègues' })).toBeNull()
@@ -142,5 +157,15 @@ describe('GroupsList', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
     expect(cancelled).toEqual(['cancelled'])
+  })
+
+  it('restores focus to the leave trigger when the confirmation is cancelled', async () => {
+    render(<Harness confirmingId="g2" />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Quitter Collègues' }))
+    })
   })
 })
