@@ -23,7 +23,9 @@ const slate = (): GroupDto => ({
   invite: { secret: 'secret' },
   expenses: [],
   services: [],
-  paybacks: [],
+  // The snapshot carries the Payback being edited (DTO shape), so the cap
+  // baseline derives it without a second read.
+  paybacks: [{ id: 'p1', debtorId: 'u2', creditorId: 'u1', amount: 20 }],
   balances: [
     { userId: 'u1', name: 'Léa', amount: 46 },
     { userId: 'u2', name: 'Bob', amount: -13 }

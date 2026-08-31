@@ -16,9 +16,11 @@ export const updatePayback = (paybacks: PaybackRepository, view: SlateView) => (
     paybackId: string,
     input: UpdatePaybackInput
   ) => {
+    // The slate snapshot is authoritative: its Balances, Members and Paybacks
+    // come from the same read, so the cap baseline cannot mix two moments.
     const slate = await view.execute(userId, groupId)
-    const payback = await paybacks.findById(paybackId)
-    if (!payback || payback.groupId !== groupId) {
+    const payback = slate.paybacks.find(payback => payback.id === paybackId)
+    if (!payback) {
       throw notFound('Règlement introuvable')
     }
     if (
@@ -33,8 +35,8 @@ export const updatePayback = (paybacks: PaybackRepository, view: SlateView) => (
       const amount = slate.balances.find(balance => balance.userId === memberId)?.amount ?? 0
       return (
         amount -
-        (payback.debtorId === memberId ? payback.amount.value : 0) +
-        (payback.creditorId === memberId ? payback.amount.value : 0)
+        (payback.debtorId === memberId ? payback.amount : 0) +
+        (payback.creditorId === memberId ? payback.amount : 0)
       )
     }
     const updated = paybackUpdate(
