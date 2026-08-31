@@ -70,4 +70,6 @@ Before every commit: `vp check` and `vp test`. Add Playwright when that suite ex
 The `check:git-workflow` gate (`bun run tools/checkGitWorkflow.ts`) makes these
 rules executable: it fails on a commit on `main`, a non-conventional subject,
 a paragraph commit body, an unpushed branch, or feature work without an open
-pull request. Run it with `vp run check:git-workflow` before pushing.
+pull request against `main`. It needs a pushed branch and an open PR to pass,
+so run it as the completion check after pushing (`vp run check:git-workflow`),
+and in CI with `vp run check:git-workflow --diff origin/main`.
