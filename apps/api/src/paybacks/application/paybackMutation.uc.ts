@@ -1,8 +1,13 @@
 import type { SlateView } from '~/groups/application/getSlate.uc'
 import { slateMutation, type SlateMutation } from '~/groups/application/slateMutation.uc'
-import { paybackCreate, paybackUpdate, type Payback } from '~/paybacks/domain/payback.entity'
+import {
+  paybackCreate,
+  paybackReconstitute,
+  paybackUpdate,
+  type Payback
+} from '~/paybacks/domain/payback.entity'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
-import { amountFromCents, dayFrom } from '~/shared/domain'
+import { amountFromCents, amountReconstitute, dayFrom, dayReconstitute } from '~/shared/domain'
 
 export type PaybackInput = {
   debtorId: string
@@ -18,7 +23,22 @@ export const paybackMutation = (
   slateMutation<PaybackInput, Payback>(view, {
     noun: 'Règlement',
     referencedMemberIds: input => [input.debtorId, input.creditorId],
-    load: paybacks.findById,
+    // The edited Payback is read from the slate snapshot (not the repository),
+    // so the cap baseline and the edited amount describe the same read — a
+    // concurrent edit cannot mix two versions.
+    load: async (id, slate) => {
+      const dto = slate.paybacks.find(payback => payback.id === id)
+      return dto
+        ? paybackReconstitute(
+            dto.id,
+            slate.id,
+            dto.debtorId,
+            dto.creditorId,
+            dayReconstitute(dto.day),
+            amountReconstitute(dto.amount)
+          )
+        : null
+    },
     buildCreate: (slate, groupId, input) => {
       const debtorBalance =
         slate.balances.find(balance => balance.userId === input.debtorId)?.amount ?? 0

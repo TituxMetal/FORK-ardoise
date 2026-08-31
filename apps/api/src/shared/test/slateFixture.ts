@@ -1,4 +1,4 @@
-import type { BalanceDto, GroupDto, MemberDto } from '~/groups/application/group.dto'
+import type { BalanceDto, GroupDto, MemberDto, PaybackDto } from '~/groups/application/group.dto'
 
 const defaultMembers: MemberDto[] = [
   { userId: 'u1', name: 'Léa' },
@@ -8,6 +8,7 @@ const defaultMembers: MemberDto[] = [
 export type SlateFixtureOverrides = {
   members?: MemberDto[]
   balances?: BalanceDto[]
+  paybacks?: PaybackDto[]
 }
 
 /** A canned Slate (GroupDto) for mutation specs, defaulting to two Members with zero Balances. */
@@ -22,7 +23,7 @@ export const slateFixture = (overrides: SlateFixtureOverrides = {}): GroupDto =>
     invite: { secret: 'secret' },
     expenses: [],
     services: [],
-    paybacks: [],
+    paybacks: overrides.paybacks ?? [],
     balances
   }
 }

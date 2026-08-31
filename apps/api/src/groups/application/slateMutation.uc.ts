@@ -14,8 +14,12 @@ export type SlateMutationSpec<TInput, TEntity extends { id: string; groupId: str
   noun: string
   /** Member ids the mutation references; all must sit in the Slate's Members. */
   referencedMemberIds: (input: TInput, slate: GroupDto, existing?: TEntity) => string[]
-  /** Loads the entity to mutate (update/delete). */
-  load: (id: string) => Promise<TEntity | null>
+  /**
+   * Loads the entity to mutate (update/delete). Receives the slate snapshot so
+   * a vocabulary can read the entity from the same snapshot as its validation
+   * baseline (the Payback cap must not mix two reads).
+   */
+  load: (id: string, slate: GroupDto) => Promise<TEntity | null>
   buildCreate: (slate: GroupDto, groupId: string, input: TInput) => TEntity
   buildUpdate: (slate: GroupDto, groupId: string, input: TInput, existing: TEntity) => TEntity
   persist: {
@@ -39,8 +43,8 @@ export const slateMutation = <TInput, TEntity extends { id: string; groupId: str
 ): SlateMutation<TInput> => {
   // The read-and-authorize is the first slate read: getSlate throws when the
   // caller is not a Member. The returned value is the post-write refresh.
-  const requireExisting = async (id: string, groupId: string) => {
-    const existing = await spec.load(id)
+  const requireExisting = async (id: string, groupId: string, slate: GroupDto) => {
+    const existing = await spec.load(id, slate)
     if (!existing || existing.groupId !== groupId) {
       throw notFound(`${spec.noun} introuvable`)
     }
@@ -64,7 +68,7 @@ export const slateMutation = <TInput, TEntity extends { id: string; groupId: str
     update: {
       execute: async (userId, groupId, id, input) => {
         const slate = await view.execute(userId, groupId)
-        const existing = await requireExisting(id, groupId)
+        const existing = await requireExisting(id, groupId, slate)
         requireMembers(input, slate, existing)
         await spec.persist.update(spec.buildUpdate(slate, groupId, input, existing))
         return view.execute(userId, groupId)
@@ -73,8 +77,8 @@ export const slateMutation = <TInput, TEntity extends { id: string; groupId: str
     delete: {
       execute: async (userId, groupId, id) => {
         // The read is the authorization: getSlate throws when not a Member.
-        await view.execute(userId, groupId)
-        const existing = await requireExisting(id, groupId)
+        const slate = await view.execute(userId, groupId)
+        const existing = await requireExisting(id, groupId, slate)
         await spec.persist.delete(existing.id)
         return view.execute(userId, groupId)
       }

@@ -1,23 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { amountReconstitute, dayReconstitute } from '~/shared/domain'
-import {
-  PAYBACK_ABOVE_CAP,
-  paybackReconstitute,
-  type Payback
-} from '~/paybacks/domain/payback.entity'
+import { PAYBACK_ABOVE_CAP, type Payback } from '~/paybacks/domain/payback.entity'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import { slateFixture, viewFixture } from '~/shared/test/slateFixture'
 import { paybackMutation } from './paybackMutation.uc'
-
-const virement = (groupId = 'g1'): Payback =>
-  paybackReconstitute(
-    'p1',
-    groupId,
-    'u2',
-    'u1',
-    dayReconstitute('2026-08-31'),
-    amountReconstitute(20)
-  )
 
 // u1 is owed 66, u2 owes 33: a Payback from u2 to u1 is capped at 33.
 const createSlate = () =>
@@ -28,13 +14,15 @@ const createSlate = () =>
     ]
   })
 
-// The Balances include the edited Payback (20): without it u2 owes 33, still capped at 33.
+// The snapshot carries the edited Payback (20) and Balances that include it:
+// without it u2 owes 33, still capped at 33. Both come from the same read.
 const editSlate = () =>
   slateFixture({
     balances: [
       { userId: 'u1', name: 'Léa', amount: 66 },
       { userId: 'u2', name: 'Bob', amount: -13 }
-    ]
+    ],
+    paybacks: [{ id: 'p1', debtorId: 'u2', creditorId: 'u1', day: '2026-08-31', amount: 20 }]
   })
 
 const repo = (
@@ -42,13 +30,12 @@ const repo = (
     saved?: Payback[]
     updated?: Payback[]
     deleted?: string[]
-    found?: Payback | null
   } = {}
 ): PaybackRepository => ({
   save: async payback => {
     opts.saved?.push(payback)
   },
-  findById: async () => opts.found ?? null,
+  findById: async () => null,
   findByGroupId: async () => [],
   update: async payback => {
     opts.updated?.push(payback)
@@ -121,10 +108,7 @@ describe('paybackMutation.update', () => {
   it('updates the Payback keeping the id and returns the fresh slate', async () => {
     const updated: Payback[] = []
     const calls: string[] = []
-    const mutation = paybackMutation(
-      repo({ updated, found: virement() }),
-      viewFixture(calls, editSlate())
-    )
+    const mutation = paybackMutation(repo({ updated }), viewFixture(calls, editSlate()))
 
     const result = await mutation.update.execute('u1', 'g1', 'p1', {
       debtorId: 'u2',
@@ -148,10 +132,7 @@ describe('paybackMutation.update', () => {
 
   it('re-validates against the Balances without the edited Payback', async () => {
     const updated: Payback[] = []
-    const mutation = paybackMutation(
-      repo({ updated, found: virement() }),
-      viewFixture([], editSlate())
-    )
+    const mutation = paybackMutation(repo({ updated }), viewFixture([], editSlate()))
 
     await mutation.update.execute('u1', 'g1', 'p1', {
       debtorId: 'u2',
@@ -165,10 +146,7 @@ describe('paybackMutation.update', () => {
 
   it('refuses an update above the cap without saving', async () => {
     const updated: Payback[] = []
-    const mutation = paybackMutation(
-      repo({ updated, found: virement() }),
-      viewFixture([], editSlate())
-    )
+    const mutation = paybackMutation(repo({ updated }), viewFixture([], editSlate()))
 
     const update = mutation.update.execute('u1', 'g1', 'p1', {
       debtorId: 'u2',
@@ -183,7 +161,7 @@ describe('paybackMutation.update', () => {
 
   it('refuses an unknown Payback', async () => {
     const updated: Payback[] = []
-    const mutation = paybackMutation(repo({ updated, found: null }), viewFixture([], editSlate()))
+    const mutation = paybackMutation(repo({ updated }), viewFixture([], editSlate()))
 
     const update = mutation.update.execute('u1', 'g1', 'inconnu', {
       debtorId: 'u2',
@@ -201,10 +179,7 @@ describe('paybackMutation.update', () => {
 
   it('refuses a Member who is not in the Group', async () => {
     const updated: Payback[] = []
-    const mutation = paybackMutation(
-      repo({ updated, found: virement() }),
-      viewFixture([], editSlate())
-    )
+    const mutation = paybackMutation(repo({ updated }), viewFixture([], editSlate()))
 
     const update = mutation.update.execute('u1', 'g1', 'p1', {
       debtorId: 'u9',
@@ -225,10 +200,7 @@ describe('paybackMutation.delete', () => {
   it('deletes the Payback and returns the fresh slate', async () => {
     const deleted: string[] = []
     const calls: string[] = []
-    const mutation = paybackMutation(
-      repo({ deleted, found: virement() }),
-      viewFixture(calls, editSlate())
-    )
+    const mutation = paybackMutation(repo({ deleted }), viewFixture(calls, editSlate()))
 
     const result = await mutation.delete.execute('u1', 'g1', 'p1')
 
@@ -239,25 +211,9 @@ describe('paybackMutation.delete', () => {
 
   it('refuses an unknown Payback', async () => {
     const deleted: string[] = []
-    const mutation = paybackMutation(repo({ deleted, found: null }), viewFixture([], editSlate()))
+    const mutation = paybackMutation(repo({ deleted }), viewFixture([], editSlate()))
 
     const remove = mutation.delete.execute('u1', 'g1', 'inconnu')
-
-    await expect(remove).rejects.toMatchObject({
-      code: 'NOT_FOUND',
-      message: 'Règlement introuvable'
-    })
-    expect(deleted).toEqual([])
-  })
-
-  it('refuses a Payback of another Group', async () => {
-    const deleted: string[] = []
-    const mutation = paybackMutation(
-      repo({ deleted, found: virement('g2') }),
-      viewFixture([], editSlate())
-    )
-
-    const remove = mutation.delete.execute('u1', 'g1', 'p1')
 
     await expect(remove).rejects.toMatchObject({
       code: 'NOT_FOUND',
