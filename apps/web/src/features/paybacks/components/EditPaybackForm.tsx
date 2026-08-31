@@ -8,6 +8,7 @@ import { $group, applyGroup } from '~features/groups'
 import { paybacksClient } from '../api'
 import { createPaybackSchema, type CreatePaybackFormInput } from '../schemas'
 import type { PaybacksClient } from '../types'
+import { paybackCap, paybackCreditors } from '../utils'
 import { PaybackFields } from './PaybackFields'
 
 type Props = {
@@ -35,24 +36,18 @@ export const EditPaybackForm = ({ paybackId, client = paybacksClient, onCancel }
   const creditorId = useWatch({ control: form.control, name: 'creditorId' })
 
   const members = group?.members ?? []
-  // The Balances include the payback being edited; the cap and the creditor
-  // list are re-derived without it, so a payback at the cap stays editable.
-  const balanceWithout = (memberId: string) =>
-    (group?.balances.find(balance => balance.userId === memberId)?.amount ?? 0) -
-    (payback && memberId === payback.debtorId ? payback.amount : 0) +
-    (payback && memberId === payback.creditorId ? payback.amount : 0)
-  const creditors =
-    group?.balances
-      .map(balance => ({ ...balance, amount: balanceWithout(balance.userId) }))
-      .filter(balance => balance.amount > 0)
-      .sort((a, b) => b.amount - a.amount) ?? []
+  const balances = group?.balances ?? []
+  // The Slate Balances include the payback being edited; the cap and the
+  // creditor list are re-derived without it, so a payback at the cap stays
+  // editable. Create passes null and reads the raw Balances.
+  const creditors = paybackCreditors(balances, payback ?? null)
   const effectiveDebtorId = members.some(member => member.userId === debtorId)
     ? debtorId
     : (payback?.debtorId ?? members[0]?.userId ?? '')
   const effectiveCreditorId = creditors.some(balance => balance.userId === creditorId)
     ? creditorId
     : (payback?.creditorId ?? creditors[0]?.userId ?? '')
-  const cap = Math.min(-balanceWithout(effectiveDebtorId), balanceWithout(effectiveCreditorId))
+  const cap = paybackCap(balances, payback ?? null, effectiveDebtorId, effectiveCreditorId)
 
   const onSubmit: SubmitHandler<CreatePaybackFormInput> = async values => {
     if (!group || !payback) return

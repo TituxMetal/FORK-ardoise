@@ -8,6 +8,7 @@ import { $group, applyGroup } from '~features/groups'
 import { paybacksClient } from '../api'
 import { createPaybackSchema, type CreatePaybackFormInput } from '../schemas'
 import type { PaybacksClient } from '../types'
+import { paybackCap, paybackCreditors } from '../utils'
 import { PaybackFields } from './PaybackFields'
 
 type Props = {
@@ -26,22 +27,17 @@ export const PaybackForm = ({ client = paybacksClient, onCancel }: Props) => {
   const creditorId = useWatch({ control: form.control, name: 'creditorId' })
 
   const members = group?.members ?? []
-  const creditors =
-    group?.balances.filter(balance => balance.amount > 0).sort((a, b) => b.amount - a.amount) ?? []
+  const balances = group?.balances ?? []
+  const creditors = paybackCreditors(balances, null)
   // An untouched select re-derives its default from the current Balances; a
   // touched one keeps the choice while it stays valid.
   const effectiveDebtorId = members.some(member => member.userId === debtorId)
     ? debtorId
-    : (group?.balances.find(balance => balance.amount < 0)?.userId ?? members[0]?.userId ?? '')
+    : (balances.find(balance => balance.amount < 0)?.userId ?? members[0]?.userId ?? '')
   const effectiveCreditorId = creditors.some(balance => balance.userId === creditorId)
     ? creditorId
     : (creditors[0]?.userId ?? '')
-  const cap = group
-    ? Math.min(
-        -(group.balances.find(balance => balance.userId === effectiveDebtorId)?.amount ?? 0),
-        group.balances.find(balance => balance.userId === effectiveCreditorId)?.amount ?? 0
-      )
-    : 0
+  const cap = group ? paybackCap(balances, null, effectiveDebtorId, effectiveCreditorId) : 0
 
   const onSubmit: SubmitHandler<CreatePaybackFormInput> = async values => {
     if (!group) return

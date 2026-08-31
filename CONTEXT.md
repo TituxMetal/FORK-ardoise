@@ -60,7 +60,7 @@ A Member's derived net position in a Group. Positive: the Group owes them. Negat
 _Avoid_: solde, debt, dette, solde global, global balance
 
 **Payback**:
-A transfer from one Member to another that reduces what is owed. Real money changing hands.
+A transfer from one Member to another that reduces what is owed. Real money changing hands. Its Amount is capped by the Balances it cancels: it cannot overpay the Debtor's debit nor the Creditor's credit.
 _Avoid_: règlement, settlement, repayment, payment, transfert, remboursement, paiement
 
 **Slate**:
