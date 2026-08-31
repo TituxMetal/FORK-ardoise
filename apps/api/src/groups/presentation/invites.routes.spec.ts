@@ -131,6 +131,31 @@ const createGroup = (app: ReturnType<typeof createApp>, cookie: string, name: st
   })
 
 describe('invites', () => {
+  it('previews the Group name and Member count without a session', async () => {
+    const app = await createTestApp()
+    const lea = await signUp(app)
+    const created = await createGroup(app, cookieHeader(lea), 'Potes de Bob')
+    const { invite } = (await created.json()) as GroupDto
+
+    const preview = await app.request(`/invites/${invite.secret}/preview`)
+
+    expect(preview.status).toBe(200)
+    expect(await preview.json()).toEqual({ name: 'Potes de Bob', memberCount: 1 })
+  })
+
+  it('previews an unknown Invite secret as not found', async () => {
+    const app = await createTestApp()
+
+    const preview = await app.request(`/invites/${crypto.randomUUID()}/preview`)
+
+    expect(preview.status).toBe(404)
+    expect(await preview.json()).toEqual({
+      statusCode: 404,
+      code: 'NOT_FOUND',
+      message: 'Invitation introuvable'
+    })
+  })
+
   it('a User with a session who opens the Invite becomes a Member', async () => {
     const app = await createTestApp()
     const lea = await signUp(app)

@@ -5,7 +5,10 @@ import { prismaExpenseAdapter } from '~/expenses/infrastructure/prismaExpense.ad
 import { createExpensesRoutes } from '~/expenses/presentation/expenses.routes'
 import { prismaGroupAdapter } from '~/groups/infrastructure/prismaGroup.adapter'
 import { createGroupsRoutes } from '~/groups/presentation/groups.routes'
-import { createInvitesRoutes } from '~/groups/presentation/invites.routes'
+import {
+  createInvitePreviewRoutes,
+  createInvitesRoutes
+} from '~/groups/presentation/invites.routes'
 import { prismaServiceAdapter } from '~/services/infrastructure/prismaService.adapter'
 import { createServicesRoutes } from '~/services/presentation/services.routes'
 import { prismaPaybackAdapter } from '~/paybacks/infrastructure/prismaPayback.adapter'
@@ -30,6 +33,7 @@ export const createApp = (
     .onError(mapException)
     .get('/ping', c => c.body(null, 200))
     .on(['POST', 'GET'], '/auth/*', c => auth.handler(c.req.raw))
+    .route('/invites', createInvitePreviewRoutes(groups))
     .use('/groups/*', requireSession(auth))
     .use('/groups', requireSession(auth))
     .use('/invites/*', requireSession(auth))
