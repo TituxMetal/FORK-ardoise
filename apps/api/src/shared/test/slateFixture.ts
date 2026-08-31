@@ -13,7 +13,9 @@ export type SlateFixtureOverrides = {
 
 /** A canned Slate (GroupDto) for mutation specs, defaulting to two Members with zero Balances. */
 export const slateFixture = (overrides: SlateFixtureOverrides = {}): GroupDto => {
-  const members = overrides.members ?? defaultMembers
+  // A fresh array (and element copies) so a test mutating the returned
+  // members cannot leak into later tests via the module-level default.
+  const members = overrides.members ?? defaultMembers.map(member => ({ ...member }))
   const balances = overrides.balances ?? members.map(member => ({ ...member, amount: 0 }))
   return {
     id: 'g1',
