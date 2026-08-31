@@ -2,8 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppLayout } from '~/layouts/AppLayout'
 import { authClient } from '~features/session'
-import { useRoute } from '~/lib/router'
-import type { Route } from '~/lib/router'
+import { useRoute, type Route } from '~/lib/router'
 import { AuthPage } from '~/pages/AuthPage'
 import { GroupsPage } from '~/pages/GroupsPage'
 import { GroupPage } from '~/pages/GroupPage'
@@ -17,7 +16,7 @@ const App = () => {
 
   if (route === null || isPending) {
     return (
-      <AppLayout session={null} current="groups">
+      <AppLayout session={null} currentRoute="groups">
         <p>Chargement…</p>
       </AppLayout>
     )
@@ -42,10 +41,11 @@ const App = () => {
       <GroupsPage />
     )
 
-  const current: Route['name'] = session !== null && route.name === 'auth' ? 'groups' : route.name
+  const currentRoute: Route['name'] =
+    session !== null && route.name === 'auth' ? 'groups' : route.name
 
   return (
-    <AppLayout session={session ? { name: session.user.name } : null} current={current}>
+    <AppLayout session={session ? { name: session.user.name } : null} currentRoute={currentRoute}>
       {page}
     </AppLayout>
   )

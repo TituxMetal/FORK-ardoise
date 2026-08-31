@@ -19,7 +19,7 @@ afterEach(() => {
 describe('AppLayout', () => {
   it('renders the title and children without the shell while signed out', () => {
     render(
-      <AppLayout session={null} current="groups">
+      <AppLayout session={null} currentRoute="groups">
         <p>Contenu</p>
       </AppLayout>
     )
@@ -33,7 +33,7 @@ describe('AppLayout', () => {
 
   it('renders the two first-level destinations at both breakpoints for an open session', () => {
     render(
-      <AppLayout session={{ name: 'Léa' }} current="groups">
+      <AppLayout session={{ name: 'Léa' }} currentRoute="groups">
         <p>Contenu</p>
       </AppLayout>
     )
@@ -57,7 +57,7 @@ describe('AppLayout', () => {
 
   it('marks Profil as the current destination on the Profile page', () => {
     render(
-      <AppLayout session={{ name: 'Léa' }} current="profile">
+      <AppLayout session={{ name: 'Léa' }} currentRoute="profile">
         <p>Contenu</p>
       </AppLayout>
     )
@@ -71,7 +71,7 @@ describe('AppLayout', () => {
 
   it('keeps Mes groupes current inside a Group screen', () => {
     render(
-      <AppLayout session={{ name: 'Léa' }} current="group">
+      <AppLayout session={{ name: 'Léa' }} currentRoute="group">
         <p>Contenu</p>
       </AppLayout>
     )
@@ -85,7 +85,7 @@ describe('AppLayout', () => {
 
   it('hides the shell on the Invite screen even with an open session', () => {
     render(
-      <AppLayout session={{ name: 'Léa' }} current="invite">
+      <AppLayout session={{ name: 'Léa' }} currentRoute="invite">
         <p>Contenu</p>
       </AppLayout>
     )
@@ -98,7 +98,7 @@ describe('AppLayout', () => {
   it('closes the session when the Member asks to', async () => {
     const user = userEvent.setup()
     render(
-      <AppLayout session={{ name: 'Léa' }} current="groups">
+      <AppLayout session={{ name: 'Léa' }} currentRoute="groups">
         <p>Contenu</p>
       </AppLayout>
     )

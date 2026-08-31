@@ -5,7 +5,7 @@ import { Link, type Route } from '~/lib/router'
 
 type Props = {
   session: { name: string } | null
-  current: Route['name']
+  currentRoute: Route['name']
   children: ReactNode
 }
 
@@ -20,12 +20,12 @@ const DESTINATIONS: Destination[] = [
   { label: 'Profil', to: '/profile', active: ['profile'] }
 ]
 
-export const AppLayout = ({ session, current, children }: Props) => {
+export const AppLayout = ({ session, currentRoute, children }: Props) => {
   const signOut = async () => {
     await authClient.signOut()
   }
 
-  const showShell = session !== null && current !== 'invite'
+  const showShell = session !== null && currentRoute !== 'invite'
 
   if (!showShell) {
     return (
@@ -50,9 +50,9 @@ export const AppLayout = ({ session, current, children }: Props) => {
             <Link
               key={destination.label}
               to={destination.to}
-              aria-current={destination.active.includes(current) ? 'page' : undefined}
+              aria-current={destination.active.includes(currentRoute) ? 'page' : undefined}
               className={`flex h-10 items-center rounded-md px-3 text-sm font-medium ${
-                destination.active.includes(current)
+                destination.active.includes(currentRoute)
                   ? 'bg-surface text-foreground'
                   : 'text-dim hover:bg-surface/60 hover:text-foreground'
               }`}
@@ -90,11 +90,11 @@ export const AppLayout = ({ session, current, children }: Props) => {
             <Link
               key={destination.label}
               to={destination.to}
-              aria-current={destination.active.includes(current) ? 'page' : undefined}
+              aria-current={destination.active.includes(currentRoute) ? 'page' : undefined}
               className={`flex h-12 flex-1 items-center justify-center text-sm font-medium ${
                 index > 0 ? 'border-l border-border ' : ''
               }${
-                destination.active.includes(current)
+                destination.active.includes(currentRoute)
                   ? 'text-foreground'
                   : 'text-dim hover:text-foreground'
               }`}
