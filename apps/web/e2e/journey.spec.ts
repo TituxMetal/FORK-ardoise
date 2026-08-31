@@ -100,7 +100,9 @@ test.describe('core journey', () => {
     await form.getByRole('button', { name: 'Enregistrer' }).click()
 
     await expect(ownerPage.getByText('Nom modifié')).toBeVisible()
-    await expect(ownerPage.getByText('Session ouverte : Aline')).toBeVisible()
+    await expect(
+      ownerPage.getByRole('complementary').getByText('Session ouverte : Aline')
+    ).toBeVisible()
 
     await ownerPage.goto('/profile')
     await expect(form.getByLabel('Nom')).toHaveValue('Aline')

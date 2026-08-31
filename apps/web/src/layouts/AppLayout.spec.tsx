@@ -17,48 +17,94 @@ afterEach(() => {
 })
 
 describe('AppLayout', () => {
-  it('renders the title and its children', () => {
+  it('renders the title and children without the shell while signed out', () => {
     render(
-      <AppLayout session={null}>
+      <AppLayout session={null} current="groups">
         <p>Contenu</p>
       </AppLayout>
     )
 
     expect(screen.getByRole('heading', { name: 'Ardoise' })).toBeTruthy()
     expect(screen.getByText('Contenu')).toBeTruthy()
+    expect(screen.queryByRole('navigation', { name: 'Navigation principale' })).toBeNull()
+    expect(screen.queryByText('Session ouverte :')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Fermer la session' })).toBeNull()
   })
 
-  it('links the signed-in Member to the Profile page', () => {
+  it('renders the two first-level destinations at both breakpoints for an open session', () => {
     render(
-      <AppLayout session={{ name: 'Léa' }}>
+      <AppLayout session={{ name: 'Léa' }} current="groups">
         <p>Contenu</p>
       </AppLayout>
     )
 
-    expect(screen.getByRole('link', { name: 'Profil' }).getAttribute('href')).toBe('/profile')
+    expect(screen.getByRole('heading', { name: 'Ardoise' })).toBeTruthy()
+    expect(screen.getAllByRole('navigation', { name: 'Navigation principale' })).toHaveLength(2)
+
+    const groupsLinks = screen.getAllByRole('link', { name: 'Mes groupes' })
+    expect(groupsLinks).toHaveLength(2)
+    expect(groupsLinks.every(link => link.getAttribute('href') === '/')).toBeTruthy()
+    expect(groupsLinks.every(link => link.getAttribute('aria-current') === 'page')).toBeTruthy()
+
+    const profileLinks = screen.getAllByRole('link', { name: 'Profil' })
+    expect(profileLinks).toHaveLength(2)
+    expect(profileLinks.every(link => link.getAttribute('href') === '/profile')).toBeTruthy()
+    expect(profileLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
+
+    expect(screen.getAllByText('Session ouverte : Léa')).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: 'Fermer la session' })).toHaveLength(2)
+  })
+
+  it('marks Profil as the current destination on the Profile page', () => {
+    render(
+      <AppLayout session={{ name: 'Léa' }} current="profile">
+        <p>Contenu</p>
+      </AppLayout>
+    )
+
+    const profileLinks = screen.getAllByRole('link', { name: 'Profil' })
+    expect(profileLinks.every(link => link.getAttribute('aria-current') === 'page')).toBeTruthy()
+
+    const groupsLinks = screen.getAllByRole('link', { name: 'Mes groupes' })
+    expect(groupsLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
+  })
+
+  it('keeps Mes groupes current inside a Group screen', () => {
+    render(
+      <AppLayout session={{ name: 'Léa' }} current="group">
+        <p>Contenu</p>
+      </AppLayout>
+    )
+
+    const groupsLinks = screen.getAllByRole('link', { name: 'Mes groupes' })
+    expect(groupsLinks.every(link => link.getAttribute('aria-current') === 'page')).toBeTruthy()
+
+    const profileLinks = screen.getAllByRole('link', { name: 'Profil' })
+    expect(profileLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
+  })
+
+  it('hides the shell on the Invite screen even with an open session', () => {
+    render(
+      <AppLayout session={{ name: 'Léa' }} current="invite">
+        <p>Contenu</p>
+      </AppLayout>
+    )
+
+    expect(screen.getByText('Contenu')).toBeTruthy()
+    expect(screen.queryByRole('navigation', { name: 'Navigation principale' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Fermer la session' })).toBeNull()
   })
 
   it('closes the session when the Member asks to', async () => {
     const user = userEvent.setup()
     render(
-      <AppLayout session={{ name: 'Léa' }}>
+      <AppLayout session={{ name: 'Léa' }} current="groups">
         <p>Contenu</p>
       </AppLayout>
     )
 
-    await user.click(screen.getByRole('button', { name: 'Fermer la session' }))
+    await user.click(screen.getAllByRole('button', { name: 'Fermer la session' })[0])
 
     expect(authClient.signOut).toHaveBeenCalled()
-  })
-
-  it('hides the session panel without an open session', () => {
-    render(
-      <AppLayout session={null}>
-        <p>Contenu</p>
-      </AppLayout>
-    )
-
-    expect(screen.queryByText('Session ouverte :')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Fermer la session' })).toBeNull()
   })
 })
