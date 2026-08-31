@@ -4,8 +4,9 @@ type Props = ComponentProps<'button'> & {
   variant?: 'primary' | 'secondary' | 'danger'
 }
 
-export const Button = ({ className, variant = 'primary', ...rest }: Props) => (
+export const Button = ({ className, variant = 'primary', ref, ...rest }: Props) => (
   <button
+    ref={ref}
     className={`inline-flex h-11 items-center justify-center gap-1.5 rounded-lg px-3 font-semibold transition-colors ${
       variant === 'primary'
         ? 'bg-accent text-on-accent hover:bg-accent/90'
