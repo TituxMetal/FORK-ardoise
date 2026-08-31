@@ -14,8 +14,21 @@ describe('groupsClient', () => {
     await expect(api.groups(testUsers.lea).get('missing')).rejects.toThrow('Groupe introuvable')
   })
 
-  it('throws the API message when the Invite is missing', async () => {
-    await expect(api.groups(testUsers.lea).join('nope')).rejects.toThrow('Invitation introuvable')
+  it('previews a Group without joining', async () => {
+    const lea = api.groups(testUsers.lea)
+
+    const group = await lea.create('Potes de Bob')
+
+    await expect(lea.preview(group.invite.secret)).resolves.toEqual({
+      name: 'Potes de Bob',
+      memberCount: 1
+    })
+  })
+
+  it('throws the API message when previewing an unknown Invite', async () => {
+    await expect(api.groups(testUsers.lea).preview('nope')).rejects.toThrow(
+      'Invitation introuvable'
+    )
   })
 
   it('creates, lists and fetches a Group', async () => {

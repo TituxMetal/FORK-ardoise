@@ -31,4 +31,4 @@ export {
   startEdit
 } from './store'
 export { selfBalanceLabel } from './utils'
-export type { Group, GroupsClient, GroupSummary, SlateTab } from './types'
+export type { Group, GroupsClient, GroupSummary, InvitePreview, SlateTab } from './types'

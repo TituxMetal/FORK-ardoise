@@ -7,6 +7,8 @@ export const createGroupsClient = (options: HttpClientOptions = {}): GroupsClien
     list: async () => unwrap(await http.groups.$get()),
     create: async name => unwrap(await http.groups.$post({ json: { name } })),
     get: async id => unwrap(await http.groups[':id'].$get({ param: { id } })),
+    preview: async secret =>
+      unwrap(await http.invites[':secret']['preview'].$get({ param: { secret } })),
     join: async secret => unwrap(await http.invites[':secret'].$post({ param: { secret } })),
     rename: async (id, name) =>
       unwrap(await http.groups[':id'].$patch({ param: { id }, json: { name } })),
