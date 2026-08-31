@@ -38,6 +38,7 @@ export type PaybackDto = {
   id: string
   debtorId: string
   creditorId: string
+  day: string
   amount: number
 }
 

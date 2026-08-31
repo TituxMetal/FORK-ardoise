@@ -1,10 +1,12 @@
 import { invalidData, type Amount } from '~/shared/domain'
+import type { Day } from '~/expenses/domain/day.vo'
 
 export type Payback = {
   id: string
   groupId: string
   debtorId: string
   creditorId: string
+  day: Day
   amount: Amount
 }
 
@@ -20,6 +22,7 @@ const paybackValidated = (
   groupId: string,
   debtorId: string,
   creditorId: string,
+  day: Day,
   amount: Amount,
   debtorBalance: number,
   creditorBalance: number
@@ -34,19 +37,20 @@ const paybackValidated = (
   if (amount.value > cap) {
     throw invalidData(PAYBACK_ABOVE_CAP)
   }
-  return { groupId, debtorId, creditorId, amount }
+  return { groupId, debtorId, creditorId, day, amount }
 }
 
 export const paybackCreate = (
   groupId: string,
   debtorId: string,
   creditorId: string,
+  day: Day,
   amount: Amount,
   debtorBalance: number,
   creditorBalance: number
 ): Payback => ({
   id: crypto.randomUUID(),
-  ...paybackValidated(groupId, debtorId, creditorId, amount, debtorBalance, creditorBalance)
+  ...paybackValidated(groupId, debtorId, creditorId, day, amount, debtorBalance, creditorBalance)
 })
 
 // An edit re-validates against the Balances without the Payback being edited
@@ -56,12 +60,13 @@ export const paybackUpdate = (
   groupId: string,
   debtorId: string,
   creditorId: string,
+  day: Day,
   amount: Amount,
   debtorBalance: number,
   creditorBalance: number
 ): Payback => ({
   id,
-  ...paybackValidated(groupId, debtorId, creditorId, amount, debtorBalance, creditorBalance)
+  ...paybackValidated(groupId, debtorId, creditorId, day, amount, debtorBalance, creditorBalance)
 })
 
 export const paybackReconstitute = (
@@ -69,5 +74,6 @@ export const paybackReconstitute = (
   groupId: string,
   debtorId: string,
   creditorId: string,
+  day: Day,
   amount: Amount
-): Payback => ({ id, groupId, debtorId, creditorId, amount })
+): Payback => ({ id, groupId, debtorId, creditorId, day, amount })

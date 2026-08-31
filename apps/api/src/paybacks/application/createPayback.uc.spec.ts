@@ -51,6 +51,7 @@ describe('createPayback', () => {
     const result = await paybacks.execute('u2', 'g1', {
       debtorId: 'u2',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 20
     })
 
@@ -59,6 +60,7 @@ describe('createPayback', () => {
       groupId: 'g1',
       debtorId: 'u2',
       creditorId: 'u1',
+      day: { value: '2026-08-31' },
       amount: { value: 20 }
     })
     expect(calls).toEqual(['u2:g1', 'u2:g1'])
@@ -72,6 +74,7 @@ describe('createPayback', () => {
     const create = paybacks.execute('u2', 'g1', {
       debtorId: 'u2',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 34
     })
 
@@ -89,6 +92,7 @@ describe('createPayback', () => {
     const create = paybacks.execute('u2', 'g1', {
       debtorId: 'u9',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 10
     })
 

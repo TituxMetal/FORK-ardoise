@@ -1,12 +1,20 @@
 import { describe, expect, it } from 'vite-plus/test'
 import type { GroupDto } from '~/groups/application/group.dto'
 import { amountReconstitute } from '~/shared/domain'
+import { dayReconstitute } from '~/expenses/domain/day.vo'
 import { paybackReconstitute, type Payback } from '~/paybacks/domain/payback.entity'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import { deletePayback } from './deletePayback.uc'
 
 const virement = (groupId = 'g1'): Payback =>
-  paybackReconstitute('p1', groupId, 'u2', 'u1', amountReconstitute(10))
+  paybackReconstitute(
+    'p1',
+    groupId,
+    'u2',
+    'u1',
+    dayReconstitute('2026-08-31'),
+    amountReconstitute(10)
+  )
 
 const slate = (): GroupDto => ({
   id: 'g1',

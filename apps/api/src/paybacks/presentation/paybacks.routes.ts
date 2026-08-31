@@ -10,7 +10,8 @@ import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 const createPaybackBody = z.object({
   debtorId: z.string(),
   creditorId: z.string(),
-  amount: z.number()
+  amount: z.number(),
+  day: z.string()
 })
 
 export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateView) => {

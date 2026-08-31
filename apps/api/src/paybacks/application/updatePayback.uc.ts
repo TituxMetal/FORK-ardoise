@@ -1,4 +1,5 @@
 import type { SlateView } from '~/groups/application/getSlate.uc'
+import { dayFrom } from '~/expenses/domain/day.vo'
 import { paybackUpdate } from '~/paybacks/domain/payback.entity'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import { amountFromCents, invalidData, notFound } from '~/shared/domain'
@@ -7,6 +8,7 @@ export type UpdatePaybackInput = {
   debtorId: string
   creditorId: string
   amount: number
+  day: string
 }
 
 export const updatePayback = (paybacks: PaybackRepository, view: SlateView) => ({
@@ -44,6 +46,7 @@ export const updatePayback = (paybacks: PaybackRepository, view: SlateView) => (
       groupId,
       input.debtorId,
       input.creditorId,
+      dayFrom(input.day),
       amountFromCents(input.amount),
       withoutEdited(input.debtorId),
       withoutEdited(input.creditorId)

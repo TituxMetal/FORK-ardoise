@@ -8,6 +8,7 @@ describe('toPayback', () => {
       groupId: 'g1',
       debtorId: 'u-bob',
       creditorId: 'u-lea',
+      day: '2026-08-31',
       amount: 500
     })
 
@@ -16,6 +17,7 @@ describe('toPayback', () => {
       groupId: 'g1',
       debtorId: 'u-bob',
       creditorId: 'u-lea',
+      day: { value: '2026-08-31' },
       amount: { value: 500 }
     })
   })

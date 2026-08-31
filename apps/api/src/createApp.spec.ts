@@ -71,13 +71,19 @@ const groupIdSql = readFileSync(
   ),
   'utf8'
 )
+const paybackDaySql = readFileSync(
+  fileURLToPath(
+    new URL('../prisma/migrations/20260831042629_payback_day/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
 
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}`
+    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}\n${paybackDaySql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))

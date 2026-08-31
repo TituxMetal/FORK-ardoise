@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
 import { amountFromCents } from '~/shared/domain'
+import { dayReconstitute } from '~/expenses/domain/day.vo'
 
 import { paybackReconstitute } from '~/paybacks/domain/payback.entity'
 import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
@@ -20,13 +21,20 @@ const createTestDb = async () => {
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sql('20260815130000_session_user')}\n${sql('20260815190000_groupe_membre')}\n${sql('20260816042947_invitation_secret')}\n${sql('20260816052720_depense')}\n${sql('20260816061030_service')}\n${sql('20260816070637_reglement')}\n${sql('20260816153023_rename_to_glossary')}\n${sql('20260817000000_expense_columns')}\n${sql('20260818000000_invite_secret')}\n${sql('20260818010000_group_id')}`
+    `${sql('20260815130000_session_user')}\n${sql('20260815190000_groupe_membre')}\n${sql('20260816042947_invitation_secret')}\n${sql('20260816052720_depense')}\n${sql('20260816061030_service')}\n${sql('20260816070637_reglement')}\n${sql('20260816153023_rename_to_glossary')}\n${sql('20260817000000_expense_columns')}\n${sql('20260818000000_invite_secret')}\n${sql('20260818010000_group_id')}\n${sql('20260831042629_payback_day')}`
   )
   sqlite.close()
   return createPrismaClient(url)
 }
 
-const payback = paybackReconstitute('p1', 'g1', 'u-bob', 'u-lea', amountFromCents(500))
+const payback = paybackReconstitute(
+  'p1',
+  'g1',
+  'u-bob',
+  'u-lea',
+  dayReconstitute('2026-08-31'),
+  amountFromCents(500)
+)
 
 describe('prismaPaybackAdapter', () => {
   it('saves a Payback and reads it back', async () => {
@@ -56,7 +64,14 @@ describe('prismaPaybackAdapter', () => {
       data: { id: 'g1', name: 'Potes de Bob', inviteSecret: 'secret-1' }
     })
     const adapter = prismaPaybackAdapter(prisma)
-    const second = paybackReconstitute('p2', 'g1', 'u-camille', 'u-lea', amountFromCents(300))
+    const second = paybackReconstitute(
+      'p2',
+      'g1',
+      'u-camille',
+      'u-lea',
+      dayReconstitute('2026-08-31'),
+      amountFromCents(300)
+    )
 
     await adapter.save(payback)
     await adapter.save(second)
@@ -95,7 +110,14 @@ describe('prismaPaybackAdapter', () => {
     })
     const adapter = prismaPaybackAdapter(prisma)
     await adapter.save(payback)
-    const edited = paybackReconstitute('p1', 'g1', 'u-lea', 'u-bob', amountFromCents(400))
+    const edited = paybackReconstitute(
+      'p1',
+      'g1',
+      'u-lea',
+      'u-bob',
+      dayReconstitute('2026-08-31'),
+      amountFromCents(400)
+    )
 
     await adapter.update(edited)
 

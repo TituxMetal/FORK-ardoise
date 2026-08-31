@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test'
 import type { GroupDto } from '~/groups/application/group.dto'
 import { amountReconstitute } from '~/shared/domain'
+import { dayReconstitute } from '~/expenses/domain/day.vo'
 import {
   PAYBACK_ABOVE_CAP,
   paybackReconstitute,
@@ -10,7 +11,14 @@ import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import { updatePayback } from './updatePayback.uc'
 
 const virement = (groupId = 'g1'): Payback =>
-  paybackReconstitute('p1', groupId, 'u2', 'u1', amountReconstitute(20))
+  paybackReconstitute(
+    'p1',
+    groupId,
+    'u2',
+    'u1',
+    dayReconstitute('2026-08-31'),
+    amountReconstitute(20)
+  )
 
 const slate = (): GroupDto => ({
   id: 'g1',
@@ -25,7 +33,7 @@ const slate = (): GroupDto => ({
   services: [],
   // The snapshot carries the Payback being edited (DTO shape), so the cap
   // baseline derives it without a second read.
-  paybacks: [{ id: 'p1', debtorId: 'u2', creditorId: 'u1', amount: 20 }],
+  paybacks: [{ id: 'p1', debtorId: 'u2', creditorId: 'u1', day: '2026-08-31', amount: 20 }],
   balances: [
     { userId: 'u1', name: 'Léa', amount: 46 },
     { userId: 'u2', name: 'Bob', amount: -13 }
@@ -56,6 +64,7 @@ describe('updatePayback', () => {
     const result = await paybacks.execute('u1', 'g1', 'p1', {
       debtorId: 'u2',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 30
     })
 
@@ -65,6 +74,7 @@ describe('updatePayback', () => {
       groupId: 'g1',
       debtorId: 'u2',
       creditorId: 'u1',
+      day: dayReconstitute('2026-08-31'),
       amount: amountReconstitute(30)
     })
     expect(calls).toEqual(['u1:g1', 'u1:g1'])
@@ -81,6 +91,7 @@ describe('updatePayback', () => {
     await paybacks.execute('u1', 'g1', 'p1', {
       debtorId: 'u2',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 33
     })
 
@@ -96,6 +107,7 @@ describe('updatePayback', () => {
     const edit = paybacks.execute('u1', 'g1', 'p1', {
       debtorId: 'u2',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 34
     })
 
@@ -113,6 +125,7 @@ describe('updatePayback', () => {
     const edit = paybacks.execute('u1', 'g1', 'inconnu', {
       debtorId: 'u2',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 10
     })
 
@@ -132,6 +145,7 @@ describe('updatePayback', () => {
     const edit = paybacks.execute('u1', 'g1', 'p1', {
       debtorId: 'u9',
       creditorId: 'u1',
+      day: '2026-08-31',
       amount: 10
     })
 

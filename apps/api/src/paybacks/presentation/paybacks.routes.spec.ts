@@ -92,13 +92,19 @@ const groupIdSql = readFileSync(
   ),
   'utf8'
 )
+const paybackDaySql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260831042629_payback_day/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
 
 const createTestApp = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}`
+    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}\n${paybackDaySql}`
   )
   sqlite.close()
   return createApp(createPrismaClient(url))
@@ -209,6 +215,7 @@ describe('paybacks', () => {
     const response = await createPayback(app, bob.cookie, group.id, {
       debtorId: bob.userId,
       creditorId: lea.userId,
+      day: '2026-08-31',
       amount: 20
     })
 
@@ -220,6 +227,7 @@ describe('paybacks', () => {
         id: expect.any(String),
         debtorId: bob.userId,
         creditorId: lea.userId,
+        day: '2026-08-31',
         amount: 20
       }
     ])
@@ -237,6 +245,7 @@ describe('paybacks', () => {
     const response = await createPayback(app, camille.cookie, group.id, {
       debtorId: bob.userId,
       creditorId: lea.userId,
+      day: '2026-08-31',
       amount: 33
     })
 
@@ -254,23 +263,23 @@ describe('paybacks', () => {
     const { app, group, lea, bob, camille } = await pizza()
     const refusals = [
       {
-        body: { debtorId: bob.userId, creditorId: lea.userId, amount: 34 },
+        body: { debtorId: bob.userId, creditorId: lea.userId, day: '2026-08-31', amount: 34 },
         message: PAYBACK_ABOVE_CAP
       },
       {
-        body: { debtorId: lea.userId, creditorId: bob.userId, amount: 10 },
+        body: { debtorId: lea.userId, creditorId: bob.userId, day: '2026-08-31', amount: 10 },
         message: PAYBACK_DEBTOR_NOT_NEGATIVE
       },
       {
-        body: { debtorId: bob.userId, creditorId: camille.userId, amount: 10 },
+        body: { debtorId: bob.userId, creditorId: camille.userId, day: '2026-08-31', amount: 10 },
         message: PAYBACK_CREDITOR_NOT_POSITIVE
       },
       {
-        body: { debtorId: 'inconnu', creditorId: lea.userId, amount: 10 },
+        body: { debtorId: 'inconnu', creditorId: lea.userId, day: '2026-08-31', amount: 10 },
         message: 'Membre introuvable'
       },
       {
-        body: { debtorId: bob.userId, creditorId: lea.userId, amount: 'dix' },
+        body: { debtorId: bob.userId, creditorId: lea.userId, day: '2026-08-31', amount: 'dix' },
         message: 'Format invalide'
       }
     ]
@@ -296,6 +305,7 @@ describe('paybacks', () => {
     const created = await createPayback(app, lea.cookie, group.id, {
       debtorId: bob.userId,
       creditorId: lea.userId,
+      day: '2026-08-31',
       amount: 20
     })
     const { paybacks } = (await created.json()) as GroupDto
@@ -332,6 +342,7 @@ describe('paybacks', () => {
     const created = await createPayback(app, lea.cookie, group.id, {
       debtorId: bob.userId,
       creditorId: lea.userId,
+      day: '2026-08-31',
       amount: 20
     })
     const { paybacks } = (await created.json()) as GroupDto
@@ -340,13 +351,24 @@ describe('paybacks', () => {
     const response = await app.request(`/groups/${group.id}/paybacks/${paybacks[0]!.id}`, {
       method: 'PATCH',
       headers: { cookie: bob.cookie, 'content-type': 'application/json' },
-      body: JSON.stringify({ debtorId: bob.userId, creditorId: lea.userId, amount: 30 })
+      body: JSON.stringify({
+        debtorId: bob.userId,
+        creditorId: lea.userId,
+        day: '2026-08-31',
+        amount: 30
+      })
     })
 
     expect(response.status).toBe(200)
     const body = (await response.json()) as GroupDto
     expect(body.paybacks).toEqual([
-      { id: paybacks[0]!.id, debtorId: bob.userId, creditorId: lea.userId, amount: 30 }
+      {
+        id: paybacks[0]!.id,
+        debtorId: bob.userId,
+        creditorId: lea.userId,
+        day: '2026-08-31',
+        amount: 30
+      }
     ])
     expect(body.balances).toEqual([
       { userId: lea.userId, name: 'Léa', amount: 36 },
@@ -360,6 +382,7 @@ describe('paybacks', () => {
     const created = await createPayback(app, lea.cookie, group.id, {
       debtorId: bob.userId,
       creditorId: lea.userId,
+      day: '2026-08-31',
       amount: 20
     })
     const { paybacks } = (await created.json()) as GroupDto
@@ -367,7 +390,12 @@ describe('paybacks', () => {
     const response = await app.request(`/groups/${group.id}/paybacks/${paybacks[0]!.id}`, {
       method: 'PATCH',
       headers: { cookie: lea.cookie, 'content-type': 'application/json' },
-      body: JSON.stringify({ debtorId: bob.userId, creditorId: lea.userId, amount: 34 })
+      body: JSON.stringify({
+        debtorId: bob.userId,
+        creditorId: lea.userId,
+        day: '2026-08-31',
+        amount: 34
+      })
     })
 
     expect(response.status).toBe(400)
@@ -385,6 +413,7 @@ describe('paybacks', () => {
     const created = await createPayback(app, lea.cookie, group.id, {
       debtorId: bob.userId,
       creditorId: lea.userId,
+      day: '2026-08-31',
       amount: 20
     })
     const { paybacks } = (await created.json()) as GroupDto
@@ -392,7 +421,12 @@ describe('paybacks', () => {
     const response = await app.request(`/groups/${otherBody.id}/paybacks/${paybacks[0]!.id}`, {
       method: 'PATCH',
       headers: { cookie: lea.cookie, 'content-type': 'application/json' },
-      body: JSON.stringify({ debtorId: bob.userId, creditorId: lea.userId, amount: 10 })
+      body: JSON.stringify({
+        debtorId: bob.userId,
+        creditorId: lea.userId,
+        day: '2026-08-31',
+        amount: 10
+      })
     })
 
     expect(response.status).toBe(404)

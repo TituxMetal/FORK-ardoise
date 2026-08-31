@@ -99,13 +99,19 @@ const groupIdSql = readFileSync(
   ),
   'utf8'
 )
+const paybackDaySql = readFileSync(
+  fileURLToPath(
+    new URL('../../../prisma/migrations/20260831042629_payback_day/migration.sql', import.meta.url)
+  ),
+  'utf8'
+)
 
 const createTestSlate = async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ardoise-'))
   const url = `file:${join(dir, 'test.db')}`
   const sqlite = createClient({ url })
   await sqlite.executeMultiple(
-    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}`
+    `${sessionSql}\n${groupSql}\n${groupSecretSql}\n${expenseSql}\n${serviceSql}\n${paybackSql}\n${renameSql}\n${expenseColumnSql}\n${inviteSecretSql}\n${groupIdSql}\n${paybackDaySql}`
   )
   sqlite.close()
   const prisma = createPrismaClient(url)
@@ -138,7 +144,9 @@ const createTestSlate = async () => {
       'u3'
     ])
   )
-  await paybacks.save(paybackCreate(group.id, 'u3', 'u1', amountFromCents(10), -39, 40))
+  await paybacks.save(
+    paybackCreate(group.id, 'u3', 'u1', dayFrom('2026-08-31'), amountFromCents(10), -39, 40)
+  )
   return { view: getSlate(groups, expenses, services, paybacks), group }
 }
 
@@ -215,6 +223,7 @@ describe('getSlate', () => {
           id: expect.any(String),
           debtorId: 'u3',
           creditorId: 'u1',
+          day: '2026-08-31',
           amount: 10
         }
       ],

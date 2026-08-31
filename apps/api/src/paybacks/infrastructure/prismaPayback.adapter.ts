@@ -11,6 +11,7 @@ export const prismaPaybackAdapter = (prisma: PrismaClient): PaybackRepository =>
         groupId: payback.groupId,
         debtorId: payback.debtorId,
         creditorId: payback.creditorId,
+        day: payback.day.value,
         amount: payback.amount.value
       }
     })
@@ -27,6 +28,7 @@ export const prismaPaybackAdapter = (prisma: PrismaClient): PaybackRepository =>
       data: {
         debtorId: payback.debtorId,
         creditorId: payback.creditorId,
+        day: payback.day.value,
         amount: payback.amount.value
       }
     })

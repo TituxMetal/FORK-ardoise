@@ -1,4 +1,5 @@
 import { amountReconstitute } from '~/shared/domain'
+import { dayReconstitute } from '~/expenses/domain/day.vo'
 import { paybackReconstitute } from '~/paybacks/domain/payback.entity'
 
 export const toPayback = (row: {
@@ -6,6 +7,7 @@ export const toPayback = (row: {
   groupId: string
   debtorId: string
   creditorId: string
+  day: string
   amount: number
 }) =>
   paybackReconstitute(
@@ -13,5 +15,6 @@ export const toPayback = (row: {
     row.groupId,
     row.debtorId,
     row.creditorId,
+    dayReconstitute(row.day),
     amountReconstitute(row.amount)
   )

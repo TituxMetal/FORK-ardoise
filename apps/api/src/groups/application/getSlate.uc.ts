@@ -79,6 +79,7 @@ const toGroupDto = (
       id: payback.id,
       debtorId: payback.debtorId,
       creditorId: payback.creditorId,
+      day: payback.day.value,
       amount: payback.amount.value
     })),
     balances: balancesOf(
