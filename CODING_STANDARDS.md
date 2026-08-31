@@ -9,6 +9,14 @@ The retrofit ticket moves the current tree to these rules. Do not mix a rename i
 - Code, Prisma models, test titles, comments: English from `CONTEXT.md`.
 - UI strings: French.
 - Issues, pull requests, commits: English. See `docs/git-workflow.md`.
+- Comments and identifiers are English even when the surrounding feature is
+  French-facing; French belongs in UI strings and speech only.
+
+## Theme
+
+- Dark theme only, from `docs/frontend.md`. No light theme anywhere: colours
+  come from the theme tokens (`bg-surface`, `text-dim`, …), never inline
+  values, and never a light-mode palette.
 
 ## Shape
 
@@ -43,6 +51,7 @@ No per-role subfolders (`entities/`, `value-objects/`, `use-cases/`): the layer 
 - `pages/` one file per route, composes feature components.
 - `features/<name>/`: `components/` + `api/` always; `hooks/`, `schemas/`, `store/`, `types/`, `utils/` as the feature needs them. Never an empty folder.
 - Barrels: every folder that exports symbols has an `index.ts` (`api/`, `components/`, `types/`, `icons/`, `ui/`). A barrel re-exports its own directory via `./` only — never `../`, never an alias. Alias imports never append `/index` (`~ui`, not `~ui/index`). Consumers import from the folder barrel, never from a member file: `import { TrashIcon } from '~/components/icons'`, not `~/components/icons/TrashIcon`.
+- Cross-feature imports go through the feature barrel: `~features/groups`, never `~features/groups/store` or `~features/groups/api/groups.client`. Within a feature, imports may reach the folder barrel (`~features/groups/api`) but never a member file. Alias imports merged on one line: `import { CreateGroupForm, GroupsList } from '~features/groups'`, not one import per symbol.
 - Type re-exports live in `types/index.ts`. The feature barrel re-exports `./types` (types) and `./api` (clients only); `api/index.ts` never re-exports types. Exception: a schema's inferred form-input type (`z.infer<…>`, e.g. `CreateGroupInput`) colocates with its schema and rides the `schemas/` barrel — it is not an API contract type.
 - `components/ui/`: shared reusable UI (Input, Button, FormWrapper…), barrel `index.ts`.
 - Component files PascalCase (`GroupPage.tsx`, `Input.tsx`); exported type identifiers PascalCase (`Group`, `GroupSummary`); type modules camelCase + suffix (`expenses.types.ts`, `groups.types.ts`) — never `.dto.ts` (DTO is an API-only role).
