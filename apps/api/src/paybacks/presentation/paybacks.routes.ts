@@ -2,9 +2,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { validateBody } from '~/shared/presentation'
 import type { SlateView } from '~/groups/application/getSlate.uc'
-import { createPayback } from '~/paybacks/application/createPayback.uc'
-import { deletePayback } from '~/paybacks/application/deletePayback.uc'
-import { updatePayback } from '~/paybacks/application/updatePayback.uc'
+import { paybackMutation } from '~/paybacks/application/paybackMutation.uc'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 
 const paybackBody = z.object({
@@ -15,13 +13,11 @@ const paybackBody = z.object({
 })
 
 export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateView) => {
-  const createPaybackUseCase = createPayback(paybacks, view)
-  const deletePaybackUseCase = deletePayback(paybacks, view)
-  const updatePaybackUseCase = updatePayback(paybacks, view)
+  const mutation = paybackMutation(paybacks, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post('/:groupId/paybacks', validateBody(paybackBody), async c => {
-      const group = await createPaybackUseCase.execute(
+      const group = await mutation.create.execute(
         c.get('userId'),
         c.req.param('groupId'),
         c.req.valid('json')
@@ -30,7 +26,7 @@ export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateVie
     })
     .patch('/:groupId/paybacks/:id', validateBody(paybackBody), async c =>
       c.json(
-        await updatePaybackUseCase.execute(
+        await mutation.update.execute(
           c.get('userId'),
           c.req.param('groupId'),
           c.req.param('id'),
@@ -40,11 +36,7 @@ export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateVie
     )
     .delete('/:groupId/paybacks/:id', async c =>
       c.json(
-        await deletePaybackUseCase.execute(
-          c.get('userId'),
-          c.req.param('groupId'),
-          c.req.param('id')
-        )
+        await mutation.delete.execute(c.get('userId'), c.req.param('groupId'), c.req.param('id'))
       )
     )
 }

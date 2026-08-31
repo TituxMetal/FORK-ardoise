@@ -3,9 +3,7 @@ import { z } from 'zod'
 import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
 import { validateBody } from '~/shared/presentation'
 import type { SlateView } from '~/groups/application/getSlate.uc'
-import { createExpense } from '~/expenses/application/createExpense.uc'
-import { deleteExpense } from '~/expenses/application/deleteExpense.uc'
-import { updateExpense } from '~/expenses/application/updateExpense.uc'
+import { expenseMutation } from '~/expenses/application/expenseMutation.uc'
 
 const expenseBody = z.object({
   label: z.string(),
@@ -16,13 +14,11 @@ const expenseBody = z.object({
 })
 
 export const createExpensesRoutes = (expenses: ExpenseRepository, view: SlateView) => {
-  const createExpenseUseCase = createExpense(expenses, view)
-  const deleteExpenseUseCase = deleteExpense(expenses, view)
-  const updateExpenseUseCase = updateExpense(expenses, view)
+  const mutation = expenseMutation(expenses, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .post('/:groupId/expenses', validateBody(expenseBody), async c => {
-      const group = await createExpenseUseCase.execute(
+      const group = await mutation.create.execute(
         c.get('userId'),
         c.req.param('groupId'),
         c.req.valid('json')
@@ -31,7 +27,7 @@ export const createExpensesRoutes = (expenses: ExpenseRepository, view: SlateVie
     })
     .patch('/:groupId/expenses/:id', validateBody(expenseBody), async c =>
       c.json(
-        await updateExpenseUseCase.execute(
+        await mutation.update.execute(
           c.get('userId'),
           c.req.param('groupId'),
           c.req.param('id'),
@@ -41,11 +37,7 @@ export const createExpensesRoutes = (expenses: ExpenseRepository, view: SlateVie
     )
     .delete('/:groupId/expenses/:id', async c =>
       c.json(
-        await deleteExpenseUseCase.execute(
-          c.get('userId'),
-          c.req.param('groupId'),
-          c.req.param('id')
-        )
+        await mutation.delete.execute(c.get('userId'), c.req.param('groupId'), c.req.param('id'))
       )
     )
 }
