@@ -29,7 +29,9 @@ export const InvitePage = ({ secret, session, client = groupsClient }: Props) =>
     setJoining(true)
     setError('')
     try {
-      setGroup(await client.join(secret))
+      const joined = await client.join(secret)
+      setGroup(joined)
+      setPreview({ name: joined.name, memberCount: joined.members.length })
     } catch (error) {
       setError(errorMessage(error, 'Invitation introuvable'))
     } finally {
