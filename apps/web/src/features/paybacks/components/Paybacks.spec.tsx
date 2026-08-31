@@ -88,4 +88,35 @@ describe('Paybacks', () => {
     expect(await screen.findByText('0,30 €')).toBeTruthy()
     expect(screen.queryByText('0,20 €')).toBeNull()
   })
+  it('resets the edit form when switching directly between two Paybacks', async () => {
+    const client = api.groups(testUsers.lea)
+    const group = await client.create('Potes de Bob')
+    await api.groups(testUsers.bob).join(group.invite.secret)
+    await api.expenses(testUsers.lea).create(group.id, {
+      label: 'Pizza',
+      day: '2026-08-15',
+      amount: 100,
+      payerId: 'lea',
+      participantIds: ['lea', 'bob']
+    })
+    await api.paybacks(testUsers.lea).create(group.id, {
+      debtorId: 'bob',
+      creditorId: 'lea',
+      amount: 20
+    })
+    await api.paybacks(testUsers.lea).create(group.id, {
+      debtorId: 'bob',
+      creditorId: 'lea',
+      amount: 30
+    })
+    applyGroup(await client.get(group.id))
+    render(<Paybacks client={api.paybacks(testUsers.lea)} />)
+
+    const user = userEvent.setup()
+    const editButtons = screen.getAllByRole('button', { name: 'Modifier Bob → Léa' })
+    await user.click(editButtons[0])
+    await user.click(editButtons[1])
+
+    expect((screen.getByLabelText('Montant') as HTMLInputElement).value).toBe('0,30')
+  })
 })

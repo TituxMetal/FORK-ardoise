@@ -1,5 +1,6 @@
 import { Button } from './Button'
 import { PencilIcon, TrashIcon } from '~/components/icons'
+import { useRef, type Ref } from 'react'
 
 type EntryRowProps = {
   /** The two-character avatar initials of the author. */
@@ -14,6 +15,8 @@ type EntryRowProps = {
   confirmLabel: string
   onConfirm: () => void
   onCancel: () => void
+  /** Optional ref to the edit trigger, so the list can restore focus to it. */
+  editRef?: Ref<HTMLButtonElement>
 }
 
 /**
@@ -30,9 +33,17 @@ export const EntryRow = ({
   confirming,
   confirmLabel,
   onConfirm,
-  onCancel
-}: EntryRowProps) =>
-  confirming ? (
+  onCancel,
+  editRef
+}: EntryRowProps) => {
+  const deleteTrigger = useRef<HTMLButtonElement>(null)
+  // Canceling returns focus to the delete trigger, matching the
+  // leave-confirmation focus pattern (GroupsList).
+  const cancelConfirmation = () => {
+    onCancel()
+    requestAnimationFrame(() => deleteTrigger.current?.focus())
+  }
+  return confirming ? (
     <li className="py-3">
       <div role="group" aria-label={confirmLabel} className="flex flex-col gap-3">
         <p className="font-medium">{confirmLabel}</p>
@@ -40,7 +51,7 @@ export const EntryRow = ({
           <Button type="button" variant="danger" onClick={onConfirm}>
             Supprimer
           </Button>
-          <Button type="button" variant="secondary" onClick={onCancel} autoFocus>
+          <Button type="button" variant="secondary" onClick={cancelConfirmation} autoFocus>
             Annuler
           </Button>
         </div>
@@ -48,7 +59,10 @@ export const EntryRow = ({
     </li>
   ) : (
     <li className="flex items-center gap-3 py-3">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-sm font-semibold">
+      <span
+        aria-hidden="true"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-sm font-semibold"
+      >
         {initials}
       </span>
       <div className="min-w-0 flex-1">
@@ -58,6 +72,7 @@ export const EntryRow = ({
       <span className="shrink-0 font-semibold">{amount}</span>
       <div className="flex shrink-0 gap-1">
         <Button
+          ref={editRef}
           type="button"
           variant="secondary"
           className="w-11 px-0"
@@ -67,6 +82,7 @@ export const EntryRow = ({
           <PencilIcon />
         </Button>
         <Button
+          ref={deleteTrigger}
           type="button"
           variant="secondary"
           className="w-11 px-0"
@@ -78,3 +94,4 @@ export const EntryRow = ({
       </div>
     </li>
   )
+}

@@ -38,7 +38,7 @@ export const ServiceFields = ({
       {error ? <Alert message={error} /> : null}
       <h3 className="font-medium">{title}</h3>
       <FormWrapper label="Libellé" error={labelError}>
-        <Input {...form.register('label')} required />
+        <Input {...form.register('label')} required autoFocus={mode === 'edit'} />
       </FormWrapper>
       <FormWrapper label="Jour" error={dayError}>
         <Input {...form.register('day')} required placeholder="YYYY-MM-DD" />

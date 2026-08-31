@@ -83,4 +83,32 @@ describe('Services', () => {
     expect(await screen.findByText('Ordi Neuf')).toBeTruthy()
     expect(screen.queryByText('Ordi Bob')).toBeNull()
   })
+  it('resets the edit form when switching directly between two Services', async () => {
+    const client = api.groups(testUsers.lea)
+    const group = await client.create('Potes de Bob')
+    await api.groups(testUsers.bob).join(group.invite.secret)
+    await api.services(testUsers.lea).create(group.id, {
+      label: 'Ordi Bob',
+      day: '2026-08-16',
+      amount: 100,
+      providerId: 'lea',
+      participantIds: ['lea', 'bob']
+    })
+    await api.services(testUsers.lea).create(group.id, {
+      label: 'Cours Guitare',
+      day: '2026-08-17',
+      amount: 80,
+      providerId: 'bob',
+      participantIds: ['lea', 'bob']
+    })
+    applyGroup(await client.get(group.id))
+    render(<Services client={api.services(testUsers.lea)} />)
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Modifier Ordi Bob' }))
+    await user.click(screen.getByRole('button', { name: 'Modifier Cours Guitare' }))
+
+    expect((screen.getByLabelText('Libellé') as HTMLInputElement).value).toBe('Cours Guitare')
+    expect((screen.getByLabelText('Montant') as HTMLInputElement).value).toBe('0,80')
+  })
 })

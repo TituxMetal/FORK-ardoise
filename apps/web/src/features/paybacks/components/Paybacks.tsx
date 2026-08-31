@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '@nanostores/react'
 import { Alert, EntryRow } from '~ui'
 import { euros } from '~/lib/amounts'
@@ -18,6 +18,20 @@ export const Paybacks = ({ client = paybacksClient }: Props) => {
   const editing = useStore($editing)
   const [error, setError] = useState('')
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
+  const editTrigger = useRef<HTMLButtonElement>(null)
+  // A callback ref: it must survive canceling (when `editing` clears and React
+  // detaches the conditional prop), so ignore the null detach and keep the
+  // last mounted trigger for the focus restore.
+  const captureEditTrigger = (el: HTMLButtonElement | null) => {
+    if (el) editTrigger.current = el
+  }
+
+  // Canceling an edit returns focus to the row's edit trigger, matching the
+  // create-form focus pattern (GroupPage.cancelForm).
+  const cancelEditForm = () => {
+    cancelEdit()
+    requestAnimationFrame(() => editTrigger.current?.focus())
+  }
 
   const deletePayback = async (paybackId: string) => {
     if (!group) return
@@ -41,7 +55,12 @@ export const Paybacks = ({ client = paybacksClient }: Props) => {
     <>
       {error ? <Alert message={error} /> : null}
       {editing?.kind === 'paybacks' ? (
-        <EditPaybackForm paybackId={editing.id} client={client} onCancel={cancelEdit} />
+        <EditPaybackForm
+          key={editing.id}
+          paybackId={editing.id}
+          client={client}
+          onCancel={cancelEditForm}
+        />
       ) : null}
       {group.paybacks.length === 0 ? (
         <p>Aucun Règlement</p>
@@ -53,6 +72,11 @@ export const Paybacks = ({ client = paybacksClient }: Props) => {
               initials={initials(nameOf(payback.debtorId))}
               label={labelOf(payback)}
               amount={euros(payback.amount)}
+              editRef={
+                editing?.kind === 'paybacks' && editing.id === payback.id
+                  ? captureEditTrigger
+                  : undefined
+              }
               onEdit={() => {
                 setConfirmingId(null)
                 startEdit({ kind: 'paybacks', id: payback.id })

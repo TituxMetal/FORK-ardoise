@@ -46,6 +46,7 @@ export const PaybackFields = ({
           value={debtorId}
           onChange={event => form.setValue('debtorId', event.target.value)}
           required
+          autoFocus={mode === 'edit'}
         >
           {members.map(member => (
             <option key={member.userId} value={member.userId}>

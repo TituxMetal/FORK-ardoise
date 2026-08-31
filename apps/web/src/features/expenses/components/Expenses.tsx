@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '@nanostores/react'
 import { Alert, EntryRow } from '~ui'
 import { euros } from '~/lib/amounts'
@@ -18,6 +18,20 @@ export const Expenses = ({ client = expensesClient }: Props) => {
   const editing = useStore($editing)
   const [error, setError] = useState('')
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
+  const editTrigger = useRef<HTMLButtonElement>(null)
+  // A callback ref: it must survive canceling (when `editing` clears and React
+  // detaches the conditional prop), so ignore the null detach and keep the
+  // last mounted trigger for the focus restore.
+  const captureEditTrigger = (el: HTMLButtonElement | null) => {
+    if (el) editTrigger.current = el
+  }
+
+  // Canceling an edit returns focus to the row's edit trigger, matching the
+  // create-form focus pattern (GroupPage.cancelForm).
+  const cancelEditForm = () => {
+    cancelEdit()
+    requestAnimationFrame(() => editTrigger.current?.focus())
+  }
 
   const deleteExpense = async (expenseId: string) => {
     if (!group) return
@@ -39,7 +53,12 @@ export const Expenses = ({ client = expensesClient }: Props) => {
     <>
       {error ? <Alert message={error} /> : null}
       {editing?.kind === 'expenses' ? (
-        <EditExpenseForm expenseId={editing.id} client={client} onCancel={cancelEdit} />
+        <EditExpenseForm
+          key={editing.id}
+          expenseId={editing.id}
+          client={client}
+          onCancel={cancelEditForm}
+        />
       ) : null}
       {group.expenses.length === 0 ? (
         <p>Aucune Dépense</p>
@@ -52,6 +71,11 @@ export const Expenses = ({ client = expensesClient }: Props) => {
               label={expense.label}
               detail={`${nameOf(expense.payerId)} · ${dayLabel(expense.day)}`}
               amount={euros(expense.amount)}
+              editRef={
+                editing?.kind === 'expenses' && editing.id === expense.id
+                  ? captureEditTrigger
+                  : undefined
+              }
               onEdit={() => {
                 setConfirmingId(null)
                 startEdit({ kind: 'expenses', id: expense.id })

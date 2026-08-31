@@ -1,8 +1,9 @@
 /** @vitest-environment happy-dom */
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { EntryRow } from './EntryRow'
+import { useState } from 'react'
 
 afterEach(cleanup)
 
@@ -68,5 +69,28 @@ describe('EntryRow', () => {
 
     expect(screen.getByText('Pizza')).toBeTruthy()
     expect(screen.queryByText('Léa · 15 août')).toBeNull()
+  })
+  it('restores focus to the delete trigger when the confirmation is cancelled', async () => {
+    const ConfirmingRow = () => {
+      const [confirming, setConfirming] = useState(false)
+      return (
+        <EntryRow
+          {...row({
+            confirming,
+            onRequestDelete: () => setConfirming(true),
+            onCancel: () => setConfirming(false)
+          })}
+        />
+      )
+    }
+    render(<ConfirmingRow />)
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('button', { name: 'Supprimer Pizza' }))
+    await user.click(screen.getByRole('button', { name: 'Annuler' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Supprimer Pizza' })).toBe(document.activeElement)
+    })
   })
 })
