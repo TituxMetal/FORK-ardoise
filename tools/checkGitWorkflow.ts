@@ -59,7 +59,7 @@ const hasUpstream = (): boolean =>
   gitTolerant(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']).length > 0
 
 const openPrFor = (branch: string): boolean => {
-  const prs = ghTolerant(['pr', 'view', '--json', 'state', '-q', '.state', '--head', branch])
+  const prs = ghTolerant(['pr', 'view', branch, '--json', 'state', '-q', '.state'])
   return prs.some(state => state === 'OPEN')
 }
 
