@@ -35,12 +35,20 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `style`, `chore`, `build`, `ci
 `feat` is a commit type. Branches and pull-request titles use the full word `feature`.
 
 One concern per commit. Subject describes the writing, not the file. Body, when present, is bullets — no paragraphs.
+Atomic means each commit is a single concern that leaves the tree compiling
+and green (`vp check` + `vp test` pass at that commit). Split unrelated
+changes into separate commits; never `git add -A` a whole working tree.
+Rewrite locally with `git reset` only before the branch is pushed.
 
 ## Issues and pull requests
 
 Titles in English, full words (`feature: add payback form`, never `feat:`).
 
 Required path:
+
+A ticket is not done when the commit exists. The completion criterion is a
+pushed branch with an open pull request against `main`, every commit atomic
+and GPG-signed, and `vp check` + `vp test` green before each commit.
 
 1. Claim the issue (`docs/agents/issue-tracker.md`).
 2. Branch from up-to-date `main`.
@@ -58,3 +66,8 @@ Rebase-merge only. No squash. History stays linear; every commit stays.
 ## Verification
 
 Before every commit: `vp check` and `vp test`. Add Playwright when that suite exists.
+
+The `check:git-workflow` gate (`bun run tools/checkGitWorkflow.ts`) makes these
+rules executable: it fails on a commit on `main`, a non-conventional subject,
+a paragraph commit body, an unpushed branch, or feature work without an open
+pull request. Run it with `vp run check:git-workflow` before pushing.
