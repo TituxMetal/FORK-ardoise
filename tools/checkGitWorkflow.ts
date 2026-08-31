@@ -47,11 +47,18 @@ const isMain = (branch: string): boolean => branch === 'main'
 
 const subjectOf = (rev: string): string => git(['log', '-1', '--format=%s', rev])[0] ?? ''
 
-const bodyOf = (rev: string): string[] =>
-  git(['log', '-1', '--format=%b', rev])
-    .join('\n')
+// The body keeps indentation (a bullet's continuation lines), so it must not
+// go through parse(), which trims every line. Read the raw stdout instead.
+const bodyOf = (rev: string): string[] => {
+  const result = Bun.spawnSync(['git', 'log', '-1', '--format=%b', rev], { stdout: 'pipe' })
+  if (result.exitCode !== 0) {
+    throw new Error(`git log -1 --format=%b ${rev} failed with exit code ${result.exitCode}`)
+  }
+  return (result.stdout as Uint8Array)
+    .toString()
     .split('\n')
     .filter(line => line.trim() !== '')
+}
 
 // A body is allowed to be absent. When present, the doc forbids paragraphs:
 // every line is a bullet (`- ` / `* `) or an indented continuation of the
