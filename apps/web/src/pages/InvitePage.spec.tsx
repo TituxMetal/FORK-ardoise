@@ -26,7 +26,7 @@ describe('InvitePage', () => {
     expect(await screen.findByRole('heading', { name: 'Invitation' })).toBeTruthy()
     expect(screen.getByText('Potes de Bob')).toBeTruthy()
     expect(screen.getByText('1 membre')).toBeTruthy()
-    expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: 'Connexion' })).toBeTruthy()
   })
 
   it('joins the Group from a screen matching the app look', async () => {

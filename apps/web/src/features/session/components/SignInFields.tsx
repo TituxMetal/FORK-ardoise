@@ -17,12 +17,14 @@ export const SignInFields = ({ form, error, onSubmit }: Props) => {
       {error ? <Alert message={error} /> : null}
       <h2 className="text-lg font-medium">Ouvrir une session</h2>
       <FormWrapper label="E-mail" error={emailError}>
-        <Input {...form.register('email')} type="email" required />
+        <Input {...form.register('email')} type="email" placeholder="lea@example.com" required />
       </FormWrapper>
       <FormWrapper label="Mot de passe" error={passwordError}>
         <Input {...form.register('password')} type="password" required />
       </FormWrapper>
-      <Button type="submit">Ouvrir la session</Button>
+      <Button type="submit" className="w-full">
+        Ouvrir la session
+      </Button>
     </form>
   )
 }

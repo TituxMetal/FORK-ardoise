@@ -17,18 +17,33 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+const signUpTab = () => screen.getByRole('tab', { name: 'Inscription' })
+const signInTab = () => screen.getByRole('tab', { name: 'Connexion' })
 const signUpForm = () =>
   screen.getByRole('heading', { name: 'Créer un User' }).closest('form') as HTMLFormElement
-
 const signInForm = () =>
   screen.getByRole('heading', { name: 'Ouvrir une session' }).closest('form') as HTMLFormElement
 
 describe('AuthPage', () => {
-  it('offers to create a User and to open a session', () => {
+  it('shows the sign-up form by default and offers the sign-in tab', () => {
     render(<AuthPage />)
 
+    expect(signUpTab().getAttribute('aria-selected')).toBe('true')
+    expect(signInTab().getAttribute('aria-selected')).toBe('false')
     expect(screen.getByRole('heading', { name: 'Créer un User' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Ouvrir une session' })).toBeNull()
+  })
+
+  it('switches to the sign-in form when its tab is selected', async () => {
+    const user = userEvent.setup()
+    render(<AuthPage />)
+
+    await user.click(signInTab())
+
+    expect(signInTab().getAttribute('aria-selected')).toBe('true')
+    expect(signUpTab().getAttribute('aria-selected')).toBe('false')
     expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Créer un User' })).toBeNull()
   })
 
   it('submits the sign-up form to create a User', async () => {
@@ -51,6 +66,7 @@ describe('AuthPage', () => {
     const user = userEvent.setup()
     render(<AuthPage />)
 
+    await user.click(signInTab())
     await user.type(within(signInForm()).getByLabelText('E-mail'), 'lea@example.com')
     await user.type(within(signInForm()).getByLabelText('Mot de passe'), 'password1234')
     await user.click(within(signInForm()).getByRole('button', { name: 'Ouvrir la session' }))
