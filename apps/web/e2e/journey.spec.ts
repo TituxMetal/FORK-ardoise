@@ -44,9 +44,10 @@ test.describe('core journey', () => {
     const guestPage = await context.newPage()
     await guestPage.goto(inviteUrl)
     await expect(guestPage.getByRole('heading', { name: 'Invitation' })).toBeVisible()
+    await expect(guestPage.getByText('Potes de Bob')).toBeVisible()
     await expectNoAxeViolations(guestPage)
     await signUp(guestPage, 'Bob', uniqueEmail('bob'))
-    await expect(guestPage.getByRole('heading', { name: 'Potes de Bob' })).toBeVisible()
+    await guestPage.getByRole('button', { name: 'Rejoindre le Groupe' }).click()
 
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Alice' })).toBeVisible()
     await expect(guestPage.getByRole('listitem').filter({ hasText: 'Bob' })).toBeVisible()
