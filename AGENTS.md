@@ -28,6 +28,11 @@ release. Add a tool name to select part of the graph. For example, run
 
 ## Agent skills
 
+### Ticket lifecycle
+
+End-to-end ritual: claim → branch → implement → PR → verdict on review
+comments → close → sync. See `docs/agents/ticket-lifecycle.md`.
+
 ### Issue tracker
 
 Claim, implement, close, checkboxes, assignee: `docs/agents/issue-tracker.md`.
