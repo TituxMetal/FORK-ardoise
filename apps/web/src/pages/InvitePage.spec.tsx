@@ -1,5 +1,6 @@
 /** @vitest-environment happy-dom */
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 import { createTestApi, testUsers, type TestApi } from '~/lib/testApi'
 import { InvitePage } from '~/pages/InvitePage'
@@ -15,7 +16,20 @@ beforeEach(async () => {
 })
 
 describe('InvitePage', () => {
-  it('adds a User with a session who opens the Invite as a Member', async () => {
+  it('shows the Group name and Member count before sign-in', async () => {
+    const lea = api.groups(testUsers.lea)
+    const group = await lea.create('Potes de Bob')
+    render(
+      <InvitePage secret={group.invite.secret} session={null} client={api.groups(testUsers.bob)} />
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Invitation' })).toBeTruthy()
+    expect(screen.getByText('Potes de Bob')).toBeTruthy()
+    expect(screen.getByText('1 membre')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
+  })
+
+  it('joins the Group from a screen matching the app look', async () => {
     const lea = api.groups(testUsers.lea)
     const group = await lea.create('Potes de Bob')
     render(
@@ -26,8 +40,11 @@ describe('InvitePage', () => {
       />
     )
 
-    expect(await screen.findByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
-    expect(screen.getByText('Bob')).toBeTruthy()
+    expect(await screen.findByText('Potes de Bob')).toBeTruthy()
+    expect(screen.getByText('1 membre')).toBeTruthy()
+    await userEvent.click(screen.getByRole('button', { name: 'Rejoindre le Groupe' }))
+
+    expect(await screen.findByText('Bob')).toBeTruthy()
     const joined = await lea.get(group.id)
     expect(joined.members.map(member => member.name)).toEqual(['Léa', 'Bob'])
   })
@@ -42,12 +59,12 @@ describe('InvitePage', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Invitation' })).toBeTruthy()
     })
-    expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
+    expect(screen.getByText('Potes de Bob')).toBeTruthy()
     const unchanged = await lea.get(group.id)
     expect(unchanged.members).toHaveLength(1)
   })
 
-  it('clears a previous error when a new Invite is joined', async () => {
+  it('clears a previous error when a new Invite is previewed', async () => {
     const lea = api.groups(testUsers.lea)
     const group = await lea.create('Potes de Bob')
     const { rerender } = render(
@@ -68,6 +85,6 @@ describe('InvitePage', () => {
         client={api.groups(testUsers.bob)}
       />
     )
-    expect(await screen.findByRole('heading', { name: 'Potes de Bob' })).toBeTruthy()
+    expect(await screen.findByText('Potes de Bob')).toBeTruthy()
   })
 })
