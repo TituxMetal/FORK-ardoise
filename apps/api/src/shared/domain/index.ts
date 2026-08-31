@@ -7,6 +7,7 @@ export {
   amountReconstitute,
   type Amount
 } from './amount.vo'
+export { DAY_REQUIRED, dayFrom, dayReconstitute, type Day } from './day.vo'
 export { PARTICIPANTS_REQUIRED, equalParts, type Part } from './part.vo'
 export {
   balancesOf,

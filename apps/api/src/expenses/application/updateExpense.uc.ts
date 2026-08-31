@@ -1,4 +1,4 @@
-import { dayFrom } from '~/expenses/domain/day.vo'
+import { dayFrom } from '~/shared/domain'
 import { labelFrom } from '~/expenses/domain/label.vo'
 import { expenseUpdate } from '~/expenses/domain/expense.entity'
 import type { ExpenseRepository } from '~/expenses/domain/expense.repository'

@@ -2,7 +2,7 @@ import type { SlateView } from '~/groups/application/getSlate.uc'
 import { amountFromCents, invalidData } from '~/shared/domain'
 import { serviceCreate } from '~/services/domain/service.entity'
 import type { ServiceRepository } from '~/services/domain/service.repository'
-import { dayFrom } from '~/expenses/domain/day.vo'
+import { dayFrom } from '~/shared/domain'
 import { labelFrom } from '~/expenses/domain/label.vo'
 
 export type CreateServiceInput = {

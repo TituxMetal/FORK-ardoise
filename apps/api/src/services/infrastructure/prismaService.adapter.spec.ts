@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
 import { amountFromCents } from '~/shared/domain'
 
-import { dayReconstitute } from '~/expenses/domain/day.vo'
+import { dayReconstitute } from '~/shared/domain'
 import { labelReconstitute } from '~/expenses/domain/label.vo'
 import { serviceCreate, serviceUpdate } from '~/services/domain/service.entity'
 import { createPrismaClient } from '~/shared/infrastructure/prisma.client'

@@ -1,5 +1,5 @@
 import { invalidData, type Amount } from '~/shared/domain'
-import type { Day } from '~/expenses/domain/day.vo'
+import type { Day } from '~/shared/domain'
 
 export type Payback = {
   id: string

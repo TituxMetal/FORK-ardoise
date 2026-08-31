@@ -1,5 +1,5 @@
 import type { SlateView } from '~/groups/application/getSlate.uc'
-import { dayFrom } from '~/expenses/domain/day.vo'
+import { dayFrom } from '~/shared/domain'
 import { paybackCreate } from '~/paybacks/domain/payback.entity'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 import { amountFromCents, invalidData } from '~/shared/domain'

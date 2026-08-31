@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 import type { GroupDto } from '~/groups/application/group.dto'
-import { amountReconstitute } from '~/shared/domain'
-import { dayReconstitute } from '~/expenses/domain/day.vo'
+import { amountReconstitute, dayReconstitute } from '~/shared/domain'
 import {
   PAYBACK_ABOVE_CAP,
   paybackReconstitute,

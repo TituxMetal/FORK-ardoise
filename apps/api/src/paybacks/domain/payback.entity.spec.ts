@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from '~/shared/domain'
-import { dayReconstitute } from '~/expenses/domain/day.vo'
+import { amountFromCents, dayReconstitute } from '~/shared/domain'
 import {
   PAYBACK_ABOVE_CAP,
   PAYBACK_CREDITOR_NOT_POSITIVE,

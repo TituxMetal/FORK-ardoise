@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vite-plus/test'
 import { amountFromCents } from '~/shared/domain'
 
 import { expenseCreate, expenseUpdate } from '~/expenses/domain/expense.entity'
-import { dayReconstitute } from '~/expenses/domain/day.vo'
+import { dayReconstitute } from '~/shared/domain'
 import { labelReconstitute } from '~/expenses/domain/label.vo'
 import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
 import { prismaExpenseAdapter } from './prismaExpense.adapter'
