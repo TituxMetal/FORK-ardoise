@@ -1,10 +1,6 @@
-import { useRef, useState } from 'react'
 import { useStore } from '@nanostores/react'
-import { Alert, EntryRow } from '~ui'
-import { euros } from '~/lib/amounts'
-import { errorMessage } from '~/lib/errorMessage'
+import { $group, SlateEntryList } from '~features/groups'
 import { dayLabel, initials } from '~/lib/format'
-import { $editing, $group, applyGroup, cancelEdit, startEdit } from '~features/groups'
 import { expensesClient } from '../api'
 import type { ExpensesClient } from '../types'
 import { EditExpenseForm } from './EditExpenseForm'
@@ -15,80 +11,26 @@ type Props = {
 
 export const Expenses = ({ client = expensesClient }: Props) => {
   const group = useStore($group)
-  const editing = useStore($editing)
-  const [error, setError] = useState('')
-  const [confirmingId, setConfirmingId] = useState<string | null>(null)
-  const editTrigger = useRef<HTMLButtonElement>(null)
-  // A callback ref: it must survive canceling (when `editing` clears and React
-  // detaches the conditional prop), so ignore the null detach and keep the
-  // last mounted trigger for the focus restore.
-  const captureEditTrigger = (el: HTMLButtonElement | null) => {
-    if (el) editTrigger.current = el
-  }
-
-  // Canceling an edit returns focus to the row's edit trigger, matching the
-  // create-form focus pattern (GroupPage.cancelForm).
-  const cancelEditForm = () => {
-    cancelEdit()
-    requestAnimationFrame(() => editTrigger.current?.focus())
-  }
-
-  const deleteExpense = async (expenseId: string) => {
-    if (!group) return
-    try {
-      applyGroup(await client.delete(group.id, expenseId))
-      setError('')
-      setConfirmingId(null)
-    } catch (error) {
-      setError(errorMessage(error, 'Dépense introuvable'))
-    }
-  }
-
   if (!group) return null
-
   const nameOf = (userId: string) =>
     group.members.find(member => member.userId === userId)?.name ?? userId
-
   return (
-    <>
-      {error ? <Alert message={error} /> : null}
-      {editing?.kind === 'expenses' ? (
-        <EditExpenseForm
-          key={editing.id}
-          expenseId={editing.id}
-          client={client}
-          onCancel={cancelEditForm}
-        />
-      ) : null}
-      {group.expenses.length === 0 ? (
-        <p>Aucune Dépense</p>
-      ) : (
-        <ul className="space-y-2">
-          {group.expenses.map(expense => (
-            <EntryRow
-              key={expense.id}
-              initials={initials(nameOf(expense.payerId))}
-              label={expense.label}
-              detail={`${nameOf(expense.payerId)} · ${dayLabel(expense.day)}`}
-              amount={euros(expense.amount)}
-              editRef={
-                editing?.kind === 'expenses' && editing.id === expense.id
-                  ? captureEditTrigger
-                  : undefined
-              }
-              onEdit={() => {
-                setConfirmingId(null)
-                startEdit({ kind: 'expenses', id: expense.id })
-              }}
-              onRequestDelete={() => setConfirmingId(expense.id)}
-              confirming={confirmingId === expense.id}
-              confirmLabel={`Supprimer « ${expense.label} » ?`}
-              onConfirm={() => void deleteExpense(expense.id)}
-              onCancel={() => setConfirmingId(null)}
-            />
-          ))}
-        </ul>
+    <SlateEntryList
+      kind="expenses"
+      entries={group.expenses}
+      emptyText="Aucune Dépense"
+      notFoundMessage="Dépense introuvable"
+      client={client}
+      rowFor={expense => ({
+        initials: initials(nameOf(expense.payerId)),
+        label: expense.label,
+        detail: `${nameOf(expense.payerId)} · ${dayLabel(expense.day)}`,
+        amount: expense.amount,
+        confirmLabel: `Supprimer « ${expense.label} » ?`
+      })}
+      renderEditForm={(entryId, onCancel) => (
+        <EditExpenseForm key={entryId} expenseId={entryId} client={client} onCancel={onCancel} />
       )}
-    </>
+    />
   )
 }

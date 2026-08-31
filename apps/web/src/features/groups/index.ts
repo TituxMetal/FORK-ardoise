@@ -5,7 +5,8 @@ export {
   LeaveGroupConfirmation,
   MemberChips,
   RenameGroupFields,
-  SlateTabs
+  SlateTabs,
+  SlateEntryList
 } from './components'
 export { createGroupsClient, groupsClient } from './api'
 export {
