@@ -7,7 +7,7 @@ import { createExpense } from '~/expenses/application/createExpense.uc'
 import { deleteExpense } from '~/expenses/application/deleteExpense.uc'
 import { updateExpense } from '~/expenses/application/updateExpense.uc'
 
-const createExpenseBody = z.object({
+const expenseBody = z.object({
   label: z.string(),
   day: z.string(),
   amount: z.number(),
@@ -21,7 +21,7 @@ export const createExpensesRoutes = (expenses: ExpenseRepository, view: SlateVie
   const updateExpenseUseCase = updateExpense(expenses, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
-    .post('/:groupId/expenses', validateBody(createExpenseBody), async c => {
+    .post('/:groupId/expenses', validateBody(expenseBody), async c => {
       const group = await createExpenseUseCase.execute(
         c.get('userId'),
         c.req.param('groupId'),
@@ -29,7 +29,7 @@ export const createExpensesRoutes = (expenses: ExpenseRepository, view: SlateVie
       )
       return c.json(group, 201)
     })
-    .patch('/:groupId/expenses/:id', validateBody(createExpenseBody), async c =>
+    .patch('/:groupId/expenses/:id', validateBody(expenseBody), async c =>
       c.json(
         await updateExpenseUseCase.execute(
           c.get('userId'),

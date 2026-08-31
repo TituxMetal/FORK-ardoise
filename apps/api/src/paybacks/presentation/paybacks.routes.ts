@@ -7,7 +7,7 @@ import { deletePayback } from '~/paybacks/application/deletePayback.uc'
 import { updatePayback } from '~/paybacks/application/updatePayback.uc'
 import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
 
-const createPaybackBody = z.object({
+const paybackBody = z.object({
   debtorId: z.string(),
   creditorId: z.string(),
   amount: z.number(),
@@ -20,7 +20,7 @@ export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateVie
   const updatePaybackUseCase = updatePayback(paybacks, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
-    .post('/:groupId/paybacks', validateBody(createPaybackBody), async c => {
+    .post('/:groupId/paybacks', validateBody(paybackBody), async c => {
       const group = await createPaybackUseCase.execute(
         c.get('userId'),
         c.req.param('groupId'),
@@ -28,7 +28,7 @@ export const createPaybacksRoutes = (paybacks: PaybackRepository, view: SlateVie
       )
       return c.json(group, 201)
     })
-    .patch('/:groupId/paybacks/:id', validateBody(createPaybackBody), async c =>
+    .patch('/:groupId/paybacks/:id', validateBody(paybackBody), async c =>
       c.json(
         await updatePaybackUseCase.execute(
           c.get('userId'),

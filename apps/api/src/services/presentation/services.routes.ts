@@ -7,7 +7,7 @@ import { deleteService } from '~/services/application/deleteService.uc'
 import { updateService } from '~/services/application/updateService.uc'
 import type { ServiceRepository } from '~/services/domain/service.repository'
 
-const createServiceBody = z.object({
+const serviceBody = z.object({
   label: z.string(),
   day: z.string(),
   amount: z.number(),
@@ -21,7 +21,7 @@ export const createServicesRoutes = (services: ServiceRepository, view: SlateVie
   const updateServiceUseCase = updateService(services, view)
 
   return new Hono<{ Variables: { userId: string; userName: string } }>()
-    .post('/:groupId/services', validateBody(createServiceBody), async c => {
+    .post('/:groupId/services', validateBody(serviceBody), async c => {
       const group = await createServiceUseCase.execute(
         c.get('userId'),
         c.req.param('groupId'),
@@ -29,7 +29,7 @@ export const createServicesRoutes = (services: ServiceRepository, view: SlateVie
       )
       return c.json(group, 201)
     })
-    .patch('/:groupId/services/:id', validateBody(createServiceBody), async c =>
+    .patch('/:groupId/services/:id', validateBody(serviceBody), async c =>
       c.json(
         await updateServiceUseCase.execute(
           c.get('userId'),
