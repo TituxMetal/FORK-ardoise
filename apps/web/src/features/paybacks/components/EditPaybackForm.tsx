@@ -26,9 +26,10 @@ export const EditPaybackForm = ({ paybackId, client = paybacksClient, onCancel }
       ? {
           debtorId: payback.debtorId,
           creditorId: payback.creditorId,
-          amount: eurosFromCents(payback.amount)
+          amount: eurosFromCents(payback.amount),
+          day: payback.day
         }
-      : { debtorId: '', creditorId: '', amount: '' }
+      : { debtorId: '', creditorId: '', amount: '', day: '' }
   })
   const debtorId = useWatch({ control: form.control, name: 'debtorId' })
   const creditorId = useWatch({ control: form.control, name: 'creditorId' })
@@ -60,6 +61,7 @@ export const EditPaybackForm = ({ paybackId, client = paybacksClient, onCancel }
         await client.update(group.id, payback.id, {
           debtorId: effectiveDebtorId,
           creditorId: effectiveCreditorId,
+          day: values.day,
           amount: centsFromEuros(values.amount)
         })
       )

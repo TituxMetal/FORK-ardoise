@@ -30,13 +30,19 @@ describe('paybacksClient', () => {
     const group = await openGroupWithBalances()
 
     const updated = await api.paybacks(testUsers.lea).create(group.id, {
+      day: '2026-08-31',
       debtorId: 'bob',
       creditorId: 'lea',
       amount: 20
     })
 
     expect(updated.paybacks).toEqual([
-      expect.objectContaining({ debtorId: 'bob', creditorId: 'lea', amount: 20 })
+      expect.objectContaining({
+        day: '2026-08-31',
+        debtorId: 'bob',
+        creditorId: 'lea',
+        amount: 20
+      })
     ])
   })
 
@@ -44,6 +50,7 @@ describe('paybacksClient', () => {
     const group = await openGroupWithBalances()
     const paybacks = api.paybacks(testUsers.lea)
     const withPayback = await paybacks.create(group.id, {
+      day: '2026-08-31',
       debtorId: 'bob',
       creditorId: 'lea',
       amount: 20
@@ -57,19 +64,26 @@ describe('paybacksClient', () => {
     const group = await openGroupWithBalances()
     const paybacks = api.paybacks(testUsers.lea)
     const withPayback = await paybacks.create(group.id, {
+      day: '2026-08-31',
       debtorId: 'bob',
       creditorId: 'lea',
       amount: 20
     })
 
     const updated = await paybacks.update(withPayback.id, withPayback.paybacks[0].id, {
+      day: '2026-08-31',
       debtorId: 'bob',
       creditorId: 'lea',
       amount: 30
     })
 
     expect(updated.paybacks).toEqual([
-      expect.objectContaining({ debtorId: 'bob', creditorId: 'lea', amount: 30 })
+      expect.objectContaining({
+        day: '2026-08-31',
+        debtorId: 'bob',
+        creditorId: 'lea',
+        amount: 30
+      })
     ])
   })
 
@@ -78,6 +92,7 @@ describe('paybacksClient', () => {
 
     await expect(
       api.paybacks(testUsers.lea).create(group.id, {
+        day: '2026-08-31',
         debtorId: 'nobody',
         creditorId: 'lea',
         amount: 20

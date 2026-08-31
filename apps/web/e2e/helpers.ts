@@ -92,6 +92,7 @@ export const addPayback = async (page: Page, amount: string) => {
   await page.getByRole('tab', { name: 'Remboursements' }).click()
   await page.getByRole('button', { name: 'Ajouter un Remboursement' }).click()
   const form = page.getByRole('form', { name: 'Constater un Règlement' })
+  await form.getByLabel('Jour').fill('2026-08-18')
   await form.getByLabel('Montant').fill(amount)
   await form.getByRole('button', { name: 'Constater le Règlement' }).click()
 }

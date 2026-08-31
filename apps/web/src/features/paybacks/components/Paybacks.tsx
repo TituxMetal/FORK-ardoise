@@ -3,7 +3,7 @@ import { useStore } from '@nanostores/react'
 import { Alert, EntryRow } from '~ui'
 import { euros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
-import { initials } from '~/lib/format'
+import { dayLabel, initials } from '~/lib/format'
 import { $editing, $group, applyGroup, cancelEdit, startEdit } from '~features/groups'
 import { paybacksClient } from '../api'
 import type { PaybacksClient } from '../types'
@@ -71,6 +71,7 @@ export const Paybacks = ({ client = paybacksClient }: Props) => {
               key={payback.id}
               initials={initials(nameOf(payback.debtorId))}
               label={labelOf(payback)}
+              detail={`${nameOf(payback.debtorId)} · ${dayLabel(payback.day)}`}
               amount={euros(payback.amount)}
               editRef={
                 editing?.kind === 'paybacks' && editing.id === payback.id

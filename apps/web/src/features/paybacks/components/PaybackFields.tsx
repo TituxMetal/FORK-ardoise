@@ -30,6 +30,7 @@ export const PaybackFields = ({
   mode = 'create'
 }: Props) => {
   const amountError = form.formState.errors.amount?.message
+  const dayError = form.formState.errors.day?.message
   const title = mode === 'edit' ? 'Modifier le Règlement' : 'Constater un Règlement'
 
   return (
@@ -69,6 +70,9 @@ export const PaybackFields = ({
         </Select>
       </FormWrapper>
       <p>Plafond {euros(cap)}</p>
+      <FormWrapper label="Jour" error={dayError}>
+        <Input {...form.register('day')} required placeholder="YYYY-MM-DD" />
+      </FormWrapper>
       <FormWrapper label="Montant" error={amountError}>
         <Input {...form.register('amount')} required />
       </FormWrapper>

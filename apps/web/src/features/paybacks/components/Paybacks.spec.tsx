@@ -29,6 +29,7 @@ const openWithPayback = async () => {
     participantIds: ['lea', 'bob']
   })
   await api.paybacks(testUsers.lea).create(group.id, {
+    day: '2026-08-31',
     debtorId: 'bob',
     creditorId: 'lea',
     amount: 20
@@ -43,6 +44,7 @@ describe('Paybacks', () => {
 
     expect(screen.getByText('BO')).toBeTruthy()
     expect(screen.getByText('Bob → Léa')).toBeTruthy()
+    expect(screen.getByText('Bob · 31 août')).toBeTruthy()
     expect(screen.getByText('0,20 €')).toBeTruthy()
   })
 
@@ -79,6 +81,7 @@ describe('Paybacks', () => {
     await user.click(screen.getByRole('button', { name: 'Modifier Bob → Léa' }))
 
     expect(screen.getByRole('form', { name: 'Modifier le Règlement' })).toBeTruthy()
+    expect((screen.getByLabelText('Jour') as HTMLInputElement).value).toBe('2026-08-31')
     expect((screen.getByLabelText('Montant') as HTMLInputElement).value).toBe('0,20')
     expect(screen.getByText('Plafond 0,50 €')).toBeTruthy()
     await user.clear(screen.getByLabelText('Montant'))
@@ -100,11 +103,13 @@ describe('Paybacks', () => {
       participantIds: ['lea', 'bob']
     })
     await api.paybacks(testUsers.lea).create(group.id, {
+      day: '2026-08-31',
       debtorId: 'bob',
       creditorId: 'lea',
       amount: 20
     })
     await api.paybacks(testUsers.lea).create(group.id, {
+      day: '2026-08-31',
       debtorId: 'bob',
       creditorId: 'lea',
       amount: 30

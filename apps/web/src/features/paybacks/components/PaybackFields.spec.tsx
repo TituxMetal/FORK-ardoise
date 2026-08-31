@@ -27,7 +27,7 @@ type HarnessProps = {
 const Harness = ({ error = '', onSubmit = () => {}, onCancel = () => {} }: HarnessProps) => {
   const form = useForm<CreatePaybackFormInput>({
     resolver: zodResolver(createPaybackSchema),
-    defaultValues: { debtorId: '', creditorId: '', amount: '' }
+    defaultValues: { debtorId: '', creditorId: '', amount: '', day: '' }
   })
 
   return (
@@ -61,6 +61,7 @@ describe('PaybackFields', () => {
       )
     ).toEqual(['Léa'])
     expect(screen.getByText('Plafond 0,33 €')).toBeTruthy()
+    expect((screen.getByLabelText('Jour') as HTMLInputElement).required).toBe(true)
     expect(screen.getByRole('button', { name: 'Constater le Règlement' })).toBeTruthy()
   })
 
@@ -76,11 +77,14 @@ describe('PaybackFields', () => {
 
     const user = userEvent.setup()
     await user.selectOptions(screen.getByLabelText('Débiteur'), 'bob')
+    await user.type(screen.getByLabelText('Jour'), '2026-08-31')
     await user.type(screen.getByLabelText('Montant'), '0,20')
     await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
     await waitFor(() => {
-      expect(submitted).toEqual([{ debtorId: 'bob', creditorId: '', amount: '0,20' }])
+      expect(submitted).toEqual([
+        { debtorId: 'bob', creditorId: '', amount: '0,20', day: '2026-08-31' }
+      ])
     })
   })
 })

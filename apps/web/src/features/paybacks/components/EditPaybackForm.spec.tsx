@@ -31,6 +31,7 @@ const openWithPayback = async () => {
     participantIds: ['lea', 'bob', 'camille']
   })
   const withPayback = await api.paybacks(testUsers.lea).create(joined.id, {
+    day: '2026-08-31',
     debtorId: 'bob',
     creditorId: 'lea',
     amount: 20
@@ -59,6 +60,7 @@ describe('EditPaybackForm', () => {
     const form = screen.getByRole('form', { name: 'Modifier le Règlement' })
     expect((within(form).getByLabelText('Débiteur') as HTMLSelectElement).value).toBe('bob')
     expect((within(form).getByLabelText('Créancier') as HTMLSelectElement).value).toBe('lea')
+    expect((within(form).getByLabelText('Jour') as HTMLInputElement).value).toBe('2026-08-31')
     expect((within(form).getByLabelText('Montant') as HTMLInputElement).value).toBe('0,20')
     // Without the 20 payback Bob owes 100: the cap is the remaining debt.
     expect(within(form).getByText('Plafond 1,00 €')).toBeTruthy()
@@ -72,6 +74,7 @@ describe('EditPaybackForm', () => {
       expect(client.update).toHaveBeenCalledWith(group.id, group.paybacks[0].id, {
         debtorId: 'bob',
         creditorId: 'lea',
+        day: '2026-08-31',
         amount: 100
       })
     })

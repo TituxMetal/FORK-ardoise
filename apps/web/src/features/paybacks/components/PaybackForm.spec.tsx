@@ -53,6 +53,7 @@ describe('PaybackForm', () => {
     const user = userEvent.setup()
     const form = screen.getByRole('form', { name: 'Constater un Règlement' })
     expect(within(form).getByText('Plafond 0,50 €')).toBeTruthy()
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-31')
     await user.type(within(form).getByLabelText('Montant'), '0,20')
     await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
@@ -60,7 +61,8 @@ describe('PaybackForm', () => {
       expect(spy.create).toHaveBeenCalledWith(group.id, {
         debtorId: 'bob',
         creditorId: 'lea',
-        amount: 20
+        amount: 20,
+        day: '2026-08-31'
       })
     })
     const next = await client.get(group.id)
@@ -84,6 +86,7 @@ describe('PaybackForm', () => {
 
     const user = userEvent.setup()
     const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-31')
     await user.type(within(form).getByLabelText('Montant'), '0,20')
     await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
@@ -96,9 +99,25 @@ describe('PaybackForm', () => {
     render(<PaybackForm client={spy} />)
 
     const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-31')
     await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
     expect((await screen.findByRole('alert')).textContent).toBe('Montant > 0 requis')
+    expect(spy.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a missing day with a French message without calling the API', async () => {
+    await openForm()
+    const spy = spyClient(api.paybacks(testUsers.lea))
+    render(<PaybackForm client={spy} />)
+
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.type(within(form).getByLabelText('Montant'), '0,20')
+    await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
+
+    expect((await screen.findByRole('alert')).textContent).toBe('Jour requis')
     expect(spy.create).not.toHaveBeenCalled()
   })
 
@@ -109,10 +128,12 @@ describe('PaybackForm', () => {
 
     const user = userEvent.setup()
     const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-31')
     await user.type(within(form).getByLabelText('Montant'), '0,20')
     await user.click(screen.getByRole('button', { name: 'Annuler' }))
 
     expect(onCancel).toHaveBeenCalled()
     expect((within(form).getByLabelText('Montant') as HTMLInputElement).value).toBe('')
+    expect((within(form).getByLabelText('Jour') as HTMLInputElement).value).toBe('')
   })
 })

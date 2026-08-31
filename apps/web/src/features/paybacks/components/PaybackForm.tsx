@@ -20,7 +20,7 @@ export const PaybackForm = ({ client = paybacksClient, onCancel }: Props) => {
   const [error, setError] = useState('')
   const form = useForm<CreatePaybackFormInput>({
     resolver: zodResolver(createPaybackSchema),
-    defaultValues: { debtorId: '', creditorId: '', amount: '' }
+    defaultValues: { debtorId: '', creditorId: '', amount: '', day: '' }
   })
   const debtorId = useWatch({ control: form.control, name: 'debtorId' })
   const creditorId = useWatch({ control: form.control, name: 'creditorId' })
@@ -50,6 +50,7 @@ export const PaybackForm = ({ client = paybacksClient, onCancel }: Props) => {
         await client.create(group.id, {
           debtorId: effectiveDebtorId,
           creditorId: effectiveCreditorId,
+          day: values.day,
           amount: centsFromEuros(values.amount)
         })
       )
