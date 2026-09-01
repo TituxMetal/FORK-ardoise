@@ -33,7 +33,7 @@ type SlateEntryListProps<TEntry extends { id: string }> = {
  * supplies the entry mapping (`rowFor`) and its edit form, so the three lists
  * are one component here.
  */
-export function SlateEntryList<TEntry extends { id: string }>({
+export const SlateEntryList = <TEntry extends { id: string }>({
   kind,
   entries,
   emptyText,
@@ -41,7 +41,7 @@ export function SlateEntryList<TEntry extends { id: string }>({
   client,
   rowFor,
   renderEditForm
-}: SlateEntryListProps<TEntry>) {
+}: SlateEntryListProps<TEntry>) => {
   const group = useStore($group)
   const editing = useStore($editing)
   const [error, setError] = useState('')
