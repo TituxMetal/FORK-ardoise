@@ -1,7 +1,5 @@
 import type { Payback } from './payback.entity'
 
-export const PaybackRepository = Symbol('PaybackRepository')
-
 export type PaybackRepository = {
   save: (payback: Payback) => Promise<void>
   findById: (id: string) => Promise<Payback | null>

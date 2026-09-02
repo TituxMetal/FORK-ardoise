@@ -1,7 +1,5 @@
 import type { Service } from './service.entity'
 
-export const ServiceRepository = Symbol('ServiceRepository')
-
 export type ServiceRepository = {
   save: (service: Service) => Promise<void>
   findById: (id: string) => Promise<Service | null>
