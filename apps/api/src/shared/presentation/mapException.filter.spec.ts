@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { describe, expect, it } from 'vite-plus/test'
-import { domainError } from '~/shared/domain'
+import { domainError } from '../domain'
 import { mapException } from './mapException.filter'
 
 const app = new Hono()

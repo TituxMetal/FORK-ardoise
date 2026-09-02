@@ -1,13 +1,9 @@
-import type { Expense } from '~/expenses/domain/expense.entity'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
-import type { Payback } from '~/paybacks/domain/payback.entity'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
-import type { Service } from '~/services/domain/service.entity'
-import type { ServiceRepository } from '~/services/domain/service.repository'
+import type { Expense, ExpenseRepository } from '~/expenses/domain'
+import type { Payback, PaybackRepository } from '~/paybacks/domain'
+import type { Service, ServiceRepository } from '~/services/domain'
 import { balancesOf, notFound } from '~/shared/domain'
-import type { GroupDto } from '~/groups/application/group.dto'
-import { groupHasMember, type Group } from '~/groups/domain/group.entity'
-import type { GroupRepository } from '~/groups/domain/group.repository'
+import type { GroupDto } from './group.dto'
+import { groupHasMember, type Group, type GroupRepository } from '../domain'
 
 export type SlateView = {
   execute: (userId: string, groupId: string) => Promise<GroupDto>

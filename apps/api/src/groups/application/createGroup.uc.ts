@@ -1,8 +1,5 @@
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { groupCreate } from '~/groups/domain/group.entity'
-import { groupNameFrom } from '~/groups/domain/groupName.vo'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { memberOf } from '~/groups/domain/member.entity'
+import type { SlateView } from './getSlate.uc'
+import { groupCreate, groupNameFrom, type GroupRepository, memberOf } from '../domain'
 
 export const createGroup = (groups: GroupRepository, view: SlateView) => ({
   execute: async (userId: string, userName: string, name: string) => {

@@ -1,4 +1,4 @@
-import type { Expense } from '~/expenses/domain/expense.entity'
+import type { Expense } from './expense.entity'
 
 export type ExpenseRepository = {
   save: (expense: Expense) => Promise<void>

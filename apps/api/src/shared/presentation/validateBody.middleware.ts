@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { invalidData } from '~/shared/domain'
+import { invalidData } from '../domain'
 
 export const validateBody = <Schema extends z.ZodType>(schema: Schema) =>
   zValidator('json', schema, result => {

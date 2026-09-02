@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { validateBody } from '~/shared/presentation'
-import { updateOwnName } from '~/users/application/updateOwnName.uc'
-import type { UserRepository } from '~/users/domain/user.repository'
+import { updateOwnName } from '../application'
+import type { UserRepository } from '../domain'
 
 const updateNameBody = z.object({
   name: z.string()

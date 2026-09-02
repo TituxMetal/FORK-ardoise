@@ -5,10 +5,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
-import { groupReconstitute } from '~/groups/domain/group.entity'
-import { groupNameReconstitute } from '~/groups/domain/groupName.vo'
-import { memberOf } from '~/groups/domain/member.entity'
-import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
+import { groupReconstitute, groupNameReconstitute, memberOf } from '../domain'
+import { createPrismaClient } from '~/shared/infrastructure'
 import { prismaGroupAdapter } from './prismaGroup.adapter'
 
 const sql = (migration: string): string => {

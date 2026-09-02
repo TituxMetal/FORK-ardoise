@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
+import type { ExpenseRepository } from '../domain'
 import { validateBody } from '~/shared/presentation'
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { expenseMutation } from '~/expenses/application/expenseMutation.uc'
+import type { SlateView } from '~/groups/application'
+import { expenseMutation } from '../application'
 
 const expenseBody = z.object({
   label: z.string(),

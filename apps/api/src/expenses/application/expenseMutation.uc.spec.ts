@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { amountReconstitute, dayReconstitute, PARTICIPANTS_REQUIRED } from '~/shared/domain'
-import { expenseReconstitute, type Expense } from '~/expenses/domain/expense.entity'
-import { labelReconstitute, LABEL_REQUIRED } from '~/expenses/domain/label.vo'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
-import { slateFixture, viewFixture } from '~/shared/test/slateFixture'
+import {
+  expenseReconstitute,
+  type Expense,
+  labelReconstitute,
+  LABEL_REQUIRED,
+  type ExpenseRepository
+} from '../domain'
+import { slateFixture, viewFixture } from '~/shared/test'
 import { expenseMutation } from './expenseMutation.uc'
 
 const pizza = (groupId = 'g1'): Expense =>

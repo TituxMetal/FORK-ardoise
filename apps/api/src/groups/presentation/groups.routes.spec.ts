@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
 import { createPrismaClient } from '~/shared/infrastructure'
 import { createApp } from '~/createApp'
-import type { GroupDto } from '~/groups/application/group.dto'
+import type { GroupDto } from '../application'
 
 const sessionSql = readFileSync(
   fileURLToPath(

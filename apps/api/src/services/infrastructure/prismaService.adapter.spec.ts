@@ -4,12 +4,10 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents } from '~/shared/domain'
-
-import { dayReconstitute } from '~/shared/domain'
-import { labelReconstitute } from '~/expenses/domain/label.vo'
-import { serviceCreate, serviceUpdate } from '~/services/domain/service.entity'
-import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
+import { amountFromCents, dayReconstitute } from '~/shared/domain'
+import { labelReconstitute } from '~/expenses/domain'
+import { serviceCreate, serviceUpdate } from '../domain'
+import { createPrismaClient } from '~/shared/infrastructure'
 import { prismaServiceAdapter } from './prismaService.adapter'
 
 const sql = (migration: string): string => {

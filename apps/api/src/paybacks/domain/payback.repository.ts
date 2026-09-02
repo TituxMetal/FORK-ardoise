@@ -1,4 +1,4 @@
-import type { Payback } from '~/paybacks/domain/payback.entity'
+import type { Payback } from './payback.entity'
 
 export const PaybackRepository = Symbol('PaybackRepository')
 

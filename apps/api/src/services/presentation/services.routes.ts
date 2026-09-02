@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { validateBody } from '~/shared/presentation'
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { serviceMutation } from '~/services/application/serviceMutation.uc'
-import type { ServiceRepository } from '~/services/domain/service.repository'
+import type { SlateView } from '~/groups/application'
+import { serviceMutation } from '../application'
+import type { ServiceRepository } from '../domain'
 
 const serviceBody = z.object({
   label: z.string(),

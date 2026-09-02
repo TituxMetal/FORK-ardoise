@@ -1,8 +1,11 @@
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { slateMutation, type SlateMutation } from '~/groups/application/slateMutation.uc'
-import { expenseCreate, expenseUpdate, type Expense } from '~/expenses/domain/expense.entity'
-import { labelFrom } from '~/expenses/domain/label.vo'
-import type { ExpenseRepository } from '~/expenses/domain/expense.repository'
+import { type SlateView, slateMutation, type SlateMutation } from '~/groups/application'
+import {
+  expenseCreate,
+  expenseUpdate,
+  type Expense,
+  labelFrom,
+  type ExpenseRepository
+} from '../domain'
 import { amountFromCents, dayFrom } from '~/shared/domain'
 
 export type ExpenseInput = {

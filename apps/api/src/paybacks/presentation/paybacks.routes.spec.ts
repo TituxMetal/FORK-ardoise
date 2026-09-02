@@ -4,14 +4,14 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
-import type { GroupDto } from '~/groups/application/group.dto'
+import type { GroupDto } from '~/groups/application'
 import { createPrismaClient } from '~/shared/infrastructure'
 import { createApp } from '~/createApp'
 import {
   PAYBACK_ABOVE_CAP,
   PAYBACK_CREDITOR_NOT_POSITIVE,
   PAYBACK_DEBTOR_NOT_NEGATIVE
-} from '~/paybacks/domain/payback.entity'
+} from '../domain'
 
 const sessionSql = readFileSync(
   fileURLToPath(

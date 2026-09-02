@@ -1,12 +1,11 @@
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { slateMutation, type SlateMutation } from '~/groups/application/slateMutation.uc'
+import { type SlateView, slateMutation, type SlateMutation } from '~/groups/application'
 import {
   paybackCreate,
   paybackReconstitute,
   paybackUpdate,
-  type Payback
-} from '~/paybacks/domain/payback.entity'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
+  type Payback,
+  type PaybackRepository
+} from '../domain'
 import { amountFromCents, amountReconstitute, dayFrom, dayReconstitute } from '~/shared/domain'
 
 export type PaybackInput = {

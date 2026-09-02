@@ -1,7 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Group } from '~/groups/domain/group.entity'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { toGroup } from '~/groups/infrastructure/toGroup.mapper'
+import type { Group, GroupRepository } from '../domain'
+import { toGroup } from './toGroup.mapper'
 
 const include = { members: true } as const
 

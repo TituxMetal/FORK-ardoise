@@ -5,9 +5,8 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
 import { amountFromCents, dayReconstitute } from '~/shared/domain'
-
-import { paybackReconstitute } from '~/paybacks/domain/payback.entity'
-import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
+import { paybackReconstitute } from '../domain'
+import { createPrismaClient } from '~/shared/infrastructure'
 import { prismaPaybackAdapter } from './prismaPayback.adapter'
 
 const sql = (migration: string): string => {

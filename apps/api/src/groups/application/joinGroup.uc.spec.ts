@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vite-plus/test'
-import type { GroupDto } from '~/groups/application/group.dto'
-import { groupReconstitute, type Group } from '~/groups/domain/group.entity'
-import { groupNameReconstitute } from '~/groups/domain/groupName.vo'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { memberOf } from '~/groups/domain/member.entity'
+import type { GroupDto } from './group.dto'
+import {
+  groupReconstitute,
+  type Group,
+  groupNameReconstitute,
+  type GroupRepository,
+  memberOf
+} from '../domain'
 import { joinGroup } from './joinGroup.uc'
 
 const potes = () =>

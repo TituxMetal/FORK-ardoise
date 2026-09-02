@@ -1,4 +1,4 @@
-import type { BalanceDto, GroupDto, MemberDto, PaybackDto } from '~/groups/application/group.dto'
+import type { BalanceDto, GroupDto, MemberDto, PaybackDto } from '~/groups/application'
 
 const defaultMembers: MemberDto[] = [
   { userId: 'u1', name: 'Léa' },

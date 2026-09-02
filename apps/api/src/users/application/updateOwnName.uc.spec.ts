@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { USER_NAME_REQUIRED } from '~/users/domain/userName.vo'
-import type { UserRepository } from '~/users/domain/user.repository'
+import { USER_NAME_REQUIRED, type UserRepository } from '../domain'
 import { updateOwnName } from './updateOwnName.uc'
 
 const repository = (renamed: Array<{ userId: string; name: string }> = []): UserRepository => ({

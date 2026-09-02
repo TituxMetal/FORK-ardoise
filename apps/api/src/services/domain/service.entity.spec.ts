@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { amountFromCents, PARTICIPANTS_REQUIRED } from '~/shared/domain'
-
-import { dayReconstitute } from '~/shared/domain'
-import { labelReconstitute } from '~/expenses/domain/label.vo'
+import { amountFromCents, PARTICIPANTS_REQUIRED, dayReconstitute } from '~/shared/domain'
+import { labelReconstitute } from '~/expenses/domain'
 import { serviceCreate, serviceReconstitute, serviceUpdate } from './service.entity'
 
 const label = labelReconstitute('Cours de guitare')

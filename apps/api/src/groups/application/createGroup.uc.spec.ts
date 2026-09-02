@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
-import type { GroupDto } from '~/groups/application/group.dto'
-import type { Group } from '~/groups/domain/group.entity'
-import { GROUP_NAME_REQUIRED } from '~/groups/domain/groupName.vo'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { memberOf } from '~/groups/domain/member.entity'
+import type { GroupDto } from './group.dto'
+import { type Group, GROUP_NAME_REQUIRED, type GroupRepository, memberOf } from '../domain'
 import { createGroup } from './createGroup.uc'
 
 const slate = (): GroupDto => ({

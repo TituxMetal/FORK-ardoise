@@ -1,8 +1,6 @@
 import { Hono } from 'hono'
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { joinGroup } from '~/groups/application/joinGroup.uc'
-import { previewInvite } from '~/groups/application/previewInvite.uc'
-import type { GroupRepository } from '~/groups/domain/group.repository'
+import { type SlateView, joinGroup, previewInvite } from '../application'
+import type { GroupRepository } from '../domain'
 
 export const createInvitePreviewRoutes = (groups: GroupRepository) => {
   const previewInviteUseCase = previewInvite(groups)

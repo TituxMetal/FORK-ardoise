@@ -1,5 +1,5 @@
-import type { GroupName } from '~/groups/domain/groupName.vo'
-import type { Member } from '~/groups/domain/member.entity'
+import type { GroupName } from './groupName.vo'
+import type { Member } from './member.entity'
 
 export type Group = {
   id: string

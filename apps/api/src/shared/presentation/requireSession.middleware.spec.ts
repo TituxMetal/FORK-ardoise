@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { describe, expect, it } from 'vite-plus/test'
-import type { Auth } from '~/shared/application'
+import type { Auth } from '../application'
 import { mapException } from './mapException.filter'
 import { requireSession } from './requireSession.middleware'
 

@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { amountReconstitute, dayReconstitute } from '~/shared/domain'
-import { PAYBACK_ABOVE_CAP, type Payback } from '~/paybacks/domain/payback.entity'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
-import { slateFixture, viewFixture } from '~/shared/test/slateFixture'
+import { PAYBACK_ABOVE_CAP, type Payback, type PaybackRepository } from '../domain'
+import { slateFixture, viewFixture } from '~/shared/test'
 import { paybackMutation } from './paybackMutation.uc'
 
 // u1 is owed 66, u2 owes 33: a Payback from u2 to u1 is capped at 33.

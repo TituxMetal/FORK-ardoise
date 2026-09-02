@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { amountReconstitute, dayReconstitute, PARTICIPANTS_REQUIRED } from '~/shared/domain'
-import { serviceReconstitute, type Service } from '~/services/domain/service.entity'
-import { labelReconstitute, LABEL_REQUIRED } from '~/expenses/domain/label.vo'
-import type { ServiceRepository } from '~/services/domain/service.repository'
-import { slateFixture, viewFixture } from '~/shared/test/slateFixture'
+import { serviceReconstitute, type Service, type ServiceRepository } from '../domain'
+import { labelReconstitute, LABEL_REQUIRED } from '~/expenses/domain'
+import { slateFixture, viewFixture } from '~/shared/test'
 import { serviceMutation } from './serviceMutation.uc'
 
 const babysitting = (groupId = 'g1'): Service =>

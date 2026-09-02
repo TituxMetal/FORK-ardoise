@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { validateBody } from '~/shared/presentation'
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { paybackMutation } from '~/paybacks/application/paybackMutation.uc'
-import type { PaybackRepository } from '~/paybacks/domain/payback.repository'
+import type { SlateView } from '~/groups/application'
+import { paybackMutation } from '../application'
+import type { PaybackRepository } from '../domain'
 
 const paybackBody = z.object({
   debtorId: z.string(),

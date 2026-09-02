@@ -1,5 +1,4 @@
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { groupHasMember } from '~/groups/domain/group.entity'
+import { type GroupRepository, groupHasMember } from '../domain'
 import { notFound } from '~/shared/domain'
 
 export const leaveGroup = (groups: GroupRepository) => ({

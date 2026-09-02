@@ -1,5 +1,5 @@
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import type { GroupDto } from '~/groups/application/group.dto'
+import type { SlateView } from './getSlate.uc'
+import type { GroupDto } from './group.dto'
 import { invalidData, notFound } from '~/shared/domain'
 
 /**

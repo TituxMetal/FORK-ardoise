@@ -1,7 +1,5 @@
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { groupAddMember } from '~/groups/domain/group.entity'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { memberOf } from '~/groups/domain/member.entity'
+import type { SlateView } from './getSlate.uc'
+import { groupAddMember, type GroupRepository, memberOf } from '../domain'
 import { notFound } from '~/shared/domain'
 
 export const joinGroup = (groups: GroupRepository, view: SlateView) => ({

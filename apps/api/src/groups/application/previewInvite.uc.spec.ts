@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { groupReconstitute, type Group } from '~/groups/domain/group.entity'
-import { groupNameReconstitute } from '~/groups/domain/groupName.vo'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { memberOf } from '~/groups/domain/member.entity'
+import {
+  groupReconstitute,
+  type Group,
+  groupNameReconstitute,
+  type GroupRepository,
+  memberOf
+} from '../domain'
 import { previewInvite } from './previewInvite.uc'
 
 const repository = (found: Group | null): GroupRepository => ({

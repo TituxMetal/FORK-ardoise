@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
-import type { UserRepository } from '~/users/domain/user.repository'
+import type { UserRepository } from '../domain'
 
 export const prismaUserAdapter = (prisma: PrismaClient): UserRepository => ({
   async rename(userId, name) {

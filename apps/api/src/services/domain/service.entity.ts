@@ -1,6 +1,5 @@
-import type { Day } from '~/shared/domain'
-import type { Label } from '~/expenses/domain/label.vo'
-import { type Amount, equalParts, type Part } from '~/shared/domain'
+import { type Day, type Amount, equalParts, type Part } from '~/shared/domain'
+import type { Label } from '~/expenses/domain'
 
 export type Service = {
   id: string

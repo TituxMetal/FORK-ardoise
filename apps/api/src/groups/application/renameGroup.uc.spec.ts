@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { groupReconstitute, type Group } from '~/groups/domain/group.entity'
-import { GROUP_NAME_REQUIRED } from '~/groups/domain/groupName.vo'
-import { groupNameReconstitute } from '~/groups/domain/groupName.vo'
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { memberOf } from '~/groups/domain/member.entity'
+import {
+  groupReconstitute,
+  type Group,
+  GROUP_NAME_REQUIRED,
+  groupNameReconstitute,
+  type GroupRepository,
+  memberOf
+} from '../domain'
 import { renameGroup } from './renameGroup.uc'
 
 const friendGroup = groupReconstitute(

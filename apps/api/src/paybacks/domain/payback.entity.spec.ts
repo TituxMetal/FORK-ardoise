@@ -7,7 +7,7 @@ import {
   paybackCap,
   paybackCreate,
   paybackUpdate
-} from '~/paybacks/domain/payback.entity'
+} from './payback.entity'
 
 const day = dayReconstitute('2026-08-31')
 

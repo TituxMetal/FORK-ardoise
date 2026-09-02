@@ -1,4 +1,4 @@
-import type { GroupRepository } from '~/groups/domain/group.repository'
+import type { GroupRepository } from '../domain'
 
 export const listGroups = (groups: GroupRepository) => ({
   execute: async (userId: string) => {

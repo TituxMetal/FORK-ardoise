@@ -1,6 +1,6 @@
 import { createMiddleware } from 'hono/factory'
-import type { Auth } from '~/shared/application'
-import { unauthorized } from '~/shared/domain'
+import type { Auth } from '../application'
+import { unauthorized } from '../domain'
 
 export const requireSession = (auth: Auth) =>
   createMiddleware(async (c, next) => {

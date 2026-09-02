@@ -1,5 +1,4 @@
-import { userNameFrom } from '~/users/domain/userName.vo'
-import type { UserRepository } from '~/users/domain/user.repository'
+import { userNameFrom, type UserRepository } from '../domain'
 
 export const updateOwnName = (users: UserRepository) => async (userId: string, name: string) => {
   const userName = userNameFrom(name)

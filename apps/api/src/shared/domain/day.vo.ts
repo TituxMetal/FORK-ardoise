@@ -1,4 +1,4 @@
-import { invalidData } from '~/shared/domain'
+import { invalidData } from './invalidData.vo'
 
 export type Day = {
   value: string

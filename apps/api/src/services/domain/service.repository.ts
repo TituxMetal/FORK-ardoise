@@ -1,4 +1,4 @@
-import type { Service } from '~/services/domain/service.entity'
+import type { Service } from './service.entity'
 
 export const ServiceRepository = Symbol('ServiceRepository')
 

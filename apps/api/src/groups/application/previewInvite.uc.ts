@@ -1,4 +1,4 @@
-import type { GroupRepository } from '~/groups/domain/group.repository'
+import type { GroupRepository } from '../domain'
 import { notFound } from '~/shared/domain'
 import type { InvitePreviewDto } from './invitePreview.dto'
 

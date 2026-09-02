@@ -1,4 +1,4 @@
-import type { Group } from '~/groups/domain/group.entity'
+import type { Group } from './group.entity'
 
 export type GroupRepository = {
   save: (group: Group) => Promise<void>

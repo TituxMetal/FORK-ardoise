@@ -1,6 +1,4 @@
-import type { GroupRepository } from '~/groups/domain/group.repository'
-import { groupHasMember } from '~/groups/domain/group.entity'
-import { groupNameFrom } from '~/groups/domain/groupName.vo'
+import { type GroupRepository, groupHasMember, groupNameFrom } from '../domain'
 import { notFound } from '~/shared/domain'
 
 export const renameGroup = (groups: GroupRepository) => ({

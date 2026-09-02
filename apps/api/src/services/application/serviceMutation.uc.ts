@@ -1,8 +1,6 @@
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { slateMutation, type SlateMutation } from '~/groups/application/slateMutation.uc'
-import { serviceCreate, serviceUpdate, type Service } from '~/services/domain/service.entity'
-import type { ServiceRepository } from '~/services/domain/service.repository'
-import { labelFrom } from '~/expenses/domain/label.vo'
+import { type SlateView, slateMutation, type SlateMutation } from '~/groups/application'
+import { serviceCreate, serviceUpdate, type Service, type ServiceRepository } from '../domain'
+import { labelFrom } from '~/expenses/domain'
 import { amountFromCents, dayFrom } from '~/shared/domain'
 
 export type ServiceInput = {

@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vite-plus/test'
-import { createPrismaClient } from '~/shared/infrastructure/prisma.client'
+import { createPrismaClient } from '~/shared/infrastructure'
 import { prismaUserAdapter } from './prismaUser.adapter'
 
 const sql = (migration: string): string => {

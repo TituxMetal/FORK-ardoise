@@ -1,5 +1,5 @@
 import { amountReconstitute, dayReconstitute } from '~/shared/domain'
-import { paybackReconstitute } from '~/paybacks/domain/payback.entity'
+import { paybackReconstitute } from '../domain'
 
 export const toPayback = (row: {
   id: string

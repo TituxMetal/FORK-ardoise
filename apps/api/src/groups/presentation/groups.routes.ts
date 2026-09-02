@@ -1,12 +1,8 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { validateBody } from '~/shared/presentation'
-import type { SlateView } from '~/groups/application/getSlate.uc'
-import { createGroup } from '~/groups/application/createGroup.uc'
-import { leaveGroup } from '~/groups/application/leaveGroup.uc'
-import { listGroups } from '~/groups/application/listGroups.uc'
-import { renameGroup } from '~/groups/application/renameGroup.uc'
-import type { GroupRepository } from '~/groups/domain/group.repository'
+import { type SlateView, createGroup, leaveGroup, listGroups, renameGroup } from '../application'
+import type { GroupRepository } from '../domain'
 
 const groupNameBody = z.object({
   name: z.string()

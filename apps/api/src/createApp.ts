@@ -1,23 +1,23 @@
 import type { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
 import type { Auth } from '~/shared/application'
-import { prismaExpenseAdapter } from '~/expenses/infrastructure/prismaExpense.adapter'
-import { createExpensesRoutes } from '~/expenses/presentation/expenses.routes'
-import { prismaGroupAdapter } from '~/groups/infrastructure/prismaGroup.adapter'
-import { createGroupsRoutes } from '~/groups/presentation/groups.routes'
+import { prismaExpenseAdapter } from '~/expenses/infrastructure'
+import { createExpensesRoutes } from '~/expenses/presentation'
+import { prismaGroupAdapter } from '~/groups/infrastructure'
 import {
+  createGroupsRoutes,
   createInvitePreviewRoutes,
   createInvitesRoutes
-} from '~/groups/presentation/invites.routes'
-import { prismaServiceAdapter } from '~/services/infrastructure/prismaService.adapter'
-import { createServicesRoutes } from '~/services/presentation/services.routes'
-import { prismaPaybackAdapter } from '~/paybacks/infrastructure/prismaPayback.adapter'
-import { createPaybacksRoutes } from '~/paybacks/presentation/paybacks.routes'
-import { prismaUserAdapter } from '~/users/infrastructure/prismaUser.adapter'
-import { createUsersRoutes } from '~/users/presentation/users.routes'
+} from '~/groups/presentation'
+import { prismaServiceAdapter } from '~/services/infrastructure'
+import { createServicesRoutes } from '~/services/presentation'
+import { prismaPaybackAdapter } from '~/paybacks/infrastructure'
+import { createPaybacksRoutes } from '~/paybacks/presentation'
+import { prismaUserAdapter } from '~/users/infrastructure'
+import { createUsersRoutes } from '~/users/presentation'
 import { createAuth, createPrismaClient } from '~/shared/infrastructure'
 import { mapException, requireSession } from '~/shared/presentation'
-import { getSlate } from '~/groups/application/getSlate.uc'
+import { getSlate } from '~/groups/application'
 
 export const createApp = (
   prisma: PrismaClient = createPrismaClient(),

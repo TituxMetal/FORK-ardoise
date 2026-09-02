@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { notFound } from '~/shared/domain'
-import { slateFixture, viewFixture } from '~/shared/test/slateFixture'
+import { slateFixture, viewFixture } from '~/shared/test'
 import { slateMutation } from './slateMutation.uc'
 
 type FakeEntity = { id: string; groupId: string; value: string }

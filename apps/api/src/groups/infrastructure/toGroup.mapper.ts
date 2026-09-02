@@ -1,6 +1,4 @@
-import { groupReconstitute } from '~/groups/domain/group.entity'
-import { groupNameReconstitute } from '~/groups/domain/groupName.vo'
-import { memberReconstitute } from '~/groups/domain/member.entity'
+import { groupReconstitute, groupNameReconstitute, memberReconstitute } from '../domain'
 
 export const toGroup = (row: {
   id: string

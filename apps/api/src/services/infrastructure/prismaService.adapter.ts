@@ -1,7 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
-import type { Service } from '~/services/domain/service.entity'
-import type { ServiceRepository } from '~/services/domain/service.repository'
-import { toService } from '~/services/infrastructure/toService.mapper'
+import type { Service, ServiceRepository } from '../domain'
+import { toService } from './toService.mapper'
 
 const include = { participants: true, parts: true } as const
 
