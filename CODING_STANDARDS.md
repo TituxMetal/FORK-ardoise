@@ -45,6 +45,8 @@ Every non-barrel file in `apps/api/src` carries its role suffix:
 
 No per-role subfolders (`entities/`, `value-objects/`, `use-cases/`): the layer folder says the layer, the suffix says the role.
 
+Barrels: every folder in `apps/api/src` that exports symbols has an `index.ts`. Imports never target a member file across folders: `import { createGroup } from '~/groups/application'`, not `~/groups/application/createGroup.uc`. A file imports a sibling in its own folder relatively (`./createGroup.uc`), never through the alias. Within the same vocabulary, another layer is imported with a single relative `../` through its barrel (`import { groupCreate } from '../domain'`), never the `~/<vocabulary>` alias. Cross-vocabulary imports go through the alias barrel: `import { getSlate } from '~/groups/application'`, `import { amountFromCents } from '~/shared/domain'`. Several symbols from the same folder import merged on one line from its barrel.
+
 ## Web files
 
 - Folders kebab-case.

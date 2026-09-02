@@ -42,7 +42,8 @@ apps/api/src/
 
 No `class`. No `function` keyword. A use case is `export const createPayback = (deps) => async (input) => { … }` — never `{ execute() }`.
 
-Every file carries its role suffix (table in `CODING_STANDARDS.md`). No per-role subfolders: the layer folder says the layer, the suffix says the role.
+- Every file carries its role suffix (table in `CODING_STANDARDS.md`). No per-role subfolders: the layer folder says the layer, the suffix says the role.
+- Every folder exposes an `index.ts` barrel. Imports cross folders through the barrel, never a member file. Within a vocabulary, layers import each other with a single relative `../` through the target layer's barrel (`import { groupCreate } from '../domain'`), never the `~/<vocabulary>` alias; siblings import relatively (`./`). Cross-vocabulary imports go through the alias barrel (`~/expenses/domain`, `~/shared/application`).
 
 HTTP English, bijection with `CONTEXT.md`:
 
