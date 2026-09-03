@@ -24,7 +24,7 @@ If pinentry cannot unlock the key, stop and say so.
 
 ## Commits
 
-Conventional commits, English, atomic:
+Conventional commits, atomic, in English (language rule: `CONTEXT.md` `## Language`):
 
 ```text
 type(scope): imperative description
@@ -42,7 +42,9 @@ Rewrite locally with `git reset` only before the branch is pushed.
 
 ## Issues and pull requests
 
-Titles in English, full words (`feature: add payback form`, never `feat:`).
+Issue and pull-request text is English per the single language rule in
+`CONTEXT.md` (`## Language`). Titles use full words (`feature: add payback
+form`, never `feat:`).
 
 Required path:
 
@@ -50,7 +52,8 @@ A ticket is not done when the commit exists. The completion criterion is a
 pushed branch with an open pull request against `main`, every commit atomic
 and GPG-signed, and `vp check` + `vp test` green before each commit.
 
-1. Claim the issue (`docs/agents/issue-tracker.md`).
+1. Claim the issue — assignee set (`gh issue edit <n> --add-assignee @me`)
+   before any file change. See `docs/agents/issue-tracker.md`.
 2. Branch from up-to-date `main`.
 3. Open a pull request against `main`.
 4. Wait for Copilot review. Address every comment. The author does not dismiss them silently.

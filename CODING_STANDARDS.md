@@ -6,11 +6,10 @@ The retrofit ticket moves the current tree to these rules. Do not mix a rename i
 
 ## Language
 
-- Code, Prisma models, test titles, comments: English from `CONTEXT.md`.
-- UI strings: French.
-- Issues, pull requests, commits: English. See `docs/git-workflow.md`.
-- Comments and identifiers are English even when the surrounding feature is
-  French-facing; French belongs in UI strings and speech only.
+The single language rule is in `CONTEXT.md` (`## Language`): all agent-authored
+text is English. Applied to code, that rule means identifiers, comments and
+test titles use CONTEXT.md vocabulary — English even when the surrounding
+feature is French-facing — and UI strings are French.
 
 ## Theme
 
