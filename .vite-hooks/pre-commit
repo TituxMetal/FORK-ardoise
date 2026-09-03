@@ -1,2 +1,11 @@
+# Wall (issue #117): no commit is created on `main`. Pre-commit runs after the
+# message is written but before the commit object exists, so aborting here
+# blocks the commit locally with a clear message.
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo detach)
+if [ "$branch" = "main" ]; then
+  echo "git-workflow: refusing to commit on main (docs/git-workflow.md): no commit lands on main, create a feature/* fix/* or docs/* branch and commit there" >&2
+  exit 1
+fi
+
 vp staged
 vp exec bun run tools/checkSpecCoverage.ts --staged

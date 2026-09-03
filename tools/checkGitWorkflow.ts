@@ -1,7 +1,8 @@
 // Git-workflow gate: the conventions docs/git-workflow.md spells out, made
 // executable. Catches the failures that recurred across sessions: commits on
-// `main`, non-conventional subjects, paragraph commit bodies, unpushed
-// branches, and feature work without an open pull request. See issue #101.
+// `main`, non-conventional subjects, paragraph commit bodies, commit text
+// carrying non-ASCII (accented) characters, unpushed branches, and feature
+// work without an open pull request. See issues #101 and #117.
 //
 // The gate fails closed: a git error or a missing ref never yields a green
 // run.
@@ -46,6 +47,17 @@ const currentBranch = (): string => git(['rev-parse', '--abbrev-ref', 'HEAD'])[0
 const isMain = (branch: string): boolean => branch === 'main'
 
 const subjectOf = (rev: string): string => git(['log', '-1', '--format=%s', rev])[0] ?? ''
+
+// The accent gate encodes the language rule in CONTEXT.md (`## Language`):
+// agent-authored commit text is English, and a non-ASCII character is French
+// text's detectable signature. Any code point above 0x7f in the subject or a
+// body line fails.
+const carriesNonAscii = (text: string): boolean => {
+  for (const ch of text) {
+    if (ch.codePointAt(0)! > 0x7f) return true
+  }
+  return false
+}
 
 // The body keeps indentation (a bullet's continuation lines), so it must not
 // go through parse(), which trims every line. Read the raw stdout instead.
@@ -125,11 +137,20 @@ const violationsFor = (revs: string[], checkBranchState: boolean): string[] => {
     if (!CONVENTIONAL.test(subject)) {
       problems.push(`subject "${subject}" is not conventional commits (type(scope): imperative)`)
     }
+    if (carriesNonAscii(subject)) {
+      problems.push(`subject "${subject}" carries non-ASCII characters: commit text is English`)
+    }
     const body = bodyOf(rev)
     if (body.length > 0) {
       const bad = bodyViolations(body)
       if (bad.length > 0) {
         problems.push(`commit body has paragraph lines: ${bad.join(' | ')} (bullets only)`)
+      }
+      const accented = body.filter(line => carriesNonAscii(line))
+      if (accented.length > 0) {
+        problems.push(
+          `commit body carries non-ASCII characters: ${accented.join(' | ')} (commit text is English)`
+        )
       }
     }
   }

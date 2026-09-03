@@ -77,3 +77,11 @@ a paragraph commit body, an unpushed branch, or feature work without an open
 pull request against `main`. It needs a pushed branch and an open PR to pass,
 so run it as the completion check after pushing (`vp run check:git-workflow`),
 and in CI with `vp run check:git-workflow --diff origin/main`.
+
+Two rules are walls (issue #117) that stop the failure before it ships:
+
+- The pre-commit hook (`.vite-hooks/pre-commit`) refuses to create a commit
+  while on `main`. `git commit` on `main` aborts with a clear message.
+- The gate rejects any commit whose subject or body carries non-ASCII
+  characters — the detectable signature of French text against the language
+  rule in `CONTEXT.md` (`## Language`). Commit text is English.
