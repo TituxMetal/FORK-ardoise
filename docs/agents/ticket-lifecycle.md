@@ -18,6 +18,8 @@ for the tracker operations.
 
 ## 3. Implement
 
+- Any design or architecture decision the work raises is grilled with the
+  human (`grilling` skill) before it is implemented.
 - Follow `docs/agents/domain.md`, `CODING_STANDARDS.md` and `CONTEXT.md`.
 - Commit atomically (definition in `docs/git-workflow.md`), conventional
   subjects, bullet bodies, GPG-signed.

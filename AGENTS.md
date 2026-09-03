@@ -28,20 +28,24 @@ release. Add a tool name to select part of the graph. For example, run
 
 ## Agent skills
 
-Rules keyed to triggers, not a menu: each fires when its trigger appears,
-however the task is phrased, whether or not it names a ticket or a skill.
-
 ### Lifecycle
 
-- **Claim before code.** Any change to product code begins with a claimed
-  issue: assign yourself (`gh issue edit <n> --add-assignee @me`) before you
-  create a branch or write code, whatever the task is called.
-- **Grill before building.** Any design or architecture decision is grilled
-  with the human (`grilling` skill) before implementation.
+Rules that fire on their trigger, however the task is phrased, whether or not
+it names a ticket or a skill:
 
-Then the end-to-end ritual: claim → branch → implement → PR → verdict on
-review comments → close → sync. See `docs/agents/ticket-lifecycle.md` and
-`docs/agents/issue-tracker.md` for the canonical steps.
+- **Claim before code.** Any change — in particular any change to product
+  code — begins with a claimed issue: assign yourself
+  (`gh issue edit <n> --add-assignee @me`) before you create a branch or
+  make any file change.
+- **Grill before building.** Any design or architecture decision is grilled
+  with the human (`grilling` skill) before it is implemented.
+
+Canonical steps: `docs/agents/ticket-lifecycle.md` and
+`docs/agents/issue-tracker.md`.
+
+### Issue tracker
+
+Claim, implement, close, checkboxes, assignee: `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
