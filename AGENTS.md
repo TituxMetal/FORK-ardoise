@@ -37,8 +37,9 @@ it names a ticket or a skill:
   code — begins with a claimed issue: assign yourself
   (`gh issue edit <n> --add-assignee @me`) before you create a branch or
   make any file change.
-- **Grill before building.** Any design or architecture decision is grilled
-  with the human (`grilling` skill) before it is implemented.
+- **Grill before building.** Any design or architecture decision the work
+  raises is grilled with the human (`grilling` skill) before it is
+  implemented.
 
 Canonical steps: `docs/agents/ticket-lifecycle.md` and
 `docs/agents/issue-tracker.md`.
