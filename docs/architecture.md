@@ -100,7 +100,7 @@ Four layers, all kept:
 
 Arrange / Act / Assert separated by a blank line. New specs use `describe` / `it`. Existing `test()` dies on the retrofit ticket. No browser suite as the _only_ contract: HTTP stays.
 
-Spec file naming and placement (one colocated spec per source file, the exemptions) are the rule in `CODING_STANDARDS.md`.
+Spec file naming and placement are the rule in `CODING_STANDARDS.md`.
 
 ## Names
 
@@ -108,6 +108,6 @@ Spec file naming and placement (one colocated spec per source file, the exemptio
 - Component files PascalCase (`GroupPage.tsx`); exported type identifiers PascalCase (`Group`, `GroupSummary`); module files camelCase + role suffix. PascalCase is never a function file.
 - Function modules camelCase with a role suffix when the role exists.
 - Aliases: `~`, `~ui`, `~features`, `api/*`. Imports carry no extension.
-- Identifiers: `CONTEXT.md` English. No accents.
+- Identifiers: per the language rule in `CONTEXT.md` (`## Language`). No accents.
 
 Oxfmt formats. Do not hand-restyle.

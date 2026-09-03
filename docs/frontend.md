@@ -10,7 +10,9 @@ Dark theme only. Light theme is a defect.
 
 ## Constraints already decided
 
-- Visible strings: French. Identifiers behind them: English (`CONTEXT.md`).
+- Language follows the single rule in `CONTEXT.md` (`## Language`): this app's
+  visible strings are its French carve-out; the identifiers behind them follow
+  that rule too.
 - Amounts display as euros (`12,50 €`); storage is cents.
 - Pages + features + routes. Not one file for every form. A page is a page; a feature owns its components.
 - Auth: sign-in and sign-up are the two tabs of one card (`SessionForms`, ARIA tablist/tab/tabpanel), sign-up first; the two forms are never stacked.

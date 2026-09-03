@@ -6,10 +6,9 @@ The retrofit ticket moves the current tree to these rules. Do not mix a rename i
 
 ## Language
 
-The single language rule is in `CONTEXT.md` (`## Language`): all agent-authored
-text is English. Applied to code, that rule means identifiers, comments and
-test titles use CONTEXT.md vocabulary — English even when the surrounding
-feature is French-facing — and UI strings are French.
+The single language rule is in `CONTEXT.md` (`## Language`) and is not restated
+here. `/code-review` checks code identifiers, comments and test titles against
+that rule.
 
 ## Theme
 
@@ -57,7 +56,6 @@ Barrels: every folder in `apps/api/src` that exports symbols has an `index.ts`. 
 - `components/ui/`: shared reusable UI (Input, Button, FormWrapper…), barrel `index.ts`.
 - Component files PascalCase (`GroupPage.tsx`, `Input.tsx`); exported type identifiers PascalCase (`Group`, `GroupSummary`); type modules camelCase + suffix (`expenses.types.ts`, `groups.types.ts`) — never `.dto.ts` (DTO is an API-only role).
 - Function modules camelCase with a role suffix when the role exists (`groups.client.ts`, `auth.schema.ts`, `auth.store.ts`); no invented suffix (`amounts.ts`, `errorMessage.ts`).
-- Specs colocated, `.spec.ts` / `.spec.tsx`.
 - Playwright specs: `apps/web/e2e/` — one suite over the whole product, not colocated.
 
 ## Tests
@@ -65,7 +63,7 @@ Barrels: every folder in `apps/api/src` that exports symbols has an `index.ts`. 
 - The spec file is the source file name plus `.spec`: `amount.vo.ts` → `amount.vo.spec.ts`, `expenses.routes.ts` → `expenses.routes.spec.ts`, `GroupPage.tsx` → `GroupPage.spec.tsx`. One file, one spec.
   Exempt from a colocated spec: `index.ts` barrels, `main.ts` / `main.tsx` entries, `vite-env.d.ts`, configs, and pure type modules with no runtime behaviour (`*.types.ts`, `*.dto.ts`, `*.port.ts`, `*.repository.ts` — contract shapes, DTOs and auth/persistence ports). An adapter (`*.adapter.ts`, `*.client.ts`) spec covers the port it implements.
 - Structure: Arrange / Act / Assert separated by a blank line. No `// Arrange` comments.
-- New specs: `describe` / `it`. Playwright specs: `test.describe` / `test` (the library exports no `it`), English titles.
+- New specs: `describe` / `it`. Playwright specs: `test.describe` / `test` (the library exports no `it`). Test titles follow the language rule in `CONTEXT.md` (`## Language`).
 - Layers: domain + HTTP in-process + React Testing Library + Playwright.
 - Behaviour at a public seam. No implementation-detail tests.
 

@@ -6,9 +6,8 @@ The retrofit copied a NestJS-shaped style onto a Hono app: PascalCase files, `I`
 
 PascalCase is for React component files and exported type identifiers (`GroupPage.tsx`, `GroupDto`). Every other module file — function, type, value object — is camelCase + role suffix. A function file is never PascalCase. There are no classes, so no file is named like a class.
 
-Every non-barrel file in `apps/api/src` carries a role suffix — the suffix table
-lives in `CODING_STANDARDS.md`. The layer folder says the layer, the suffix says
-the role; no per-role subfolders.
+Role suffixes are defined once, in `CODING_STANDARDS.md` (the suffix table and
+the layer layout); this ADR does not restate the requirement.
 
 Web function modules carry a role suffix when the role exists (`groups.client.ts`, `auth.schema.ts`); component files and exported type identifiers stay PascalCase (`GroupPage.tsx`, `GroupDto`).
 
@@ -24,9 +23,8 @@ The api↔web seam is the typed Hono route table: `AppType = ReturnType<typeof c
 
 ## Tests
 
-One file, one colocated spec — spec naming, placement and the exemptions are
-the rule in `CODING_STANDARDS.md`. Tests are structured Arrange / Act / Assert
-separated by a blank line, no comments. The closing sweep greps for source files
-without a sibling spec.
+Spec naming, placement and the exemptions are the rule in `CODING_STANDARDS.md`;
+the closing sweep greps for source files without a sibling spec. Tests are
+structured Arrange / Act / Assert separated by a blank line, no comments.
 
 Aliases `~`, `~ui`, `~features` and `api/*` replace relative chains; imports carry no extension.

@@ -24,7 +24,8 @@ If pinentry cannot unlock the key, stop and say so.
 
 ## Commits
 
-Conventional commits, atomic, in English (language rule: `CONTEXT.md` `## Language`):
+Conventional commits, atomic. Commit text follows the single language rule in
+`CONTEXT.md` (`## Language`):
 
 ```text
 type(scope): imperative description
@@ -42,9 +43,9 @@ Rewrite locally with `git reset` only before the branch is pushed.
 
 ## Issues and pull requests
 
-Issue and pull-request text is English per the single language rule in
-`CONTEXT.md` (`## Language`). Titles use full words (`feature: add payback
-form`, never `feat:`).
+Issue and pull-request text follows the single language rule in `CONTEXT.md`
+(`## Language`). Titles use full words (`feature: add payback form`, never
+`feat:`).
 
 Required path:
 

@@ -27,8 +27,8 @@ for the tracker operations.
 
 - Open a PR against `main` once the branch is pushed — the completion
   criterion, not an afterthought.
-- PR text is English per the single language rule in `CONTEXT.md`
-  (`## Language`); title full words (`feature: add payback form`).
+- PR text follows the single language rule in `CONTEXT.md` (`## Language`);
+  title full words (`feature: add payback form`).
 
 ## 5. Review comments
 

@@ -2,8 +2,7 @@
 
 Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
 
-Issue text is English per the single language rule in `CONTEXT.md`
-(`## Language`); the body may quote French UI copy.
+Issue text follows the single language rule in `CONTEXT.md` (`## Language`).
 
 ## Ticket ritual
 

@@ -4,9 +4,7 @@ The product: expenses, services and paybacks between friends, organised in group
 
 ## Language
 
-All agent-authored text — commit subjects and bodies, pull-request titles, descriptions and bodies, issue titles and comments, close comments, review replies, code identifiers — is English, using the written terms below; French is reserved for visible UI strings and conversation.
-
-The written terms are the only names for code, tables, tests, commits, issues and pull requests. French synonyms belong in `_Avoid_`.
+All agent-authored text — commit subjects and bodies, PR titles, descriptions and bodies, issue titles and comments, close comments, review replies, code identifiers — is English, using `CONTEXT.md` vocabulary; French is reserved for visible UI strings and conversation.
 
 **Ardoise**:
 The product. Not a domain object.
