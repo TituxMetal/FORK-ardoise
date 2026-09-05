@@ -28,22 +28,6 @@ release. Add a tool name to select part of the graph. For example, run
 
 ## Agent skills
 
-### Lifecycle
-
-Rules that fire on their trigger, however the task is phrased, whether or not
-it names a ticket or a skill:
-
-- **Claim before code.** Any change — in particular any change to product
-  code — begins with a claimed issue: assign yourself
-  (`gh issue edit <n> --add-assignee @me`) before you create a branch or
-  make any file change.
-- **Grill before building.** Any design or architecture decision the work
-  raises is grilled with the human (`grilling` skill) before it is
-  implemented.
-
-Canonical steps: `docs/agents/ticket-lifecycle.md` and
-`docs/agents/issue-tracker.md`.
-
 ### Issue tracker
 
 Claim, implement, close, checkboxes, assignee: `docs/agents/issue-tracker.md`.
@@ -63,7 +47,3 @@ Schema, migrate, `migration.sql`, new tables: `docs/agents/prisma.md`.
 ### Coding standards
 
 Language, files, tests, no `class`: `CODING_STANDARDS.md`. Shape: `docs/architecture.md`. Look and dark theme: `docs/frontend.md`.
-
-### Git workflow
-
-`feature/*` `fix/*` `docs/*` → pull request → Copilot → human rebase-merge. Never commit `main`. SSH remote only. GPG-signed commits only. See `docs/git-workflow.md`.

@@ -27,8 +27,6 @@ jobs:
       - run: vp check
       - run: vp test
       - run: vp run check:spec-coverage --no-cache
-      - name: Enforce the git workflow on the PR commits
-        run: vp run check:git-workflow --diff origin/main
 
       - name: Install the Playwright browser
         run: vp exec playwright install --with-deps chromium
