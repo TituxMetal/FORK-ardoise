@@ -11,7 +11,6 @@
   "scripts": {
     "ready": "vp check && vp run -r test && vp run -r build",
     "check:spec-coverage": "bun run tools/checkSpecCoverage.ts",
-    "check:git-workflow": "bun run tools/checkGitWorkflow.ts",
     "prepare": "vp config",
     "test:e2e": "playwright test"
   },
