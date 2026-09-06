@@ -4,7 +4,7 @@ The product: expenses, services and paybacks between friends, organised in group
 
 ## Language
 
-All agent-authored text — commit subjects and bodies, PR titles, descriptions and bodies, issue titles and comments, close comments, review replies, code identifiers — is English, using `CONTEXT.md` vocabulary; French is reserved for visible UI strings and conversation.
+All agent-authored text — commit subjects and bodies, PR titles, descriptions and bodies, issue titles and comments, close comments, review replies, code identifiers — is English, using `CONTEXT.md` vocabulary; French is reserved for visible UI strings and conversation. The `_Avoid_` lists constrain identifiers and agent-authored English only — they do not govern visible UI strings, where a French word listed as `_Avoid_` (e.g. Dépense, Règlement, Solde, Invitation) may still be the correct copy (ADR 0007).
 
 **Ardoise**:
 The product. Not a domain object.
