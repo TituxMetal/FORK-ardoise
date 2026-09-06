@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ideation: an About page for Ardoise</title>
+    <style>
+      :root {
+        --bg: #faf9f7;
+        --ink: #22201d;
+        --mut: #6b6760;
+        --rule: #e4e0d8;
+        --accent: #8a3b2a;
+        --accent-soft: #f3e6e1;
+        --accent-text: #7a3123;
+        --chip: #efebe4;
+        --card: #ffffff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.62 -apple-system,
+          'Segoe UI',
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+      header.doc {
+        margin-bottom: 8px;
+      }
+      .eyebrow {
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--mut);
+        font-weight: 600;
+      }
+      h1 {
+        font-size: 1.85rem;
+        line-height: 1.2;
+        margin: 0.35rem 0 0.4rem;
+        font-weight: 700;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 0.9rem;
+        margin: 0.6rem 0 1rem;
+        font-size: 0.85rem;
+        color: var(--mut);
+      }
+      .meta b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      h2 {
+        font-size: 1.22rem;
+        margin: 2.4rem 0 0.6rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--rule);
+        font-weight: 700;
+      }
+      h2 .hl {
+        color: var(--accent);
+      }
+      p {
+        max-width: 70ch;
+      }
+      .lead {
+        color: #33302c;
+      }
+      code {
+        font:
+          0.86em ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        background: #f1ede6;
+        border: 1px solid #e7e1d6;
+        border-radius: 4px;
+        padding: 0.05em 0.32em;
+      }
+      a {
+        color: var(--accent-text);
+        text-decoration: none;
+        border-bottom: 1px solid #d9b9ae;
+      }
+      a:hover {
+        border-bottom-color: var(--accent-text);
+      }
+      ul.axes {
+        list-style: none;
+        padding: 0;
+        margin: 0.4rem 0;
+      }
+      ul.axes li {
+        padding: 0.34rem 0.8rem;
+        margin: 0.3rem 0;
+        border: 1px solid var(--rule);
+        background: var(--card);
+        border-radius: 8px;
+      }
+      ul.axes li b {
+        display: inline-block;
+        min-width: 1.6em;
+      }
+      nav.jump {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin: 0.4rem 0 0.9rem;
+      }
+      nav.jump a {
+        font-size: 0.9rem;
+        border: 1px solid var(--rule);
+        border-radius: 999px;
+        padding: 0.2rem 0.7rem;
+        background: var(--card);
+      }
+      article.idea {
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        padding: 1.1rem 1.2rem;
+        margin: 0.7rem 0;
+      }
+      article.idea .rank {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      article.idea h3 {
+        display: inline;
+        font-size: 1.06rem;
+        margin: 0 0 0.3rem;
+        line-height: 1.3;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 0.1em 0.7em;
+        margin-left: 0.5em;
+        vertical-align: middle;
+      }
+      .pill.c {
+        background: var(--chip);
+        color: #5a554c;
+        border: 1px solid #e2dcd2;
+      }
+      .pill.a {
+        background: var(--accent-soft);
+        color: var(--accent-text);
+        border: 1px solid #e3c9c0;
+      }
+      .axisline {
+        margin: 0.2rem 0 0.4rem;
+        font-size: 0.82rem;
+        color: var(--mut);
+      }
+      dl.fields {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.25rem 0.9rem;
+        margin: 0.5rem 0;
+      }
+      dl.fields dt {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--accent);
+        padding-top: 0.15rem;
+      }
+      dl.fields dd {
+        margin: 0;
+      }
+      figure {
+        margin: 1rem 0;
+      }
+      figcaption {
+        font-size: 0.85rem;
+        color: var(--mut);
+        margin-top: 0.45rem;
+        max-width: 70ch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        margin: 0.6rem 0;
+      }
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        border: 1px solid var(--rule);
+        padding: 0.45rem 0.6rem;
+      }
+      th {
+        background: var(--chip);
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #4a463f;
+      }
+      footer.composition-signal {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--rule);
+        font-size: 0.8rem;
+        color: var(--mut);
+      }
+      @media (max-width: 640px) {
+        .page {
+          padding: 28px 16px 56px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="doc">
+        <div class="eyebrow">Ideation · repo-grounded</div>
+        <h1>An About page for Ardoise — what it is and who it's for</h1>
+        <div class="meta">
+          <span><b>Date</b>&nbsp;<time datetime="2026-09-06">2026-09-06</time></span>
+          <span><b>Topic</b>&nbsp;about-page</span>
+          <span><b>Mode</b>&nbsp;repo-grounded</span>
+        </div>
+        <p class="lead">
+          Direction under exploration: an «&nbsp;À propos&nbsp;» page for the Ardoise web app that
+          explains to a visitor who knows nothing what the app does and what it's for. These are
+          ranked candidate directions for that page — <em>not</em> a spec. Choose one (or a
+          combination) to brainstorm next.
+        </p>
+      </header>
+
+      <section id="grounding-context">
+        <h2><span class="hl">▸</span> Grounding Context — Codebase</h2>
+        <p>
+          Ardoise is
+          <em
+            >«&nbsp;expenses, services and paybacks between friends, organised in groups&nbsp;»</em
+          >
+          (CONTEXT.md first line; same in README). Friends keep one shared running slate per Group:
+          a Member records an <b>Expense</b> (real money paid, split into equal Parts) or a
+          <b>Service</b> (an act valued in cents — time, skill); the app derives each Member's
+          <b>Balance</b>; <b>Paybacks</b> settle who owes whom. The value proposition is a
+          behaviour:
+          <em
+            >no mental ledger — the slate always shows who owes whom, and Balances never cross
+            Groups.</em
+          >
+        </p>
+        <p>
+          The web app is a client-side Hono router (<a
+            href="https://github.com/TituxMetal/FORK-ardoise/blob/main/apps/web/src/lib/router.tsx"
+            ><code>apps/web/src/lib/router.tsx</code></a
+          >): routes are <code>groups</code>, <code>group</code>, <code>invite</code>,
+          <code>profile</code>, <code>auth</code> —
+          <b>there is no landing, About, help, or intro surface of any kind.</b> A visitor who is
+          not signed in is sent to the bare sign-up/sign-in card on every route except
+          <code>invite</code> (<a
+            href="https://github.com/TituxMetal/FORK-ardoise/blob/main/apps/web/src/main.tsx"
+            ><code>main.tsx</code></a
+          >: <code>session === null ? &lt;AuthPage /&gt;</code>), and the signed-out shell renders
+          only a brand <code>&lt;h1&gt;Ardoise&lt;/h1&gt;</code> over that card (<a
+            href="https://github.com/TituxMetal/FORK-ardoise/blob/main/apps/web/src/layouts/AppLayout.tsx"
+            ><code>AppLayout.tsx</code></a
+          >: <code>showShell = session !== null &amp;&amp; currentRoute !== 'invite'</code>). The
+          invite landing (<a
+            href="https://github.com/TituxMetal/FORK-ardoise/blob/main/apps/web/src/pages/InvitePage.tsx"
+            ><code>InvitePage.tsx</code></a
+          >) — the only acquisition path — shows the Group name and member count, then
+          <code>Rejoindre le Groupe</code> or the auth forms, with zero product explanation.
+        </p>
+        <p>
+          Vocabulary is authoritative in CONTEXT.md: <b>Ardoise</b> is the product name (not a
+          domain object); it means the French bar tab / slate — a shared running bill at the
+          counter. UI copy is French (sole carve-out; identifiers are English), in a compact,
+          imperative register with capitalized domain nouns («&nbsp;Mes groupes&nbsp;»,
+          «&nbsp;Rejoindre le Groupe&nbsp;», «&nbsp;Aucune Dépense&nbsp;»). The app is invite-only,
+          no user directory, memberships created by opening a secret invite (ADR&nbsp;0003);
+          Balances are sealed per Group (ADR&nbsp;0001); French is the single copy language
+          (ADR&nbsp;0004). <b>No end-user positioning copy exists anywhere in the product</b> — only
+          the README tagline, the page <code>&lt;title&gt;</code>, and the brand heading. Target
+          user: friends who share spending (dinners, trips, shared purchases, evenings) and settle
+          up.
+        </p>
+      </section>
+
+      <section id="topic-axes">
+        <h2><span class="hl">▸</span> Topic Axes</h2>
+        <ul class="axes">
+          <li>
+            <b>A</b> <b>Core narrative &amp; content</b> — what the page must explain: the
+            shared-slate metaphor, the Expense → Service → Payback → derived Balance mechanics in a
+            Group, the value proposition — in plain French.
+          </li>
+          <li>
+            <b>B</b> <b>Entry &amp; placement</b> — route + link placement; whether the bare
+            logged-out auth card (the current front door) can reach the page; entry points for a
+            person who knows nothing.
+          </li>
+          <li>
+            <b>C</b> <b>Form &amp; depth</b> — static prose vs a visual/demonstrated walkthrough vs
+            guided or expanding sections; single screen vs several sections.
+          </li>
+          <li>
+            <b>D</b> <b>Register, boundaries &amp; trust</b> — tone consistent with the compact
+            French copy and capitalized vocabulary; invite-only/privacy positioning; what not to
+            overclaim.
+          </li>
+        </ul>
+      </section>
+
+      <section id="ranked-ideas">
+        <h2><span class="hl">▸</span> Ranked Ideas</h2>
+        <nav class="jump">
+          <a href="#i1">1. Public About, pitch at the door</a>
+          <a href="#i2">2. Show a Slate</a>
+          <a href="#i3">3. The «&nbsp;ardoise&nbsp;» delta line</a>
+          <a href="#i4">4. Teach the decision (mini-lexicon)</a>
+          <a href="#i5">5. One narrated evening</a>
+          <a href="#i6">6. Invite landing teaches the instance</a>
+          <a href="#i7">7. Honest boundaries + register</a>
+        </nav>
+
+        <article class="idea" id="i1">
+          <span class="rank">1.</span>
+          <h3>Public About, reachable before sign-up — pitch lives at the front door</h3>
+          <span class="pill a">Axis B</span>
+          <p class="axisline">Confidence 88% · Complexity Low</p>
+          <p>
+            Today an About page is structurally dead for its only real audience: every logged-out
+            route except <code>invite</code> dispatches to the bare auth card. Make
+            <code>/about</code> an open route (add <code>about</code> to the
+            <code>Route</code> union, carve it out of the
+            <code>session === null ? &lt;AuthPage /&gt;</code> gate in <code>main.tsx</code>),
+            render it in a minimal public shell, and put a 2–3 line French pitch + a
+            «&nbsp;Qu'est-ce qu'Ardoise&nbsp;?&nbsp;» link on the auth card and on <code>/</code>.
+            The enabling routing change also buys a reusable capability: future landing/help/legal
+            pages slot in as one-line entries.
+          </p>
+          <dl class="fields">
+            <dt>Basis</dt>
+            <dd>
+              <code>direct:</code> verified — <code>main.tsx</code> routes non-invite logged-out
+              visitors to <code>AuthPage</code>; <code>router.tsx</code> union has no
+              <code>about</code> member and <code>notFound → groupsRoute</code>;
+              <code>AppLayout.tsx</code> <code>showShell</code> is false signed-out, so nav
+              destinations exist only in the signed-in shell.
+            </dd>
+            <dt>Rationale</dt>
+            <dd>
+              Every other idea on this page is worthless if the page can't be reached pre-commit;
+              the single most information-hungry visitor is exactly whom the current gate locks out.
+              This is the enabling move.
+            </dd>
+            <dt>Downsides</dt>
+            <dd>
+              A public (unauthenticated) route and a public shell are a real routing/gating decision
+              with security surface (what stays behind the session wall); needs an explicit
+              navigation-architecture ruling.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="i2">
+          <span class="rank">2.</span>
+          <h3>Show a Slate — don't describe it</h3>
+          <span class="pill c">Axis C</span>
+          <p class="axisline">Confidence 85% · Complexity Medium</p>
+          <p>
+            The product's whole promise is that Balances are <em>derived</em> — nobody computes or
+            types a solde. That property can only be felt by watching a small fake Group (fake
+            members, fake money, clearly signposted) rendered with the app's own components —
+            <code>BalanceHero</code>, member chips, the three slate lists — as one Dépense is added,
+            its Parts split, the «&nbsp;On te doit / Tu dois&nbsp;» figures visibly move, and a
+            Règlement clears a line. Playable, or replaying; mounted on About, and (reused as one
+            component) on a brand-new empty Group where the teaching moment actually happens.
+          </p>
+          <figure>
+            <svg
+              viewBox="0 0 620 150"
+              role="img"
+              aria-label="Conceptual: one Expense splits, Balances derive, a Payback settles the slate"
+              width="100%"
+              height="auto"
+            >
+              <style>
+                .bl {
+                  fill: #fff;
+                  stroke: #c9c2b6;
+                }
+                .st {
+                  stroke: #c9c2b6;
+                  fill: none;
+                }
+                .tx {
+                  font: 13px sans-serif;
+                  fill: #22201d;
+                }
+                .lb {
+                  font: 12px sans-serif;
+                  fill: #6b6760;
+                }
+                .hl {
+                  fill: #f3e6e1;
+                  stroke: #8a3b2a;
+                }
+              </style>
+              <text class="tx" x="10" y="20" font-weight="600">Dépense</text>
+              <rect class="bl" x="10" y="30" width="150" height="78" rx="8" />
+              <text class="tx" x="24" y="52">Léa paie 60 €</text>
+              <text class="lb" x="24" y="70">Partages égaux</text>
+              <text class="lb" x="24" y="88">Léa · Bob · Tom</text>
+              <text class="tx" x="205" y="20" font-weight="600">Balances (dérivées)</text>
+              <rect class="hl" x="205" y="30" width="150" height="78" rx="8" />
+              <text class="tx" x="219" y="52">On te doit</text>
+              <text class="tx" x="219" y="70">Tu dois</text>
+              <text class="tx" x="219" y="88">Ne se saisit jamais</text>
+              <text class="tx" x="400" y="20" font-weight="600">Règlement</text>
+              <rect class="bl" x="400" y="30" width="160" height="78" rx="8" />
+              <text class="tx" x="414" y="52">Bob → Léa 20 €</text>
+              <text class="lb" x="414" y="70">réduit ce qui est dû</text>
+              <text class="lb" x="414" y="88">ardoise soldée</text>
+              <path class="st" d="M160 69 H205" marker-end="url(#arr)" />
+              <path class="st" d="M355 69 H400" marker-end="url(#arr)" />
+              <defs>
+                <marker id="arr" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+                  <path d="M0 0 L9 4.5 L0 9 z" fill="#8a3b2a" />
+                </marker>
+              </defs>
+            </svg>
+            <figcaption>
+              Conceptual shape of the demonstrated core loop: an Expense is split, the derived
+              Balances move, a Payback settles the slate. Directional only — illustrative of the
+              direction, not a design spec.
+            </figcaption>
+          </figure>
+          <dl class="fields">
+            <dt>Basis</dt>
+            <dd>
+              <code>direct:</code> CONTEXT.md — Expense is money that left a pocket split into
+              Parts; Balance «&nbsp;Never typed in&nbsp;»; Payback is real money reducing what is
+              owed. The real components (<code>BalanceHero.tsx</code> «&nbsp;Ton solde / On te doit
+              / Tu dois&nbsp;», the three empty-state lists) already render this model — verified in
+              source.
+            </dd>
+            <dt>Rationale</dt>
+            <dd>
+              The one thing that cannot be conveyed in prose is precisely the product's
+              differentiator (derivation); and a paragraph asserting it is strictly weaker than a
+              10-second watch. Building from existing components keeps it register-perfect and
+              cheap.
+            </dd>
+            <dt>Downsides</dt>
+            <dd>
+              Most expensive option (demo state/components to keep in sync); a maintained static
+              page is the cheap baseline. If unused, it's the biggest single cost.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="i3">
+          <span class="rank">3.</span>
+          <h3>Open on the «&nbsp;ardoise&nbsp;» delta line — found the French voice</h3>
+          <span class="pill a">Axis A</span>
+          <p class="axisline">Confidence 82% · Complexity Low</p>
+          <p>
+            A French visitor already knows what an ardoise is (the café slate), so the page must not
+            define the name — it opens on the delta, the one thing a café slate can't do: compute
+            itself. Candidate line in the app's register:
+            <em
+              >«&nbsp;L'ardoise du comptoir se tient au crayon. Celle-ci se calcule toute
+              seule.&nbsp;»</em
+            >
+            No French product sentence exists anywhere today (the CONTEXT/README line is English;
+            the UI shows only the bare brand heading). This line seeds the brand's French voice and
+            is small enough to double as the auth-card subtitle and the page
+            <code>&lt;title&gt;</code> treatment.
+          </p>
+          <dl class="fields">
+            <dt>Basis</dt>
+            <dd>
+              <code>direct:</code> verified — no French intro/positioning copy in the codebase;
+              <code>AppLayout.tsx</code> logged-out branch renders only
+              <code>&lt;h1&gt;Ardoise&lt;/h1&gt;</code>; CONTEXT.md's tagline is English-only; the
+              app's own name supplies the built-in contrast.
+            </dd>
+            <dt>Rationale</dt>
+            <dd>
+              Every strong product page starts from one true sentence, and none exists in French;
+              the name itself carries the metaphor, so generic «&nbsp;track shared expenses&nbsp;»
+              copy would waste it.
+            </dd>
+            <dt>Downsides</dt>
+            <dd>
+              A voice line is only as good as the page it anchors; on its own it's copy, not a page
+              — needs a content body (ideas 4/5) to live in.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="i4">
+          <span class="rank">4.</span>
+          <h3>Teach the decision: an on-screen mini-lexicon</h3>
+          <span class="pill a">Axis A</span>
+          <p class="axisline">Confidence 78% · Complexity Low</p>
+          <p>
+            The real learning cost of this app is the domain model, not the mechanics: Expense vs
+            Service is a genuinely non-obvious distinction (the codebase itself needed
+            <a
+              href="https://github.com/TituxMetal/FORK-ardoise/blob/main/docs/adr/0002-service-is-not-an-expense.md"
+              >ADR&nbsp;0002</a
+            >), and mis-recording one silently relabels real money as goodwill. Build the body as
+            compact definition rows for the capitalized French nouns the UI already speaks —
+            <b>Dépense / Service / Règlement</b> and the derived <b>Solde</b> — each with a
+            one-sentence contrast and a one-line mini-slate example, mirroring the on-screen tabs
+            and <code>BalanceHero</code> labels so the page doubles as a self-documenting map of the
+            real screens.
+          </p>
+          <dl class="fields">
+            <dt>Basis</dt>
+            <dd>
+              <code>direct:</code> ADR&nbsp;0002 (Service is not an Expense); CONTEXT.md — Service
+              «&nbsp;not for money spent&nbsp;», Balance «&nbsp;Never typed in&nbsp;»; on-screen
+              nouns from the empty states (<code>Aucune Dépense</code>,
+              <code>Aucun Règlement</code>) and the tabs.
+            </dd>
+            <dt>Rationale</dt>
+            <dd>
+              Teach the nouns and the rest of the UI teaches itself — the cheapest possible
+              onboarding win that also protects data quality (correct recording). Coupling the
+              sections to live screen labels stops the page silently drifting from the product.
+            </dd>
+            <dt>Downsides</dt>
+            <dd>
+              Risk of reading like a spec/glossary; must stay scenario-led, not taxonomic, or it
+              loses the casual invitee.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="i5">
+          <span class="rank">5.</span>
+          <h3>One narrated evening, Balance-first</h3>
+          <span class="pill a">Axis A</span>
+          <p class="axisline">Confidence 74% · Complexity Low</p>
+          <p>
+            Rather than a glossary, tell one canonical evening —
+            <em>«&nbsp;Vendredi, Léa paie le dîner 84,50 €&nbsp;»</em> — with honest arithmetic
+            (equal Parts, leftover cents to the Payer) and lead with the derived Solde, the thing
+            nobody types and the first thing an invitee meets on the group screen. Bob returns the
+            favour with a Service; the Balance says who owes whom; a Règlement settles it. The story
+            doubles as a glossary-by-encounter for the reader who skims.
+          </p>
+          <dl class="fields">
+            <dt>Basis</dt>
+            <dd>
+              <code>direct:</code> CONTEXT.md — Part «&nbsp;Always an equal split; leftover cents go
+              to the Payer&nbsp;», Balance «&nbsp;Never typed in&nbsp;», Slate «&nbsp;A Member sees
+              a Slate; nobody types one in&nbsp;»; a new user's first real surface is the
+              <code>BalanceHero</code>-led group screen.
+            </dd>
+            <dt>Rationale</dt>
+            <dd>
+              What makes Ardoise worth explaining is not the input model but that Balances appear by
+              themselves; leading with the derived Solde matches both the product's magic and the
+              visitor's actual first screen.
+            </dd>
+            <dt>Downsides</dt>
+            <dd>
+              More prose to maintain; a scenario's appeal is subjective. Ideas 4 and 5 are the two
+              competing content-philosophies for the body — this is the key content decision to make
+              when brainstorming.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="i6">
+          <span class="rank">6.</span>
+          <h3>The invite landing teaches the instance you're joining</h3>
+          <span class="pill a">Axis B</span>
+          <p class="axisline">Confidence 80% · Complexity Low–Medium</p>
+          <p>
+            The invite screen is the only organic acquisition path and the single highest-intent
+            stranger surface that exists. A stranger's decision to join is made in seconds there,
+            where today nothing explains what they're joining. Instantiate the explanation from data
+            that already exists at invite time:
+            <em
+              >«&nbsp;Bob vous invite sur l'ardoise de ses potes — une note commune, chacun sait qui
+              doit quoi&nbsp;»</em
+            >
+            with the real Group name above <code>Rejoindre le Groupe</code>, plus a link to About.
+            Replace the category lesson («&nbsp;what is ardoise&nbsp;») with the instance lesson
+            («&nbsp;here is our shared slate&nbsp;»), which is the framing that makes a stranger
+            click.
+          </p>
+          <dl class="fields">
+            <dt>Basis</dt>
+            <dd>
+              <code>direct:</code> verified — <code>InvitePage.tsx</code> renders only
+              <code>preview.name</code> and <code>memberCountLabel</code> before the join/sign-up
+              wall; CONTEXT.md — Invite is a stable secret link any Member copies; ADR&nbsp;0003 (no
+              directory — invites are the only on-ramp).
+            </dd>
+            <dt>Rationale</dt>
+            <dd>
+              Answers the only question that matters to that visitor («&nbsp;what is this specific
+              group and why should I be in it&nbsp;») at the exact moment of decision, and is
+              automatable over live data rather than hand-authored.
+            </dd>
+            <dt>Downsides</dt>
+            <dd>
+              Partially an expansion beyond the About route itself (it touches the invite surface);
+              scope must be confirmed. Done naively it could read as clutter above a form the
+              visitor already intends to use.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="i7">
+          <span class="rank">7.</span>
+          <h3>Honest boundaries + ratified register — «&nbsp;ce que ce n'est pas&nbsp;»</h3>
+          <span class="pill a">Axis D</span>
+          <p class="axisline">Confidence 84% · Complexity Low</p>
+          <p>
+            For a product where real money changes hands among friends, trust is precision, not
+            enthusiasm. A short section states what is true by construction: each Groupe is a
+            separate room (Balances never cross a Group), you enter only by a Member's secret invite
+            (no directory), and Ardoise records and computes but holds and moves no money — plus a
+            register ruling that glossary <em>avoid</em>-lists constrain English identifiers, not
+            French display copy. Writing this page forces that ruling into the open and lets it seed
+            a single French copy source; the observed drift (<code>Créer un User</code> beside
+            <code>Créer le Groupe</code>) then gets fixed at its root.
+          </p>
+          <dl class="fields">
+            <dt>Basis</dt>
+            <dd>
+              <code>direct:</code> ADR&nbsp;0003 (no user directory / friend graph); ADR&nbsp;0001
+              (Balances do not cross Groups); CONTEXT.md — Payback is «&nbsp;Real money changing
+              hands&nbsp;» happening between friends in real life; avoid-lists ban
+              <em>notes de frais / compte / debt</em>.
+            </dd>
+            <dt>Rationale</dt>
+            <dd>
+              Invite-only, no-directory, sealed-per-Group design is a genuine differentiator that
+              generic «&nbsp;secure!&nbsp;» copy would waste — and naming what the app refuses
+              pre-filters the wrong users (expense-report hunters) before they churn.
+            </dd>
+            <dt>Downsides</dt>
+            <dd>
+              A register/scope ruling is organizational copy-work beyond the page itself; overplayed
+              it can read as legalistic. Pair it with the voice/content of ideas 3–5 rather than
+              shipping it bare.
+            </dd>
+          </dl>
+        </article>
+      </section>
+
+      <section id="rejection-summary">
+        <h2><span class="hl">▸</span> Rejection Summary</h2>
+        <p>
+          29 raw ideas across six ideation frames collapsed into the 7 directions above. Cut, with
+          reasons:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Idea</th>
+              <th>Reason rejected</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Standalone static «&nbsp;chalkboard&nbsp;» one-screen form</td>
+              <td>
+                Folded as the baseline static rendering of the low-complexity content directions
+                (3/4/5/7); not itself a distinct direction.
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>
+                «&nbsp;Don't build an About page — teach only at first use / in empty states&nbsp;»
+              </td>
+              <td>
+                Exceeds the asked scope (the user wants the page); its real-component explainer
+                reuse is kept as part of idea 2's empty-Group mounting.
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>
+                Fix <code>Créer un User</code> → <code>Créer un utilisateur</code> as a standalone
+              </td>
+              <td>Micro-fix; folded into idea 7's register ruling and single-copy-source work.</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Raw duplicates of ideas 1–7 across frames</td>
+              <td>
+                Absorbed into their cluster — five independent agents cross-corroborated the same
+                file/line bases, confirming rather than adding.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="axisline">
+          Axis coverage: B×2 (1, 6), A×3 (3, 4, 5), C×1 (2), D×1 (7). No axis left empty.
+        </p>
+      </section>
+
+      <footer class="composition-signal">
+        Composed 2026-09-06 by <code>ce-ideate</code> (orchestrator ideate) in
+        TituxMetal/FORK-ardoise from the user ask <em>«&nbsp;ideate une page à propos…&nbsp;»</em>.
+        Ranked survivor selection verified against <code>apps/web/src</code> routing/gating sources
+        and CONTEXT.md/ADRs.
+      </footer>
+    </div>
+  </body>
+</html>
