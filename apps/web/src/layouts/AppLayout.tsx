@@ -25,13 +25,34 @@ export const AppLayout = ({ session, currentRoute, children }: Props) => {
     await authClient.signOut()
   }
 
-  const showShell = session !== null && currentRoute !== 'invite'
-
-  if (!showShell) {
+  if (currentRoute === 'invite') {
     return (
       <main className="mx-auto max-w-md space-y-6 p-6">
         <h1 className="text-2xl font-semibold">Ardoise</h1>
         {children}
+      </main>
+    )
+  }
+
+  if (session === null) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-10 px-4 py-6 md:px-8">
+        <header className="flex items-center justify-between gap-4 border-b border-border pb-4">
+          <h1 className="text-xl font-semibold">
+            <Link to="/" className="text-foreground">
+              Ardoise
+            </Link>
+          </h1>
+          <nav aria-label="Accès public">
+            <Link
+              to="/session"
+              className="inline-flex h-11 items-center rounded-md px-3 text-sm font-medium text-dim hover:text-foreground"
+            >
+              Se connecter
+            </Link>
+          </nav>
+        </header>
+        <div className="mx-auto w-full max-w-2xl flex-1">{children}</div>
       </main>
     )
   }

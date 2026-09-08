@@ -6,6 +6,7 @@ import {
   copyInvite,
   createGroup,
   joinInvite,
+  reachRegistration,
   signUp,
   uniqueEmail,
   waitForApi
@@ -19,7 +20,7 @@ test.describe('refused writes', () => {
   test('renders the API error when a Payback exceeds its cap', async ({ browser }) => {
     const owner = await browser.newPage()
     await captureInviteWrites(owner)
-    await owner.goto('/')
+    await reachRegistration(owner)
     await signUp(owner, 'Carol', uniqueEmail('carol'))
     await expect(owner.getByRole('heading', { name: 'Créer un Groupe' })).toBeVisible()
     await createGroup(owner, 'Potes de Carol')
@@ -38,7 +39,7 @@ test.describe('refused writes', () => {
   test('renders the API error when the session is missing', async ({ browser }) => {
     const context = await browser.newContext()
     const page = await context.newPage()
-    await page.goto('/')
+    await reachRegistration(page)
     await signUp(page, 'Dave', uniqueEmail('dave'))
     await expect(page.getByRole('heading', { name: 'Créer un Groupe' })).toBeVisible()
 

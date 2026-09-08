@@ -31,10 +31,10 @@ const stubPageOpenFetches = () => {
 }
 
 describe('router', () => {
-  it('routes the groups list path', async () => {
+  it('routes the landing path', async () => {
     const response = await app.fetch(new Request('/'))
 
-    expect(await response.json()).toEqual({ name: 'groups' })
+    expect(await response.json()).toEqual({ name: 'landing' })
   })
 
   it('routes a group detail path', async () => {
@@ -83,12 +83,12 @@ describe('useRoute', () => {
   it('resolves the current pathname through the app', async () => {
     render(<Probe />)
 
-    expect(await screen.findByText('groups')).toBeTruthy()
+    expect(await screen.findByText('landing')).toBeTruthy()
   })
 
   it('re-resolves on history navigation', async () => {
     render(<Probe />)
-    await screen.findByText('groups')
+    await screen.findByText('landing')
 
     window.history.pushState(null, '', '/groups/g1')
     window.dispatchEvent(new PopStateEvent('popstate'))

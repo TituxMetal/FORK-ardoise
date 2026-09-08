@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test'
-import { expectNoAxeViolations, signUp, uniqueEmail, waitForApi } from './helpers'
+import {
+  expectNoAxeViolations,
+  reachRegistration,
+  signUp,
+  uniqueEmail,
+  waitForApi
+} from './helpers'
 
 const MOBILE = { width: 390, height: 844 }
 const DESKTOP = { width: 1280, height: 800 }
@@ -14,7 +20,7 @@ test.describe('app shell', () => {
   }) => {
     const context = await browser.newContext({ viewport: MOBILE })
     const page = await context.newPage()
-    await page.goto('/')
+    await reachRegistration(page)
     await signUp(page, 'Nino', uniqueEmail('nino'))
 
     await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toHaveCount(1)
@@ -36,12 +42,28 @@ test.describe('app shell', () => {
     await expectNoAxeViolations(page)
   })
 
+  test('meets the auth card signed-out on protected deep links without private chrome', async ({
+    browser
+  }) => {
+    const context = await browser.newContext()
+    const page = await context.newPage()
+
+    for (const path of ['/profile', '/groups/some-group']) {
+      await page.goto(path)
+      await expect(page.getByRole('heading', { name: 'Créer un compte' })).toBeVisible()
+      await expect(page.getByRole('link', { name: 'Se connecter' })).toBeVisible()
+      await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toHaveCount(0)
+      await expect(page.getByRole('link', { name: 'Mes Groupes' })).toHaveCount(0)
+      await expect(page.getByRole('link', { name: 'Profil' })).toHaveCount(0)
+    }
+  })
+
   test('shows a sticky sidebar at and above the breakpoint and navigates to real pages', async ({
     browser
   }) => {
     const context = await browser.newContext({ viewport: DESKTOP })
     const page = await context.newPage()
-    await page.goto('/')
+    await reachRegistration(page)
     await signUp(page, 'Mina', uniqueEmail('mina'))
 
     await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toHaveCount(1)
