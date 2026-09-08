@@ -30,11 +30,11 @@ export const expectNoAxeViolations = async (page: Page) => {
 export const signUp = async (page: Page, name: string, email: string) => {
   const form = page
     .locator('form')
-    .filter({ has: page.getByRole('heading', { name: 'Créer un User' }) })
+    .filter({ has: page.getByRole('heading', { name: 'Créer un compte' }) })
   await form.getByLabel('Nom affiché').fill(name)
   await form.getByLabel('E-mail').fill(email)
   await form.getByLabel('Mot de passe').fill(PASSWORD)
-  await form.getByRole('button', { name: 'Créer le User' }).click()
+  await form.getByRole('button', { name: 'Créer le compte' }).click()
 }
 
 export const createGroup = async (page: Page, name: string) => {
@@ -91,8 +91,8 @@ export const addExpense = async (page: Page, label: string, amount: string) => {
 }
 
 export const addPayback = async (page: Page, amount: string) => {
-  await page.getByRole('tab', { name: 'Remboursements' }).click()
-  await page.getByRole('button', { name: 'Ajouter un Remboursement' }).click()
+  await page.getByRole('tab', { name: 'Règlements' }).click()
+  await page.getByRole('button', { name: 'Ajouter un Règlement' }).click()
   const form = page.getByRole('form', { name: 'Constater un Règlement' })
   await form.getByLabel('Jour').fill('2026-08-18')
   await form.getByLabel('Montant').fill(amount)

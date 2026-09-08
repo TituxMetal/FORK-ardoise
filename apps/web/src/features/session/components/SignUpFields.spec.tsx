@@ -27,11 +27,11 @@ describe('SignUpFields', () => {
   it('renders the French sign-up form chrome', () => {
     render(<Harness />)
 
-    expect(screen.getByRole('heading', { name: 'Créer un User' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Créer un compte' })).toBeTruthy()
     expect((screen.getByLabelText('Nom affiché') as HTMLInputElement).required).toBe(true)
     expect((screen.getByLabelText('E-mail') as HTMLInputElement).required).toBe(true)
     expect((screen.getByLabelText('Mot de passe') as HTMLInputElement).required).toBe(true)
-    expect(screen.getByRole('button', { name: 'Créer le User' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Créer le compte' })).toBeTruthy()
   })
 
   it('shows the API error message passed by the container', () => {
@@ -48,7 +48,7 @@ describe('SignUpFields', () => {
     await user.type(screen.getByLabelText('Nom affiché'), 'Léa')
     await user.type(screen.getByLabelText('E-mail'), 'lea@example.com')
     await user.type(screen.getByLabelText('Mot de passe'), 'password1234')
-    await user.click(screen.getByRole('button', { name: 'Créer le User' }))
+    await user.click(screen.getByRole('button', { name: 'Créer le compte' }))
 
     await waitFor(() => {
       expect(submitted).toEqual([

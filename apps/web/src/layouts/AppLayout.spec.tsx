@@ -41,7 +41,7 @@ describe('AppLayout', () => {
     expect(screen.getByRole('heading', { name: 'Ardoise' })).toBeTruthy()
     expect(screen.getAllByRole('navigation', { name: 'Navigation principale' })).toHaveLength(2)
 
-    const groupsLinks = screen.getAllByRole('link', { name: 'Mes groupes' })
+    const groupsLinks = screen.getAllByRole('link', { name: 'Mes Groupes' })
     expect(groupsLinks).toHaveLength(2)
     expect(groupsLinks.every(link => link.getAttribute('href') === '/')).toBeTruthy()
     expect(groupsLinks.every(link => link.getAttribute('aria-current') === 'page')).toBeTruthy()
@@ -65,18 +65,18 @@ describe('AppLayout', () => {
     const profileLinks = screen.getAllByRole('link', { name: 'Profil' })
     expect(profileLinks.every(link => link.getAttribute('aria-current') === 'page')).toBeTruthy()
 
-    const groupsLinks = screen.getAllByRole('link', { name: 'Mes groupes' })
+    const groupsLinks = screen.getAllByRole('link', { name: 'Mes Groupes' })
     expect(groupsLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
   })
 
-  it('keeps Mes groupes current inside a Group screen', () => {
+  it('keeps Mes Groupes current inside a Group screen', () => {
     render(
       <AppLayout session={{ name: 'Léa' }} currentRoute="group">
         <p>Contenu</p>
       </AppLayout>
     )
 
-    const groupsLinks = screen.getAllByRole('link', { name: 'Mes groupes' })
+    const groupsLinks = screen.getAllByRole('link', { name: 'Mes Groupes' })
     expect(groupsLinks.every(link => link.getAttribute('aria-current') === 'page')).toBeTruthy()
 
     const profileLinks = screen.getAllByRole('link', { name: 'Profil' })

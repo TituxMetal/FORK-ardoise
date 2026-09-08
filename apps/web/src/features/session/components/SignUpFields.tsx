@@ -16,7 +16,7 @@ export const SignUpFields = ({ form, error, onSubmit }: Props) => {
   return (
     <form className="flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)} noValidate>
       {error ? <Alert message={error} /> : null}
-      <h2 className="text-lg font-medium">Créer un User</h2>
+      <h2 className="text-lg font-medium">Créer un compte</h2>
       <FormWrapper label="Nom affiché" error={nameError}>
         <Input {...form.register('name')} placeholder="Léa" required />
       </FormWrapper>
@@ -27,7 +27,7 @@ export const SignUpFields = ({ form, error, onSubmit }: Props) => {
         <Input {...form.register('password')} type="password" required minLength={8} />
       </FormWrapper>
       <Button type="submit" className="w-full">
-        Créer le User
+        Créer le compte
       </Button>
     </form>
   )

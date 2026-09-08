@@ -26,7 +26,7 @@ test.describe('core journey', () => {
     ownerPage = await context.newPage()
     await captureInviteWrites(ownerPage)
     await ownerPage.goto('/')
-    await expect(ownerPage.getByRole('heading', { name: 'Créer un User' })).toBeVisible()
+    await expect(ownerPage.getByRole('heading', { name: 'Créer un compte' })).toBeVisible()
     await expectNoAxeViolations(ownerPage)
     await signUp(ownerPage, 'Alice', uniqueEmail('alice'))
     await expect(ownerPage.getByRole('heading', { name: 'Créer un Groupe' })).toBeVisible()

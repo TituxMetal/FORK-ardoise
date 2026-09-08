@@ -20,7 +20,7 @@ afterEach(() => {
 const signUpTab = () => screen.getByRole('tab', { name: 'Inscription' })
 const signInTab = () => screen.getByRole('tab', { name: 'Connexion' })
 const signUpForm = () =>
-  screen.getByRole('heading', { name: 'Créer un User' }).closest('form') as HTMLFormElement
+  screen.getByRole('heading', { name: 'Créer un compte' }).closest('form') as HTMLFormElement
 const signInForm = () =>
   screen.getByRole('heading', { name: 'Ouvrir une session' }).closest('form') as HTMLFormElement
 
@@ -30,7 +30,7 @@ describe('SessionForms', () => {
 
     expect(signUpTab().getAttribute('aria-selected')).toBe('true')
     expect(signInTab().getAttribute('aria-selected')).toBe('false')
-    expect(screen.getByRole('heading', { name: 'Créer un User' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Créer un compte' })).toBeTruthy()
     expect(screen.queryByRole('heading', { name: 'Ouvrir une session' })).toBeNull()
   })
 
@@ -43,7 +43,7 @@ describe('SessionForms', () => {
     expect(signInTab().getAttribute('aria-selected')).toBe('true')
     expect(signUpTab().getAttribute('aria-selected')).toBe('false')
     expect(screen.getByRole('heading', { name: 'Ouvrir une session' })).toBeTruthy()
-    expect(screen.queryByRole('heading', { name: 'Créer un User' })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Créer un compte' })).toBeNull()
   })
 
   it('moves focus and selection with the arrow keys and Home/End', async () => {
@@ -88,7 +88,7 @@ describe('SessionForms', () => {
     await user.type(within(signUpForm()).getByLabelText('Nom affiché'), 'Léa')
     await user.type(within(signUpForm()).getByLabelText('E-mail'), 'lea@example.com')
     await user.type(within(signUpForm()).getByLabelText('Mot de passe'), 'password1234')
-    await user.click(within(signUpForm()).getByRole('button', { name: 'Créer le User' }))
+    await user.click(within(signUpForm()).getByRole('button', { name: 'Créer le compte' }))
 
     expect(authClient.signUp.email).toHaveBeenCalledWith({
       email: 'lea@example.com',
@@ -122,7 +122,7 @@ describe('SessionForms', () => {
     await user.type(within(signUpForm()).getByLabelText('Nom affiché'), 'Léa')
     await user.type(within(signUpForm()).getByLabelText('E-mail'), 'lea@example.com')
     await user.type(within(signUpForm()).getByLabelText('Mot de passe'), 'password1234')
-    await user.click(within(signUpForm()).getByRole('button', { name: 'Créer le User' }))
+    await user.click(within(signUpForm()).getByRole('button', { name: 'Créer le compte' }))
 
     expect((await screen.findByRole('alert')).textContent).toBe('E-mail déjà utilisé')
   })
