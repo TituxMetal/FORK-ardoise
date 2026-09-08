@@ -31,6 +31,32 @@ const openForm = async () => {
   return { client, group }
 }
 
+const openWithTwoCreditors = async () => {
+  const client = api.groups(testUsers.lea)
+  const group = await client.create('Potes de Bob')
+  await api.groups(testUsers.bob).join(group.invite.secret)
+  await api.groups(testUsers.camille).join(group.invite.secret)
+  const joined = await client.get(group.id)
+  // Léa pays Bob's dinner: Bob owes her 1,00 €.
+  await api.expenses(testUsers.lea).create(joined.id, {
+    label: 'Pizza',
+    day: '2026-08-15',
+    amount: 200,
+    payerId: 'lea',
+    participantIds: ['lea', 'bob']
+  })
+  // Camille covers a round for Bob: Bob owes her 0,30 €.
+  await api.expenses(testUsers.camille).create(joined.id, {
+    label: 'Cafés',
+    day: '2026-08-16',
+    amount: 60,
+    payerId: 'camille',
+    participantIds: ['camille', 'bob']
+  })
+  applyGroup(await client.get(group.id))
+  return { client, group }
+}
+
 const spyClient = (
   real: PaybacksClient
 ): PaybacksClient & { create: ReturnType<typeof vi.fn> } => ({
@@ -118,6 +144,41 @@ describe('PaybackForm', () => {
     await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
     expect((await screen.findByRole('alert')).textContent).toBe('Jour requis')
+    expect(spy.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects an Amount above the cap with the French message without calling the API', async () => {
+    await openForm()
+    const spy = spyClient(api.paybacks(testUsers.lea))
+    render(<PaybackForm client={spy} />)
+
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-31')
+    await user.type(within(form).getByLabelText('Montant'), '0,60')
+    await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
+
+    expect((await screen.findByRole('alert')).textContent).toBe('Montant au-dessus du plafond')
+    expect(spy.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects an Amount that a selection change makes over-cap without calling the API', async () => {
+    await openWithTwoCreditors()
+    const spy = spyClient(api.paybacks(testUsers.lea))
+    render(<PaybackForm client={spy} />)
+
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Constater un Règlement' })
+    // Default pair Bob → Léa caps at the 1,00 € Bob owes her.
+    expect(within(form).getByText('Plafond 1,00 €')).toBeTruthy()
+    await user.type(within(form).getByLabelText('Jour'), '2026-08-31')
+    await user.type(within(form).getByLabelText('Montant'), '0,60')
+    // Switching the creditor to Camille shrinks the cap to her 0,30 € credit.
+    await user.selectOptions(within(form).getByLabelText('Créancier'), 'camille')
+    expect(within(form).getByText('Plafond 0,30 €')).toBeTruthy()
+    await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
+
+    expect((await screen.findByRole('alert')).textContent).toBe('Montant au-dessus du plafond')
     expect(spy.create).not.toHaveBeenCalled()
   })
 

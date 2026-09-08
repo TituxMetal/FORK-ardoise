@@ -6,7 +6,7 @@ import { centsFromEuros } from '~/lib/amounts'
 import { errorMessage } from '~/lib/errorMessage'
 import { $group, applyGroup } from '~features/groups'
 import { paybacksClient } from '../api'
-import { createPaybackSchema, type CreatePaybackFormInput } from '../schemas'
+import { enforcePaybackCap, paybackFieldsSchema, type CreatePaybackFormInput } from '../schemas'
 import type { PaybacksClient } from '../types'
 import { paybackCap, paybackCreditors } from '../utils'
 import { PaybackFields } from './PaybackFields'
@@ -20,7 +20,7 @@ export const PaybackForm = ({ client = paybacksClient, onCancel }: Props) => {
   const group = useStore($group)
   const [error, setError] = useState('')
   const form = useForm<CreatePaybackFormInput>({
-    resolver: zodResolver(createPaybackSchema),
+    resolver: zodResolver(paybackFieldsSchema),
     defaultValues: { debtorId: '', creditorId: '', amount: '', day: '' }
   })
   const debtorId = useWatch({ control: form.control, name: 'debtorId' })
@@ -41,6 +41,7 @@ export const PaybackForm = ({ client = paybacksClient, onCancel }: Props) => {
 
   const onSubmit: SubmitHandler<CreatePaybackFormInput> = async values => {
     if (!group) return
+    if (enforcePaybackCap(form, cap, values)) return
     try {
       applyGroup(
         await client.create(group.id, {

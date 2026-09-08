@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Group } from '~features/groups'
-import { createPaybackSchema, type CreatePaybackFormInput } from '../schemas'
+import { paybackFieldsSchema, type CreatePaybackFormInput } from '../schemas'
 import { PaybackFields } from './PaybackFields'
 
 afterEach(cleanup)
@@ -26,7 +26,7 @@ type HarnessProps = {
 
 const Harness = ({ error = '', onSubmit = () => {}, onCancel = () => {} }: HarnessProps) => {
   const form = useForm<CreatePaybackFormInput>({
-    resolver: zodResolver(createPaybackSchema),
+    resolver: zodResolver(paybackFieldsSchema),
     defaultValues: { debtorId: '', creditorId: '', amount: '', day: '' }
   })
 
