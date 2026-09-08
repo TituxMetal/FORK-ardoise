@@ -17,18 +17,35 @@ afterEach(() => {
 })
 
 describe('AppLayout', () => {
-  it('renders the title and children without the shell while signed out', () => {
+  it('renders the public shell with brand and sign-in, no private destinations, signed out', () => {
     render(
-      <AppLayout session={null} currentRoute="groups">
+      <AppLayout session={null} currentRoute="landing">
         <p>Contenu</p>
       </AppLayout>
     )
 
-    expect(screen.getByRole('heading', { name: 'Ardoise' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Ardoise' }).getAttribute('href')).toBe('/')
+    expect(screen.getByRole('link', { name: 'Se connecter' }).getAttribute('href')).toBe('/session')
     expect(screen.getByText('Contenu')).toBeTruthy()
     expect(screen.queryByRole('navigation', { name: 'Navigation principale' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Mes Groupes' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Profil' })).toBeNull()
     expect(screen.queryByText('Session ouverte :')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Fermer la session' })).toBeNull()
+  })
+
+  it('wraps the auth card in the public shell for a signed-out visitor on a non-public route', () => {
+    render(
+      <AppLayout session={null} currentRoute="auth">
+        <p>Contenu</p>
+      </AppLayout>
+    )
+
+    expect(screen.getByRole('link', { name: 'Ardoise' }).getAttribute('href')).toBe('/')
+    expect(screen.getByRole('link', { name: 'Se connecter' })).toBeTruthy()
+    expect(screen.queryByRole('navigation', { name: 'Navigation principale' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Mes Groupes' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Profil' })).toBeNull()
   })
 
   it('renders the two first-level destinations at both breakpoints for an open session', () => {

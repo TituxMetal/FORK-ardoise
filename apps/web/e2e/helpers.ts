@@ -3,8 +3,17 @@ import AxeBuilder from '@axe-core/playwright'
 
 export const PASSWORD = 'password-123'
 
+export const HOME_HEADING = 'Une ardoise partagée pour les comptes d’un Groupe'
+
 export const uniqueEmail = (name: string) =>
   `${name}-${Date.now()}-${Math.floor(Math.random() * 10000)}@example.com`
+
+export const reachRegistration = async (page: Page) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: HOME_HEADING })).toBeVisible()
+  await page.getByRole('link', { name: 'Créer un compte' }).click()
+  await expect(page.getByRole('heading', { name: 'Créer un compte' })).toBeVisible()
+}
 
 export const waitForApi = async (request: APIRequestContext) => {
   await expect

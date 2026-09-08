@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import {
+  HOME_HEADING,
   addExpense,
   addPayback,
   captureInviteWrites,
@@ -26,6 +27,9 @@ test.describe('core journey', () => {
     ownerPage = await context.newPage()
     await captureInviteWrites(ownerPage)
     await ownerPage.goto('/')
+    await expect(ownerPage.getByRole('heading', { name: HOME_HEADING })).toBeVisible()
+    await expectNoAxeViolations(ownerPage)
+    await ownerPage.getByRole('link', { name: 'Créer un compte' }).click()
     await expect(ownerPage.getByRole('heading', { name: 'Créer un compte' })).toBeVisible()
     await expectNoAxeViolations(ownerPage)
     await signUp(ownerPage, 'Alice', uniqueEmail('alice'))

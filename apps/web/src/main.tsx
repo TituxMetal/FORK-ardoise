@@ -1,12 +1,14 @@
-import { StrictMode } from 'react'
+import { StrictMode, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppLayout } from '~/layouts/AppLayout'
 import { authClient } from '~features/session'
-import { useRoute, type Route } from '~/lib/router'
+import { useRoute } from '~/lib/router'
+import { resolvePage } from '~/lib/resolvePage'
 import { AuthPage } from '~/pages/AuthPage'
 import { GroupsPage } from '~/pages/GroupsPage'
 import { GroupPage } from '~/pages/GroupPage'
 import { InvitePage } from '~/pages/InvitePage'
+import { LandingPage } from '~/pages/LandingPage'
 import { ProfilePage } from '~/pages/ProfilePage'
 import '~/index.css'
 
@@ -16,36 +18,40 @@ const App = () => {
 
   if (route === null || isPending) {
     return (
-      <AppLayout session={null} currentRoute="groups">
+      <main className="mx-auto max-w-md space-y-6 p-6">
+        <h1 className="text-2xl font-semibold">Ardoise</h1>
         <p>Chargement…</p>
-      </AppLayout>
+      </main>
     )
   }
 
-  const page =
-    route.name === 'invite' ? (
-      <InvitePage secret={route.secret} session={session ? { name: session.user.name } : null} />
-    ) : route.name === 'auth' ? (
-      session ? (
-        <GroupsPage />
-      ) : (
-        <AuthPage />
-      )
-    ) : session === null ? (
-      <AuthPage />
-    ) : route.name === 'group' ? (
-      <GroupPage id={route.id} />
-    ) : route.name === 'profile' ? (
-      <ProfilePage session={{ name: session.user.name }} onRenamed={() => void refetch()} />
-    ) : (
-      <GroupsPage />
-    )
+  const member = session ? { name: session.user.name } : null
+  const resolved = resolvePage(route, member)
 
-  const currentRoute: Route['name'] =
-    session !== null && route.name === 'auth' ? 'groups' : route.name
+  let page: ReactNode
+  switch (resolved.name) {
+    case 'landing':
+      page = <LandingPage />
+      break
+    case 'auth':
+      page = <AuthPage />
+      break
+    case 'groups':
+      page = <GroupsPage />
+      break
+    case 'group':
+      page = <GroupPage id={resolved.id} />
+      break
+    case 'invite':
+      page = <InvitePage secret={resolved.secret} session={member} />
+      break
+    case 'profile':
+      page = <ProfilePage session={member!} onRenamed={() => void refetch()} />
+      break
+  }
 
   return (
-    <AppLayout session={session ? { name: session.user.name } : null} currentRoute={currentRoute}>
+    <AppLayout session={member} currentRoute={resolved.name}>
       {page}
     </AppLayout>
   )
