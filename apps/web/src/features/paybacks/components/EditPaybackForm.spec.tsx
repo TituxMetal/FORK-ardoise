@@ -80,6 +80,21 @@ describe('EditPaybackForm', () => {
     })
   })
 
+  it('rejects an Amount above the cap with the French message without calling the API', async () => {
+    const group = await openWithPayback()
+    const client = spyClient(api.paybacks(testUsers.lea))
+    render(<EditPaybackForm paybackId={group.paybacks[0].id} client={client} />)
+
+    const user = userEvent.setup()
+    const form = screen.getByRole('form', { name: 'Modifier le Règlement' })
+    await user.clear(within(form).getByLabelText('Montant'))
+    await user.type(within(form).getByLabelText('Montant'), '1,50')
+    await user.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+    expect((await screen.findByRole('alert')).textContent).toBe('Montant au-dessus du plafond')
+    expect(client.update).not.toHaveBeenCalled()
+  })
+
   it('shows the API message when the edit fails', async () => {
     const group = await openWithPayback()
     const client: PaybacksClient = {
