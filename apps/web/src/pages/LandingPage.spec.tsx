@@ -27,4 +27,10 @@ describe('LandingPage', () => {
     const cta = screen.getByRole('link', { name: 'Créer un compte' })
     expect(cta.getAttribute('href')).toBe('/session')
   })
+
+  it('gives the visitor a path to the About page', () => {
+    render(<LandingPage />)
+
+    expect(screen.getByRole('link', { name: 'À propos' }).getAttribute('href')).toBe('/about')
+  })
 })

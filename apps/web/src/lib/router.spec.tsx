@@ -61,6 +61,12 @@ describe('router', () => {
     expect(await response.json()).toEqual({ name: 'auth' })
   })
 
+  it('routes the About path', async () => {
+    const response = await app.fetch(new Request('/about'))
+
+    expect(await response.json()).toEqual({ name: 'about' })
+  })
+
   it('falls back to the groups list for unknown paths', async () => {
     const response = await app.fetch(new Request('/unknown'))
 

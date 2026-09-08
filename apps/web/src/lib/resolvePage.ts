@@ -4,6 +4,9 @@ export const resolvePage = (route: Route, session: { name: string } | null): Rou
   if (route.name === 'invite') {
     return { name: 'invite', secret: route.secret }
   }
+  if (route.name === 'about') {
+    return { name: 'about' }
+  }
   if (route.name === 'landing') {
     return session ? { name: 'groups' } : { name: 'landing' }
   }

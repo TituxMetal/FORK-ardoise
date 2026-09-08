@@ -4,6 +4,7 @@ import { AppLayout } from '~/layouts/AppLayout'
 import { authClient } from '~features/session'
 import { useRoute } from '~/lib/router'
 import { resolvePage } from '~/lib/resolvePage'
+import { AboutPage } from '~/pages/AboutPage'
 import { AuthPage } from '~/pages/AuthPage'
 import { GroupsPage } from '~/pages/GroupsPage'
 import { GroupPage } from '~/pages/GroupPage'
@@ -32,6 +33,9 @@ const App = () => {
   switch (resolved.name) {
     case 'landing':
       page = <LandingPage />
+      break
+    case 'about':
+      page = <AboutPage session={member} />
       break
     case 'auth':
       page = <AuthPage />
