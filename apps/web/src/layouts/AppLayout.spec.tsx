@@ -25,6 +25,7 @@ describe('AppLayout', () => {
     )
 
     expect(screen.getByRole('link', { name: 'Ardoise' }).getAttribute('href')).toBe('/')
+    expect(screen.getByRole('link', { name: 'À propos' }).getAttribute('href')).toBe('/about')
     expect(screen.getByRole('link', { name: 'Se connecter' }).getAttribute('href')).toBe('/session')
     expect(screen.getByText('Contenu')).toBeTruthy()
     expect(screen.queryByRole('navigation', { name: 'Navigation principale' })).toBeNull()
@@ -48,7 +49,7 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: 'Profil' })).toBeNull()
   })
 
-  it('renders the two first-level destinations at both breakpoints for an open session', () => {
+  it('renders the three first-level destinations at both breakpoints for an open session', () => {
     render(
       <AppLayout session={{ name: 'Léa' }} currentRoute="groups">
         <p>Contenu</p>
@@ -68,8 +69,30 @@ describe('AppLayout', () => {
     expect(profileLinks.every(link => link.getAttribute('href') === '/profile')).toBeTruthy()
     expect(profileLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
 
+    const aboutLinks = screen.getAllByRole('link', { name: 'À propos' })
+    expect(aboutLinks).toHaveLength(2)
+    expect(aboutLinks.every(link => link.getAttribute('href') === '/about')).toBeTruthy()
+    expect(aboutLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
+
     expect(screen.getAllByText('Session ouverte : Léa')).toHaveLength(2)
     expect(screen.getAllByRole('button', { name: 'Fermer la session' })).toHaveLength(2)
+  })
+
+  it('marks À propos as the current destination on the About page', () => {
+    render(
+      <AppLayout session={{ name: 'Léa' }} currentRoute="about">
+        <p>Contenu</p>
+      </AppLayout>
+    )
+
+    const aboutLinks = screen.getAllByRole('link', { name: 'À propos' })
+    expect(aboutLinks.every(link => link.getAttribute('aria-current') === 'page')).toBeTruthy()
+
+    const groupsLinks = screen.getAllByRole('link', { name: 'Mes Groupes' })
+    expect(groupsLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
+
+    const profileLinks = screen.getAllByRole('link', { name: 'Profil' })
+    expect(profileLinks.every(link => link.getAttribute('aria-current') === null)).toBeTruthy()
   })
 
   it('marks Profil as the current destination on the Profile page', () => {

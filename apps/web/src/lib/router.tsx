@@ -9,6 +9,7 @@ import { Hono } from 'hono'
 
 export type Route =
   | { name: 'landing' }
+  | { name: 'about' }
   | { name: 'groups' }
   | { name: 'group'; id: string }
   | { name: 'invite'; secret: string }
@@ -19,6 +20,7 @@ const groupsRoute = { name: 'groups' } satisfies Route
 
 export const app = new Hono()
   .get('/', c => c.json({ name: 'landing' } satisfies Route))
+  .get('/about', c => c.json({ name: 'about' } satisfies Route))
   .get('/groups/:id', c => c.json({ name: 'group', id: c.req.param('id') } satisfies Route))
   .get('/invites/:secret', c =>
     c.json({ name: 'invite', secret: c.req.param('secret') } satisfies Route)

@@ -23,6 +23,11 @@ describe('resolvePage', () => {
     expect(resolvePage({ name: 'auth' }, lea)).toEqual({ name: 'groups' })
   })
 
+  it('resolves the About route to the About page signed out and signed in', () => {
+    expect(resolvePage({ name: 'about' }, null)).toEqual({ name: 'about' })
+    expect(resolvePage({ name: 'about' }, lea)).toEqual({ name: 'about' })
+  })
+
   it('resolves a signed-in Member on a Group route to that Group screen', () => {
     expect(resolvePage({ name: 'group', id: 'g1' }, lea)).toEqual({ name: 'group', id: 'g1' })
   })

@@ -16,5 +16,11 @@ export const LandingPage = () => (
     >
       Créer un compte
     </Link>
+    <Link
+      to="/about"
+      className="inline-flex h-11 items-center rounded-md px-3 text-sm font-medium text-dim hover:text-foreground"
+    >
+      À propos
+    </Link>
   </section>
 )

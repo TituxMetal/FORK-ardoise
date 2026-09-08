@@ -17,7 +17,8 @@ type Destination = {
 
 const DESTINATIONS: Destination[] = [
   { label: 'Mes Groupes', to: '/', active: ['groups', 'group'] },
-  { label: 'Profil', to: '/profile', active: ['profile'] }
+  { label: 'Profil', to: '/profile', active: ['profile'] },
+  { label: 'À propos', to: '/about', active: ['about'] }
 ]
 
 export const AppLayout = ({ session, currentRoute, children }: Props) => {
@@ -44,6 +45,12 @@ export const AppLayout = ({ session, currentRoute, children }: Props) => {
             </Link>
           </h1>
           <nav aria-label="Accès public">
+            <Link
+              to="/about"
+              className="inline-flex h-11 items-center rounded-md px-3 text-sm font-medium text-dim hover:text-foreground"
+            >
+              À propos
+            </Link>
             <Link
               to="/session"
               className="inline-flex h-11 items-center rounded-md px-3 text-sm font-medium text-dim hover:text-foreground"
