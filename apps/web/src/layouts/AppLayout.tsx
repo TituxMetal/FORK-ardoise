@@ -16,7 +16,7 @@ type Destination = {
 }
 
 const DESTINATIONS: Destination[] = [
-  { label: 'Mes groupes', to: '/', active: ['groups', 'group'] },
+  { label: 'Mes Groupes', to: '/', active: ['groups', 'group'] },
   { label: 'Profil', to: '/profile', active: ['profile'] }
 ]
 

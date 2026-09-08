@@ -22,7 +22,7 @@ test.describe('app shell', () => {
       'position',
       'sticky'
     )
-    await expect(page.getByRole('link', { name: 'Mes groupes' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Mes Groupes' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Profil' })).toBeVisible()
     await expect(page.locator('aside')).toBeHidden()
 
@@ -30,7 +30,7 @@ test.describe('app shell', () => {
     await expect(page).toHaveURL(/\/profile/)
     await expect(page.getByRole('heading', { name: 'Profil' })).toBeVisible()
 
-    await page.getByRole('link', { name: 'Mes groupes' }).click()
+    await page.getByRole('link', { name: 'Mes Groupes' }).click()
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByRole('heading', { name: 'Mes Groupes' })).toBeVisible()
     await expectNoAxeViolations(page)
@@ -47,14 +47,14 @@ test.describe('app shell', () => {
     await expect(page.getByRole('navigation', { name: 'Navigation principale' })).toHaveCount(1)
     await expect(page.locator('aside')).toBeVisible()
     await expect(page.locator('aside')).toHaveCSS('position', 'sticky')
-    await expect(page.getByRole('link', { name: 'Mes groupes' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Mes Groupes' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Profil' })).toBeVisible()
 
     await page.getByRole('link', { name: 'Profil' }).click()
     await expect(page).toHaveURL(/\/profile/)
     await expect(page.getByRole('heading', { name: 'Profil' })).toBeVisible()
 
-    await page.getByRole('link', { name: 'Mes groupes' }).click()
+    await page.getByRole('link', { name: 'Mes Groupes' }).click()
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByRole('heading', { name: 'Mes Groupes' })).toBeVisible()
     await expectNoAxeViolations(page)

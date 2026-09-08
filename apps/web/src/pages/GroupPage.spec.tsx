@@ -41,7 +41,7 @@ describe('GroupPage', () => {
     expect(screen.queryByText('Aucun Service')).toBeNull()
     expect(screen.queryByText('Aucun Règlement')).toBeNull()
     expect(screen.queryByRole('tabpanel', { name: 'Services' })).toBeNull()
-    expect(screen.queryByRole('tabpanel', { name: 'Remboursements' })).toBeNull()
+    expect(screen.queryByRole('tabpanel', { name: 'Règlements' })).toBeNull()
   })
 
   it('switches the Slate between the three tabs', async () => {
@@ -53,8 +53,8 @@ describe('GroupPage', () => {
     expect(screen.getByText('Aucun Service')).toBeTruthy()
     expect(screen.queryByText('Aucune Dépense')).toBeNull()
 
-    await user.click(screen.getByRole('tab', { name: 'Remboursements' }))
-    expect(screen.getByRole('tabpanel', { name: 'Remboursements' })).toBeTruthy()
+    await user.click(screen.getByRole('tab', { name: 'Règlements' }))
+    expect(screen.getByRole('tabpanel', { name: 'Règlements' })).toBeTruthy()
     expect(screen.getByText('Aucun Règlement')).toBeTruthy()
     expect(screen.queryByText('Aucun Service')).toBeNull()
   })

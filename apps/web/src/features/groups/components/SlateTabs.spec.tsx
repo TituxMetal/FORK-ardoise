@@ -31,7 +31,7 @@ describe('SlateTabs', () => {
     expect(screen.getByRole('tab', { name: 'Services' }).getAttribute('aria-controls')).toBe(
       'slate-panel-services'
     )
-    expect(screen.getByRole('tab', { name: 'Remboursements' }).getAttribute('aria-controls')).toBe(
+    expect(screen.getByRole('tab', { name: 'Règlements' }).getAttribute('aria-controls')).toBe(
       'slate-panel-paybacks'
     )
   })
@@ -51,7 +51,7 @@ describe('SlateTabs', () => {
 
     await user.keyboard('{End}')
     expect($activeTab.get()).toBe('paybacks')
-    expect(document.activeElement).toBe(screen.getByRole('tab', { name: 'Remboursements' }))
+    expect(document.activeElement).toBe(screen.getByRole('tab', { name: 'Règlements' }))
 
     await user.keyboard('{Home}')
     expect($activeTab.get()).toBe('expenses')
@@ -83,9 +83,9 @@ describe('SlateTabs', () => {
 
   it('labels the add button after the active tab', async () => {
     render(<SlateTabs />)
-    await userEvent.click(screen.getByRole('tab', { name: 'Remboursements' }))
+    await userEvent.click(screen.getByRole('tab', { name: 'Règlements' }))
 
-    expect(screen.getByRole('button', { name: 'Ajouter un Remboursement' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Ajouter un Règlement' })).toBeTruthy()
   })
 
   it('keeps an open form when the active tab is re-clicked', async () => {

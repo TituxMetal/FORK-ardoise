@@ -25,7 +25,7 @@ describe('SignUpForm', () => {
     await user.type(screen.getByLabelText('Nom affiché'), 'Léa')
     await user.type(screen.getByLabelText('E-mail'), 'lea@example.com')
     await user.type(screen.getByLabelText('Mot de passe'), 'password1234')
-    await user.click(screen.getByRole('button', { name: 'Créer le User' }))
+    await user.click(screen.getByRole('button', { name: 'Créer le compte' }))
 
     expect(authClient.signUp.email).toHaveBeenCalledWith({
       email: 'lea@example.com',
@@ -44,7 +44,7 @@ describe('SignUpForm', () => {
     await user.type(screen.getByLabelText('Nom affiché'), 'Léa')
     await user.type(screen.getByLabelText('E-mail'), 'lea@example.com')
     await user.type(screen.getByLabelText('Mot de passe'), 'password1234')
-    await user.click(screen.getByRole('button', { name: 'Créer le User' }))
+    await user.click(screen.getByRole('button', { name: 'Créer le compte' }))
 
     expect((await screen.findByRole('alert')).textContent).toBe('E-mail déjà utilisé')
   })
@@ -53,7 +53,7 @@ describe('SignUpForm', () => {
     const user = userEvent.setup()
     render(<SignUpForm />)
 
-    await user.click(screen.getByRole('button', { name: 'Créer le User' }))
+    await user.click(screen.getByRole('button', { name: 'Créer le compte' }))
 
     const alerts = await screen.findAllByRole('alert')
     expect(alerts.map(alert => alert.textContent)).toContain('Nom requis')

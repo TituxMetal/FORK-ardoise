@@ -19,7 +19,7 @@ const TABS: { key: SlateTab; label: string; tabId: string; panelId: string }[] =
   },
   {
     key: 'paybacks',
-    label: 'Remboursements',
+    label: 'Règlements',
     tabId: 'slate-tab-paybacks',
     panelId: 'slate-panel-paybacks'
   }
@@ -28,7 +28,7 @@ const TABS: { key: SlateTab; label: string; tabId: string; panelId: string }[] =
 const ADD_LABELS: Record<SlateTab, string> = {
   expenses: 'Ajouter une Dépense',
   services: 'Ajouter un Service',
-  paybacks: 'Ajouter un Remboursement'
+  paybacks: 'Ajouter un Règlement'
 }
 
 export const SlateTabs = ({ ref }: { ref?: Ref<HTMLButtonElement> }) => {
