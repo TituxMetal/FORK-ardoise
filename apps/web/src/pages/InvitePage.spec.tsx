@@ -46,6 +46,7 @@ describe('InvitePage', () => {
 
     expect(await screen.findByText('Bob')).toBeTruthy()
     expect(screen.getByText('2 membres')).toBeTruthy()
+    expect(screen.queryByText(/est une ardoise partagée/)).toBeNull()
     const joined = await lea.get(group.id)
     expect(joined.members.map(member => member.name)).toEqual(['Léa', 'Bob'])
   })
@@ -63,6 +64,47 @@ describe('InvitePage', () => {
     expect(screen.getByText('Potes de Bob')).toBeTruthy()
     const unchanged = await lea.get(group.id)
     expect(unchanged.members).toHaveLength(1)
+  })
+
+  it('explains the shared slate to a signed-out visitor above the sign-up wall', async () => {
+    const lea = api.groups(testUsers.lea)
+    const group = await lea.create('Potes de Bob')
+    render(
+      <InvitePage secret={group.invite.secret} session={null} client={api.groups(testUsers.bob)} />
+    )
+
+    const explanation = await screen.findByText(/« Potes de Bob » est une ardoise partagée/)
+
+    expect(explanation.textContent).toContain('découlent de ce que le Groupe enregistre')
+    expect(explanation.textContent).toContain('jamais d’une saisie à la main')
+    const about = screen.getByRole('link', { name: 'À propos' })
+    expect(about.getAttribute('href')).toBe('/about')
+    const signUpWall = screen.getByRole('tab', { name: 'Connexion' })
+    expect(
+      explanation.compareDocumentPosition(signUpWall) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
+
+  it('shows the same explanation to a Member already in the Group, above the join button', async () => {
+    const lea = api.groups(testUsers.lea)
+    const group = await lea.create('Potes de Bob')
+    render(
+      <InvitePage
+        secret={group.invite.secret}
+        session={{ name: 'Léa' }}
+        client={api.groups(testUsers.lea)}
+      />
+    )
+
+    const explanation = await screen.findByText(/« Potes de Bob » est une ardoise partagée/)
+
+    expect(explanation.textContent).toContain('découlent de ce que le Groupe enregistre')
+    expect(explanation.textContent).toContain('jamais d’une saisie à la main')
+    expect(screen.getByRole('link', { name: 'À propos' }).getAttribute('href')).toBe('/about')
+    const joinButton = screen.getByRole('button', { name: 'Rejoindre le Groupe' })
+    expect(
+      explanation.compareDocumentPosition(joinButton) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
   })
 
   it('clears a previous error when a new Invite is previewed', async () => {

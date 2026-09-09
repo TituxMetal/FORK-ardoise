@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Alert, Button } from '~ui'
 import { groupsClient, type Group, type GroupsClient, type InvitePreview } from '~features/groups'
 import { errorMessage } from '~/lib/errorMessage'
+import { Link } from '~/lib/router'
 import { SessionForms } from '~features/session'
 
 type Props = {
@@ -73,12 +74,30 @@ export const InvitePage = ({ secret, session, client = groupsClient }: Props) =>
             <li key={member.userId}>{member.name}</li>
           ))}
         </ul>
-      ) : session ? (
-        <Button type="button" onClick={() => void join()} disabled={joining}>
-          Rejoindre le Groupe
-        </Button>
       ) : (
-        <SessionForms />
+        <>
+          {preview ? (
+            <div className="space-y-3">
+              <p className="text-dim">
+                « {preview.name} » est une ardoise partagée : les Soldes découlent de ce que le
+                Groupe enregistre, jamais d’une saisie à la main.
+              </p>
+              <Link
+                to="/about"
+                className="inline-flex h-11 items-center rounded-md px-3 text-sm font-medium text-dim hover:text-foreground"
+              >
+                À propos
+              </Link>
+            </div>
+          ) : null}
+          {session ? (
+            <Button type="button" onClick={() => void join()} disabled={joining}>
+              Rejoindre le Groupe
+            </Button>
+          ) : (
+            <SessionForms />
+          )}
+        </>
       )}
     </section>
   )
