@@ -83,7 +83,7 @@ export const joinInvite = async (
 ) => {
   await page.goto(inviteUrl)
   await expect(page.getByRole('heading', { name: 'Invitation' })).toBeVisible()
-  await expect(page.getByText(groupName)).toBeVisible()
+  await expect(page.getByText(groupName, { exact: true })).toBeVisible()
   await signUp(page, name, email)
   await page.getByRole('button', { name: 'Rejoindre le Groupe' }).click()
   await expect(page.getByRole('listitem').filter({ hasText: name })).toBeVisible()
