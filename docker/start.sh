@@ -10,7 +10,11 @@ fi
 cd "$(dirname "$0")/../apps/api"
 
 if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
-  echo "Applying migrations to ${DATABASE_URL:-the default database}"
+  if [ -z "${DATABASE_URL:-}" ]; then
+    echo "RUN_MIGRATIONS=true requires DATABASE_URL; refusing to start." >&2
+    exit 1
+  fi
+  echo "Applying migrations (RUN_MIGRATIONS=true)"
   bun node_modules/.bin/prisma migrate deploy
 fi
 
