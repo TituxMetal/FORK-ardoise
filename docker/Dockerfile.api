@@ -1,0 +1,49 @@
+# fork-ardoise-api: the Ardoise HTTP API on Bun, with the Prisma CLI and schema engine
+# it needs to migrate the volume on boot. Built from the repository root:
+#   docker build -f docker/Dockerfile.api -t fork-ardoise-api .
+
+FROM oven/bun:1.3.14-alpine
+
+# Prisma's platform detection reads the installed openssl version to pick its engine,
+# and Alpine is musl: this is what makes the linux-musl schema engine get selected.
+RUN apk add --no-cache openssl
+
+WORKDIR /app
+
+COPY package.json bun.lock ./
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+
+# Dev dependencies stay installed on purpose: the prisma CLI is a devDependency of
+# apps/api and docker/start.sh runs `prisma migrate deploy` at every boot. Install
+# scripts are skipped: the root `prepare` is the workstation `vp config` step (it needs
+# git), and the Prisma engine download is done explicitly below.
+RUN bun install --frozen-lockfile --ignore-scripts
+
+COPY . .
+
+WORKDIR /app/apps/api
+
+# The client the API imports at runtime; generated here, never carried in the context.
+RUN bun node_modules/.bin/prisma generate
+
+# Downloads the platform-matching schema engine (the running migration needs it) and
+# fails the build if the CLI cannot bootstrap it.
+RUN bun node_modules/.bin/prisma --version
+
+WORKDIR /app
+
+# The checkout carries restrictive modes (0600 files, the generated client among them);
+# the runtime user has to read the bundle, and only /data is writable.
+RUN addgroup -S ardoise \
+  && adduser -S -G ardoise ardoise \
+  && mkdir -p /data \
+  && chown ardoise:ardoise /data \
+  && chmod -R a+rX /app \
+  && chmod +x docker/start.sh
+
+ENV PORT=3000
+
+USER ardoise
+
+ENTRYPOINT ["/app/docker/start.sh"]

@@ -1,0 +1,23 @@
+# Build context for docker/Dockerfile.api and docker/Dockerfile.web.
+# The context is the repository root, and the installed modules, the checkout history
+# and the developer's real SQLite databases are never needed by either image.
+
+**/node_modules
+**/dist
+.git
+.gitignore
+
+# Local databases (apps/api/prisma/dev.db is a real one).
+**/*.db
+**/*.db-journal
+
+# Local secrets; the images take every value from the environment.
+.env
+.env.*
+**/.env
+**/.env.*
+
+**/coverage
+test-results
+playwright-report
+**/*.log
