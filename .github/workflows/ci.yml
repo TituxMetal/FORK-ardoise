@@ -44,10 +44,12 @@ jobs:
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    # Serialised, not cancelled: two overlapping main pushes must not let the
-    # older run publish `prod` after the newer one.
+    # Serialised per service, not cancelled: two overlapping main pushes must
+    # not let the older run publish `prod` after the newer one. The service
+    # belongs in the group because GitHub keeps only one pending job per
+    # group, so a shared group would drop the older run's queued leg.
     concurrency:
-      group: docker-publish
+      group: docker-publish-${{ matrix.service }}
       cancel-in-progress: false
 
     # The repository-wide default workflow token is read-only, so the GHCR push
