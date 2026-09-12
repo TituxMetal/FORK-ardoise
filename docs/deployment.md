@@ -153,13 +153,17 @@ Tear the data down once the deployment is verified.
   Users and the Group with any SQLite client against the volume:
 
   ```sql
+  PRAGMA foreign_keys = ON;
   DELETE FROM user WHERE email IN ('lea@ardoise.test', 'bob@ardoise.test');
   DELETE FROM "group" WHERE inviteSecret = 'ardoise-demo-invite';
   ```
 
   The schema cascades: each User takes their Sessions, Accounts and Member seats,
-  and the Group takes its Members, Expenses, Services and Paybacks. Leave the
-  stack stopped until the volume is clean, then redeploy.
+  and the Group takes its Members, Expenses, Services and Paybacks. SQLite
+  enforces that per connection and leaves it off by default, so the `PRAGMA` is
+  load-bearing — without it the two `DELETE`s drop the rows they name and leave
+  everything hanging off them behind. Leave the stack stopped until the volume is
+  clean, then redeploy.
 
 The seed writes its rows one use case at a time, so a boot killed partway through
 leaves half a dataset. The next boot then refuses to serve it: the API logs
