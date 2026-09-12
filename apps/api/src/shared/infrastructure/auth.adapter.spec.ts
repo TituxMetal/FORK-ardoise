@@ -28,10 +28,13 @@ const createTestPrisma = async () => {
 const createTestAuth = async () => createAuth(await createTestPrisma())
 
 // better-auth skips the origin check when NODE_ENV is "test"; production does not.
+// This instance exists to reject an unknown origin, which better-auth logs, so its
+// logger is muted: the assertion below is the observable behavior, not the log line.
 const createCheckableAuth = async () =>
   betterAuth({
     ...createAuthOptions(await createTestPrisma()),
-    advanced: { disableOriginCheck: false }
+    advanced: { disableOriginCheck: false },
+    logger: { disabled: true }
   })
 
 const signUp = (auth: Pick<Auth, 'handler'>, origin?: string) =>
