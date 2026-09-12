@@ -25,30 +25,37 @@ const contentTypes: Record<string, string> = {
   '.woff2': 'font/woff2'
 }
 
-// Hop-by-hop headers (RFC 9110 §7.6.1) belong to the connection, not to the caller; `host`
+// Hop-by-hop headers (RFC 9110 §7.6.1) belong to the connection, not to the caller: the
+// standard set, plus every field the incoming `Connection` names — see `copyHeaders`. `host`
 // and the framing headers are recomputed by fetch and by the runtime; and the body the
 // runtime hands back is already decoded, so its `content-encoding` no longer describes it.
-const droppedRequestHeaders = [
+const hopByHopHeaders = [
   'connection',
-  'content-length',
-  'host',
   'keep-alive',
-  'transfer-encoding'
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade'
 ]
-const droppedResponseHeaders = [
-  'connection',
-  'content-encoding',
-  'content-length',
-  'keep-alive',
-  'transfer-encoding'
-]
+const droppedRequestHeaders = [...hopByHopHeaders, 'content-length', 'host']
+const droppedResponseHeaders = [...hopByHopHeaders, 'content-encoding', 'content-length']
 
 // A `Headers` copy keeps the several `Set-Cookie` headers better-auth answers a sign-in with
 // apart; every comma-joined view — `forEach`, `Object.fromEntries` — collapses them into one,
 // and the browser then stores a single mangled cookie.
+// Those named lists are not the whole drop set: RFC 9110 §7.6.1 also makes hop-by-hop every
+// field the incoming `Connection` names, so a peer answering `Connection: close, X-Internal`
+// must not have `X-Internal` forwarded. The tokens are read before the first delete, which is
+// what removes `connection` itself.
 const copyHeaders = (source: Headers, dropped: string[]): Headers => {
+  const nominated = (source.get('connection') ?? '')
+    .split(',')
+    .map(token => token.trim())
+    .filter(token => token !== '')
   const headers = new Headers(source)
-  for (const name of dropped) {
+  for (const name of [...dropped, ...nominated]) {
     headers.delete(name)
   }
   return headers
