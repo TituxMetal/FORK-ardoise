@@ -35,7 +35,18 @@ const startUpstream = async (): Promise<Upstream> => {
         response.end()
         return
       }
-      response.writeHead(200, { 'content-type': 'application/json' })
+      if (request.url === '/echo-headers') {
+        response.writeHead(200, { 'content-type': 'application/json' })
+        response.end(JSON.stringify(request.headers))
+        return
+      }
+      response.writeHead(200, {
+        'content-type': 'application/json',
+        connection: 'close, X-Upstream-Internal',
+        'proxy-authenticate': 'Basic realm="ardoise"',
+        trailer: 'X-Trailing',
+        'x-upstream-internal': 'supabase-service-role'
+      })
       response.end(JSON.stringify({ ok: true }))
     })
   })
@@ -124,5 +135,35 @@ describe('createWebApp', () => {
       url: '/auth/sign-in/email',
       body: signInBody
     })
+  })
+
+  it('drops the response headers the connection owns, including the one Connection names', async () => {
+    const response = await web.request('/api/ping')
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('connection')).toBeNull()
+    expect(response.headers.get('x-upstream-internal')).toBeNull()
+    expect(response.headers.get('proxy-authenticate')).toBeNull()
+    expect(response.headers.get('trailer')).toBeNull()
+    expect(response.headers.get('content-type')).toBe('application/json')
+  })
+
+  it('drops the request headers the connection owns, including the one Connection names', async () => {
+    const response = await web.request('/api/echo-headers', {
+      headers: {
+        authorization: 'Bearer session-token',
+        connection: 'close, X-Internal',
+        'x-internal': 'supabase-service-role',
+        te: 'trailers',
+        upgrade: 'h2c'
+      }
+    })
+
+    expect(response.status).toBe(200)
+    const forwarded = (await response.json()) as Record<string, string>
+    expect(forwarded['x-internal']).toBeUndefined()
+    expect(forwarded.te).toBeUndefined()
+    expect(forwarded.upgrade).toBeUndefined()
+    expect(forwarded.authorization).toBe('Bearer session-token')
   })
 })
