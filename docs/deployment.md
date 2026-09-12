@@ -23,7 +23,8 @@ creates them.
 
 The images themselves are published by CI: every push to `main` builds
 `ghcr.io/tituxmetal/fork-ardoise-api` and `ghcr.io/tituxmetal/fork-ardoise-web`
-and tags them `prod`, `latest` and `sha-<hash>`.
+under a `sha-<hash>` tag, and the commit that is newest on `main` also tags them
+`prod` and `latest`.
 
 ## First deploy
 
@@ -87,7 +88,10 @@ Run these against `https://<hostname>` after the stack is up:
 
 ## Update
 
-1. Push to `main`. CI builds and publishes new `prod` and `sha-<hash>` images.
+1. Push to `main`. CI builds and publishes the new `sha-<hash>` images; `prod`
+   and `latest` belong to the commit that is newest on `main`, so a push that a
+   later one supersedes during its checks publishes its own `sha-<hash>` alone
+   and leaves `prod` to that later run.
 2. Wait for that commit's **Build and Push Docker Images** run to finish
    successfully. The publish is asynchronous and the redeploy below re-pulls
    `prod`: starting it while the run is still going pulls the previous images
