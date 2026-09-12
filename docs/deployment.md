@@ -88,7 +88,11 @@ Run these against `https://<hostname>` after the stack is up:
 ## Update
 
 1. Push to `main`. CI builds and publishes new `prod` and `sha-<hash>` images.
-2. In Portainer, open the stack and redeploy it **with the image re-pull**:
+2. Wait for that commit's **Build and Push Docker Images** run to finish
+   successfully. The publish is asynchronous and the redeploy below re-pulls
+   `prod`: starting it while the run is still going pulls the previous images
+   and keeps the previous commit serving.
+3. In Portainer, open the stack and redeploy it **with the image re-pull**:
    Portainer's _Re-pull image and redeploy_. A plain redeploy reuses the `prod`
    image already on the host and keeps the previous commit serving. The API
    applies any pending migration before serving, and the web container serves
