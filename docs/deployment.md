@@ -48,8 +48,8 @@ The API container refuses to start if `BETTER_AUTH_SECRET` is missing or shorter
 than 32 characters. That check is a floor, not a guarantee: the example value in
 `apps/api/.env.example` is long enough to pass it, so never paste it.
 
-3. Deploy the stack. The API applies the migrations to the empty volume, then
-   both containers start.
+3. Deploy the stack. The API applies the migrations to the empty volume, and the
+   web container starts once the API answers its health check.
 
 ## The NPM host
 

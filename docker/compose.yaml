@@ -31,6 +31,14 @@ services:
       - reverse-proxy-nw
       - default-nw
     restart: unless-stopped
+    # The readiness signal the web container waits on: /ping answers 200 as soon
+    # as the HTTP server serves, which docker/start.sh reaches only after the
+    # boot migrations have run. The retries cover a slow first migration.
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://127.0.0.1:3000/ping']
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   fork-ardoise-web:
     # Serves the SPA and proxies /api to the API. Nginx Proxy Manager forwards
@@ -45,8 +53,11 @@ services:
       - reverse-proxy-nw
       - default-nw
     restart: unless-stopped
+    # Startup order alone would expose the SPA while the API is still migrating,
+    # so /api refuses; the web container starts only once the API is healthy.
     depends_on:
-      - fork-ardoise-api
+      fork-ardoise-api:
+        condition: service_healthy
 
 volumes:
   data:
