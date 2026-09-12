@@ -79,10 +79,13 @@ jobs:
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    # Serialised per service, not cancelled: two overlapping main pushes must
-    # not let the older run publish `prod` after the newer one. The service
-    # belongs in the group because GitHub keeps only one pending job per
-    # group, so a shared group would drop the older run's queued leg.
+    # Two things keep `prod` on the newest commit. The group serialises the two
+    # publishes of one image and is per service, not cancelled, because GitHub
+    # keeps only one pending job per group: a shared group would drop the older
+    # run's queued leg. The group cannot order the runs themselves, since a job
+    # enters it when its `ci` finishes and an older commit whose `ci` ran slow
+    # can finish last. The tip check below closes that: a run whose commit main
+    # has moved past publishes its own `sha-<hash>` and leaves `prod` alone.
     concurrency:
       group: docker-publish-${{ matrix.service }}
       cancel-in-progress: false
@@ -105,6 +108,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Check the commit is still the tip of main
+        id: tip
+        run: |
+          set -o pipefail
+          tip=$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)
+          promote=true
+          if [ "$tip" != "$GITHUB_SHA" ]; then
+            promote=false
+            echo "::notice::main moved to ${tip}; prod not promoted."
+          fi
+          echo "promote=$promote" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
@@ -120,10 +135,12 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}-${{ matrix.service }}
+          # The sha tag is immutable and always published; `prod` and `latest`
+          # are promotions only the newest commit on main may perform.
           tags: |
             type=sha,prefix=sha-
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=prod,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ steps.tip.outputs.promote }}
+            type=raw,value=prod,enable=${{ steps.tip.outputs.promote }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
