@@ -5,7 +5,9 @@ import { updateOwnName } from './updateOwnName.uc'
 const repository = (renamed: Array<{ userId: string; name: string }> = []): UserRepository => ({
   rename: async (userId, name) => {
     renamed.push({ userId, name })
-  }
+  },
+  count: async () => 0,
+  hasEmail: async () => false
 })
 
 describe('updateOwnName', () => {

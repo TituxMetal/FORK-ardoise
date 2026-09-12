@@ -18,4 +18,12 @@ if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
   bun node_modules/.bin/prisma migrate deploy
 fi
 
+if [ "${SEED_DEMO_DATA:-false}" = "true" ]; then
+  echo "Seeding the demo dataset (SEED_DEMO_DATA=true)"
+  if ! bun src/seed/main.ts; then
+    echo "Demo dataset seeding failed; refusing to start." >&2
+    exit 1
+  fi
+fi
+
 exec bun src/main.ts

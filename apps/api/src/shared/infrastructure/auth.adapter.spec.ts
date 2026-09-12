@@ -96,6 +96,30 @@ describe('createAuth', () => {
     expect(user).toBeNull()
   })
 
+  it('signs a User up with a real password hash that signs back in', async () => {
+    const prisma = await createTestPrisma()
+    const auth = createAuth(prisma)
+
+    const user = await auth.signUp({
+      email: 'lea@example.com',
+      password: 'password1234',
+      name: 'Léa'
+    })
+
+    expect(user).toEqual({ id: expect.any(String), name: 'Léa' })
+    const account = await prisma.account.findFirst({ where: { userId: user.id } })
+    expect(account?.password).toBeDefined()
+    expect(account?.password).not.toBe('password1234')
+    const response = await auth.handler(
+      new Request('http://localhost:3000/auth/sign-in/email', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: 'lea@example.com', password: 'password1234' })
+      })
+    )
+    expect(response.status).toBe(200)
+  })
+
   it('trusts the Vite dev origin whatever BETTER_AUTH_URL holds', async () => {
     await withEnv({ BETTER_AUTH_URL: 'https://ardoise.example.com' }, async () => {
       const auth = await createCheckableAuth()
