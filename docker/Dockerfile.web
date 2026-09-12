@@ -1,0 +1,61 @@
+# fork-ardoise-web: the Ardoise SPA on Bun, served by the small Hono server that also
+# forwards /api to the API with the prefix stripped. Built from the repository root:
+#   docker build -f docker/Dockerfile.web -t fork-ardoise-web .
+
+# The build stage runs on Node: `vp` is a Node program (node_modules/.bin/vp starts with
+# `#!/usr/bin/env node`, and vite-plus declares engines.node), so `vp build` cannot run on
+# a Bun-only stage. The Bun binary is copied in from the house runtime image to install the
+# workspace from the lockfile, the same install path the API image uses.
+FROM node:24-alpine AS build
+
+COPY --from=oven/bun:1.3.14-alpine /usr/local/bin/bun /usr/local/bin/bun
+
+WORKDIR /app
+
+COPY package.json bun.lock ./
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+
+# Install scripts are skipped: the root `prepare` is the workstation `vp config` step (git
+# hooks and agent integration), which a build container has no use for.
+RUN bun install --frozen-lockfile --ignore-scripts
+
+COPY . .
+
+WORKDIR /app/apps/web
+
+# Produces apps/web/dist, the static build the server answers from.
+RUN bun run build
+
+FROM oven/bun:1.3.14-alpine
+
+WORKDIR /app
+
+# The server reads hono at runtime and nothing else from the workspace; a production
+# install off the lockfile pins it and keeps the build-only dependencies (vite-plus and its
+# platform bindings, the API's Prisma CLI) out of the image.
+COPY package.json bun.lock ./
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+
+RUN bun install --frozen-lockfile --ignore-scripts --production
+
+# Only the server and the build it serves travel to the runtime stage, and the layout
+# mirrors the repository so the entry resolves `apps/web/dist` next to itself.
+COPY --from=build /app/apps/web/src/server apps/web/src/server
+COPY --from=build /app/apps/web/dist apps/web/dist
+
+# The checkout carries restrictive modes (0600 files among them); the runtime user has to
+# read everything it serves, and it writes nothing.
+RUN addgroup -S ardoise \
+  && adduser -S -G ardoise ardoise \
+  && chmod -R a+rX /app
+
+# The port the compose file and the reverse proxy target, and the API origin the forwarded
+# /api routes are sent to. API_URL is required: with no origin to forward to, the proxy
+# would answer from itself.
+ENV PORT=3000
+
+USER ardoise
+
+CMD ["bun", "/app/apps/web/src/server/main.ts"]
