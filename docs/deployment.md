@@ -127,8 +127,9 @@ The flow the dataset exists to verify:
 3. Copy the Group's Invite link, then sign out.
 4. Paste the link — `/invites/ardoise-demo-invite` — into the address bar: the
    Invite page opens while signed out.
-5. Register a new account from that page: it becomes a Member of
-   `Démo Ardoise`.
+5. Register a new account from that page, then press **Rejoindre le Groupe**:
+   registration alone does not join, the button is the join, so the account is a
+   Member of `Démo Ardoise` only once it is pressed.
 
 The same seed runs by hand against a local database: from `apps/api`, run
 `bun run seed:demo`. It targets the database the local API serves — `DATABASE_URL`
