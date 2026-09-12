@@ -1,0 +1,62 @@
+# Ardoise as a Portainer stack. Paste this file into a new Portainer stack and
+# set the variables it reads as stack environment variables; the runbook is
+# docs/deployment.md.
+#
+# Both images are built and pushed to ghcr.io by .github/workflows/ci.yml on
+# every push to main, tagged `prod`. Nothing in this file builds from source.
+
+services:
+  fork-ardoise-api:
+    image: ghcr.io/tituxmetal/fork-ardoise-api:prod
+    container_name: fork-ardoise-api
+    environment:
+      # Absolute file: DSN on the volume below, so the Prisma CLI migrates the
+      # exact file the runtime serves.
+      DATABASE_URL: ${DATABASE_URL}
+      # The public https origin. better-auth takes it as its base URL and emits
+      # Secure, __Secure-prefixed session cookies from it.
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      # Migrations run on boot unless this is set to false; defaulting to true
+      # means a missing or misspelled stack variable cannot silently skip them.
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+    volumes:
+      # The SQLite database survives container recreate and stack redeploy.
+      - data:/data
+      # The house timezone mounts: the API container's clock would be UTC
+      # otherwise, and its dates are the slate's.
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - reverse-proxy-nw
+      - default-nw
+    restart: unless-stopped
+
+  fork-ardoise-web:
+    # Serves the SPA and proxies /api to the API. Nginx Proxy Manager forwards
+    # the public hostname to this container on port 3000, the port the image
+    # sets as PORT.
+    image: ghcr.io/tituxmetal/fork-ardoise-web:prod
+    container_name: fork-ardoise-web
+    environment:
+      # The API over the shared networks; the web container proxies /api there.
+      API_URL: ${API_URL}
+    networks:
+      - reverse-proxy-nw
+      - default-nw
+    restart: unless-stopped
+    depends_on:
+      - fork-ardoise-api
+
+volumes:
+  data:
+
+networks:
+  # Both networks already exist on the server and are shared with the other
+  # stacks there, so they are external and this stack never creates them.
+  # Nginx Proxy Manager sits on reverse-proxy-nw and reaches the web container
+  # through it; the API has no host port and no proxy host targets it.
+  default-nw:
+    external: true
+  reverse-proxy-nw:
+    external: true
