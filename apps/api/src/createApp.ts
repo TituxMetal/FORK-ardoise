@@ -19,16 +19,28 @@ import { createAuth, createPrismaClient } from '~/shared/infrastructure'
 import { mapException, requireSession } from '~/shared/presentation'
 import { getSlate } from '~/groups/application'
 
-export const createApp = (
-  prisma: PrismaClient = createPrismaClient(),
-  auth: Auth = createAuth(prisma)
-) => {
+/** The deps the HTTP app and the demo seed both compose. */
+export const createApiDeps = (prisma: PrismaClient) => {
   const groups = prismaGroupAdapter(prisma)
   const expenses = prismaExpenseAdapter(prisma)
   const services = prismaServiceAdapter(prisma)
   const paybacks = prismaPaybackAdapter(prisma)
   const users = prismaUserAdapter(prisma)
-  const view = getSlate(groups, expenses, services, paybacks)
+  return {
+    groups,
+    expenses,
+    services,
+    paybacks,
+    users,
+    view: getSlate(groups, expenses, services, paybacks)
+  }
+}
+
+export const createApp = (
+  prisma: PrismaClient = createPrismaClient(),
+  auth: Auth = createAuth(prisma)
+) => {
+  const { groups, expenses, services, paybacks, users, view } = createApiDeps(prisma)
   return new Hono<{ Variables: { userId: string; userName: string } }>()
     .onError(mapException)
     .get('/ping', c => c.body(null, 200))

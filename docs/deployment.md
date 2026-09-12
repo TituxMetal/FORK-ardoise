@@ -31,13 +31,14 @@ under a `sha-<hash>` tag, and the commit that is newest on `main` also tags them
 1. In Portainer, create a stack and paste the contents of `docker/compose.yaml`.
 2. Add the stack environment variables below, with your own values.
 
-| Variable             | Service | Value                          | Meaning                                                                                                   |
-| -------------------- | ------- | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`       | api     | `file:/data/ardoise.db`        | The SQLite database on the stack volume; the Prisma CLI and the runtime resolve the same file.            |
-| `BETTER_AUTH_URL`    | api     | `https://ardoise.example.com`  | The public origin of the site: the scheme and hostname a browser uses.                                    |
-| `BETTER_AUTH_SECRET` | api     | output of the command below    | Signs sessions. At least 32 characters, and never the placeholder committed in `apps/api/.env.example`.   |
-| `RUN_MIGRATIONS`     | api     | `true` (the default)           | Applies pending database migrations on boot, before the API serves; set `false` to skip them.             |
-| `API_URL`            | web     | `http://fork-ardoise-api:3000` | Where the web container forwards `/api` calls; the API's name on the stack's networks and its fixed port. |
+| Variable             | Service | Value                          | Meaning                                                                                                                                                            |
+| -------------------- | ------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`       | api     | `file:/data/ardoise.db`        | The SQLite database on the stack volume; the Prisma CLI and the runtime resolve the same file.                                                                     |
+| `BETTER_AUTH_URL`    | api     | `https://ardoise.example.com`  | The public origin of the site: the scheme and hostname a browser uses.                                                                                             |
+| `BETTER_AUTH_SECRET` | api     | output of the command below    | Signs sessions. At least 32 characters, and never the placeholder committed in `apps/api/.env.example`.                                                            |
+| `RUN_MIGRATIONS`     | api     | `true` (the default)           | Applies pending database migrations on boot, before the API serves; set `false` to skip them.                                                                      |
+| `SEED_DEMO_DATA`     | api     | `true`, or unset               | Seeds the fixed demo dataset on boot, after the migrations and before the API serves. Off unless set to exactly `true`; remove it once the deployment is verified. |
+| `API_URL`            | web     | `http://fork-ardoise-api:3000` | Where the web container forwards `/api` calls; the API's name on the stack's networks and its fixed port.                                                          |
 
 Generate the secret on the server or your machine, and paste the output:
 
@@ -85,6 +86,85 @@ Run these against `https://<hostname>` after the stack is up:
 - [ ] Reload the page: the session persists.
 - [ ] Open a deep link such as `/groups/<id>` in a fresh tab: the page loads
       instead of a 404.
+
+## Verify with the demo dataset
+
+A first deployment can be exercised end to end without hand-building data. With
+the stack variable `SEED_DEMO_DATA` set to the literal `true` (service `api`), the
+container seeds a fixed demo dataset on boot — after `prisma migrate deploy` and
+before the API serves. Unset, or any value other than `true`, seeds nothing.
+
+The comparison is exact: `True`, `1`, or a value with a trailing space seeds
+nothing. Leave `RUN_MIGRATIONS` at its default `true` on a fresh volume — the seed
+needs the schema the migrations apply.
+
+The seed runs only while the `user` table is empty. A second boot changes nothing,
+and a stack that already holds real Users never gets a known-password account,
+whatever the toggle says. Removing the variable stops the seed from running; it
+removes nothing that is already on the volume, so tear the dataset down with
+[Remove the demo dataset](#remove-the-demo-dataset) once the deployment is
+verified.
+
+| Item     | Demo value                                                                                        |
+| -------- | ------------------------------------------------------------------------------------------------- |
+| Accounts | `lea@ardoise.test` and `bob@ardoise.test`                                                         |
+| Password | `ardoise-demo`, both accounts                                                                     |
+| Group    | `Démo Ardoise`, both accounts as Members                                                          |
+| Invite   | `https://<hostname>/invites/ardoise-demo-invite`                                                  |
+| Expenses | `Courses` 30,00 € paid by Léa, `Essence` 20,00 € paid by Bob — each split between the two Members |
+| Service  | `Bricolage` 20,00 € provided by Léa, split between the two Members                                |
+| Payback  | Bob pays Léa 5,00 €                                                                               |
+| Balances | Léa **+10,00 €**, Bob **−10,00 €**                                                                |
+
+Every seeded row is dated 2026-01-01. The API stores whole cents; the app displays
+euros, so the table above is what a browser shows.
+
+The flow the dataset exists to verify:
+
+1. Sign in as `lea@ardoise.test`.
+2. The Groups list shows `Démo Ardoise`; open it and read the slate: two Expenses,
+   one Service, one Payback, and the Balances above — Léa is owed 10,00 €.
+3. Copy the Group's Invite link, then sign out.
+4. Paste the link — `/invites/ardoise-demo-invite` — into the address bar: the
+   Invite page opens while signed out.
+5. Register a new account from that page: it becomes a Member of
+   `Démo Ardoise`.
+
+The same seed runs by hand against a local database: from `apps/api`, run
+`bun run seed:demo`. It targets the database the local API serves — `DATABASE_URL`
+from the environment (bun loads `apps/api/.env` when you have one) or the
+repo-relative `prisma/dev.db` otherwise — and prints whether it seeded the dataset
+or skipped it.
+
+## Remove the demo dataset
+
+This dataset is a verification aid, not a feature. Removing `SEED_DEMO_DATA` from
+the stack stops the seed from running again and removes nothing already written:
+the two accounts keep the password published above, and the Group keeps its
+known Invite secret, so anyone who has read this runbook can sign in and join.
+Tear the data down once the deployment is verified.
+
+- **A stack that holds no real data yet** — the usual case, where the dataset was
+  the first thing on the volume: stop the stack, delete its volume (Docker
+  registers it as `<stack-name>_data`), remove the `SEED_DEMO_DATA` variable, and
+  redeploy. The API migrates the fresh volume on boot and serves an empty Ardoise.
+- **A stack that already holds real data**: stop the stack and delete the two
+  Users and the Group with any SQLite client against the volume:
+
+  ```sql
+  DELETE FROM user WHERE email IN ('lea@ardoise.test', 'bob@ardoise.test');
+  DELETE FROM "group" WHERE inviteSecret = 'ardoise-demo-invite';
+  ```
+
+  The schema cascades: each User takes their Sessions, Accounts and Member seats,
+  and the Group takes its Members, Expenses, Services and Paybacks. Leave the
+  stack stopped until the volume is clean, then redeploy.
+
+The seed writes its rows one use case at a time, so a boot killed partway through
+leaves half a dataset. The next boot then refuses to serve it: the API logs
+`The demo dataset is half-seeded: …`, exits non-zero, and the restart policy
+retries it. Reset the volume as above — the demo Group may not exist yet, so the
+`user` delete is the load-bearing one — and boot again.
 
 ## Update
 

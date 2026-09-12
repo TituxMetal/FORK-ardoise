@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
-import type { Auth } from '../application'
+import type { Auth, AuthSignUp } from '../application'
 
 export const createAuthOptions = (prisma: PrismaClient) => ({
   baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:3000',
@@ -17,11 +17,15 @@ export const createAuthOptions = (prisma: PrismaClient) => ({
   trustedOrigins: ['http://localhost:1337']
 })
 
-export const createAuth = (prisma: PrismaClient): Auth => {
+export const createAuth = (prisma: PrismaClient): Auth & AuthSignUp => {
   const auth = betterAuth(createAuthOptions(prisma))
 
   return {
     handler: request => auth.handler(request),
+    signUp: async ({ email, password, name }) => {
+      const { user } = await auth.api.signUpEmail({ body: { email, password, name } })
+      return { id: user.id, name: user.name }
+    },
     getSessionUser: async headers => {
       const session = await auth.api.getSession({ headers })
       if (!session) {

@@ -20,6 +20,11 @@ services:
       # Migrations run on boot unless this is set to false; defaulting to true
       # means a missing or misspelled stack variable cannot silently skip them.
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+      # The optional demo dataset for verifying a first deployment: the literal
+      # 'true' seeds it on boot, after the migrations and before the API serves.
+      # Off unless set, and seeding only ever touches an empty user table; remove
+      # this variable once the deployment is verified.
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
     volumes:
       # The SQLite database survives container recreate and stack redeploy.
       - data:/data

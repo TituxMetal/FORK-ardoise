@@ -7,5 +7,11 @@ export const prismaUserAdapter = (prisma: PrismaClient): UserRepository => ({
       await tx.user.update({ where: { id: userId }, data: { name } })
       await tx.member.updateMany({ where: { userId }, data: { name } })
     })
+  },
+  async count() {
+    return prisma.user.count()
+  },
+  async hasEmail(email) {
+    return (await prisma.user.count({ where: { email } })) > 0
   }
 })

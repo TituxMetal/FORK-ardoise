@@ -74,4 +74,25 @@ describe('prismaUserAdapter', () => {
     const bobSeats = await prisma.member.findMany({ where: { userId: 'u-bob' } })
     expect(bobSeats.map(seat => seat.name)).toEqual(['Bob'])
   })
+
+  it('counts the Users', async () => {
+    const prisma = await createTestDb()
+    const adapter = prismaUserAdapter(prisma)
+
+    expect(await adapter.count()).toBe(0)
+    await seed(prisma)
+
+    expect(await adapter.count()).toBe(2)
+  })
+
+  it('reports whether a User holds an email', async () => {
+    const prisma = await createTestDb()
+    const adapter = prismaUserAdapter(prisma)
+
+    expect(await adapter.hasEmail('lea@example.com')).toBe(false)
+    await seed(prisma)
+
+    expect(await adapter.hasEmail('lea@example.com')).toBe(true)
+    expect(await adapter.hasEmail('camille@example.com')).toBe(false)
+  })
 })
