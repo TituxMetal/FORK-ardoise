@@ -1,5 +1,5 @@
 /** @vitest-environment happy-dom */
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
@@ -71,7 +71,9 @@ describe('SlateEntryFields', () => {
 
     expect(screen.getByRole('heading', { name: 'Constater une Dépense' })).toBeTruthy()
     expect((screen.getByLabelText('Libellé') as HTMLInputElement).required).toBe(true)
-    expect((screen.getByLabelText('Jour') as HTMLInputElement).required).toBe(true)
+    const day = screen.getByLabelText('Jour') as HTMLInputElement
+    expect(day.required).toBe(true)
+    expect(day.type).toBe('date')
     expect((screen.getByLabelText('Montant') as HTMLInputElement).required).toBe(true)
     expect(screen.getByRole('button', { name: 'Constater la Dépense' })).toBeTruthy()
   })
@@ -101,7 +103,7 @@ describe('SlateEntryFields', () => {
 
     const user = userEvent.setup()
     await user.type(screen.getByLabelText('Libellé'), 'Pizza')
-    await user.type(screen.getByLabelText('Jour'), '2026-08-15')
+    fireEvent.change(screen.getByLabelText('Jour'), { target: { value: '2026-08-15' } })
     await user.type(screen.getByLabelText('Montant'), '10')
     await user.click(screen.getByRole('button', { name: 'Constater la Dépense' }))
 

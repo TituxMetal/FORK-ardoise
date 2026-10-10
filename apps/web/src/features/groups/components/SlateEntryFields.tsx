@@ -75,7 +75,7 @@ export const SlateEntryFields = <TSubject extends 'payerId' | 'providerId'>({
         <Input {...register('label')} required autoFocus={mode === 'edit'} />
       </FormWrapper>
       <FormWrapper label="Jour" error={dayError}>
-        <Input {...register('day')} required placeholder="YYYY-MM-DD" />
+        <Input {...register('day')} required type="date" />
       </FormWrapper>
       <FormWrapper label="Montant" error={amountError}>
         <Input {...register('amount')} required />

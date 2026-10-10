@@ -1,5 +1,5 @@
 /** @vitest-environment happy-dom */
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
@@ -61,7 +61,9 @@ describe('PaybackFields', () => {
       )
     ).toEqual(['Léa'])
     expect(screen.getByText('Plafond 0,33 €')).toBeTruthy()
-    expect((screen.getByLabelText('Jour') as HTMLInputElement).required).toBe(true)
+    const day = screen.getByLabelText('Jour') as HTMLInputElement
+    expect(day.required).toBe(true)
+    expect(day.type).toBe('date')
     expect(screen.getByRole('button', { name: 'Constater le Règlement' })).toBeTruthy()
   })
 
@@ -77,7 +79,7 @@ describe('PaybackFields', () => {
 
     const user = userEvent.setup()
     await user.selectOptions(screen.getByLabelText('Débiteur'), 'bob')
-    await user.type(screen.getByLabelText('Jour'), '2026-08-31')
+    fireEvent.change(screen.getByLabelText('Jour'), { target: { value: '2026-08-31' } })
     await user.type(screen.getByLabelText('Montant'), '0,20')
     await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
