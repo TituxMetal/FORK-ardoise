@@ -32,6 +32,10 @@ dist-ssr
 # AI agent worktrees
 .claude/worktrees/
 
+# Principal workflow reports and pi harness state (local, never product)
+.principal/
+.pi/
+
 # Playwright
 test-results
 playwright-report
