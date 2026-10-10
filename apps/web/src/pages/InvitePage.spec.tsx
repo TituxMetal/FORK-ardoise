@@ -44,9 +44,9 @@ describe('InvitePage', () => {
     expect(screen.getByText('1 membre')).toBeTruthy()
     await userEvent.click(screen.getByRole('button', { name: 'Rejoindre le Groupe' }))
 
-    expect(await screen.findByText('Bob')).toBeTruthy()
-    expect(screen.getByText('2 membres')).toBeTruthy()
-    expect(screen.queryByText(/est une ardoise partagée/)).toBeNull()
+    await waitFor(() => {
+      expect(window.location.pathname).toBe(`/groups/${group.id}`)
+    })
     const joined = await lea.get(group.id)
     expect(joined.members.map(member => member.name)).toEqual(['Léa', 'Bob'])
   })

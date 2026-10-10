@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Alert, Button } from '~ui'
-import { groupsClient, type Group, type GroupsClient, type InvitePreview } from '~features/groups'
+import { groupsClient, type GroupsClient, type InvitePreview } from '~features/groups'
 import { errorMessage } from '~/lib/errorMessage'
-import { Link } from '~/lib/router'
+import { Link, navigate } from '~/lib/router'
 import { SessionForms } from '~features/session'
 
 type Props = {
@@ -13,13 +13,11 @@ type Props = {
 
 export const InvitePage = ({ secret, session, client = groupsClient }: Props) => {
   const [preview, setPreview] = useState<InvitePreview | null>(null)
-  const [group, setGroup] = useState<Group | null>(null)
   const [error, setError] = useState('')
   const [joining, setJoining] = useState(false)
 
   useEffect(() => {
     setError('')
-    setGroup(null)
     void client
       .preview(secret)
       .then(setPreview)
@@ -31,8 +29,7 @@ export const InvitePage = ({ secret, session, client = groupsClient }: Props) =>
     setError('')
     try {
       const joined = await client.join(secret)
-      setGroup(joined)
-      setPreview({ name: joined.name, memberCount: joined.members.length })
+      navigate(`/groups/${joined.id}`)
     } catch (error) {
       setError(errorMessage(error, 'Invitation introuvable'))
     } finally {
@@ -68,36 +65,26 @@ export const InvitePage = ({ secret, session, client = groupsClient }: Props) =>
         </article>
       ) : null}
       {error ? <Alert message={error} /> : null}
-      {group ? (
-        <ul className="space-y-1">
-          {group.members.map(member => (
-            <li key={member.userId}>{member.name}</li>
-          ))}
-        </ul>
+      {preview ? (
+        <div className="space-y-3">
+          <p className="text-dim">
+            « {preview.name} » est une ardoise partagée : les Soldes découlent de ce que le Groupe
+            enregistre, jamais d’une saisie à la main.
+          </p>
+          <Link
+            to="/about"
+            className="inline-flex h-11 items-center rounded-md px-3 text-sm font-medium text-dim hover:text-foreground"
+          >
+            À propos
+          </Link>
+        </div>
+      ) : null}
+      {session ? (
+        <Button type="button" onClick={() => void join()} disabled={joining}>
+          Rejoindre le Groupe
+        </Button>
       ) : (
-        <>
-          {preview ? (
-            <div className="space-y-3">
-              <p className="text-dim">
-                « {preview.name} » est une ardoise partagée : les Soldes découlent de ce que le
-                Groupe enregistre, jamais d’une saisie à la main.
-              </p>
-              <Link
-                to="/about"
-                className="inline-flex h-11 items-center rounded-md px-3 text-sm font-medium text-dim hover:text-foreground"
-              >
-                À propos
-              </Link>
-            </div>
-          ) : null}
-          {session ? (
-            <Button type="button" onClick={() => void join()} disabled={joining}>
-              Rejoindre le Groupe
-            </Button>
-          ) : (
-            <SessionForms />
-          )}
-        </>
+        <SessionForms />
       )}
     </section>
   )
