@@ -71,7 +71,7 @@ export const PaybackFields = ({
       </FormWrapper>
       <p>Plafond {euros(cap)}</p>
       <FormWrapper label="Jour" error={dayError}>
-        <Input {...form.register('day')} required placeholder="YYYY-MM-DD" />
+        <Input {...form.register('day')} required type="date" />
       </FormWrapper>
       <FormWrapper label="Montant" error={amountError}>
         <Input {...form.register('amount')} required />
