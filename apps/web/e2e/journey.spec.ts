@@ -54,7 +54,7 @@ test.describe('core journey', () => {
     await signUp(guestPage, 'Bob', uniqueEmail('bob'))
     await guestPage.getByRole('button', { name: 'Rejoindre le Groupe' }).click()
 
-    await expect(guestPage).toHaveURL(new RegExp(`/groups/`))
+    await expect(guestPage).toHaveURL(/\/groups\/[^/]+$/)
     await expectNoAxeViolations(guestPage)
   })
 
