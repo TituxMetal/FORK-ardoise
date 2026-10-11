@@ -1,5 +1,5 @@
 /** @vitest-environment happy-dom */
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
 import { afterEach, describe, expect, it } from 'vite-plus/test'
@@ -79,7 +79,7 @@ describe('PaybackFields', () => {
 
     const user = userEvent.setup()
     await user.selectOptions(screen.getByLabelText('Débiteur'), 'bob')
-    fireEvent.change(screen.getByLabelText('Jour'), { target: { value: '2026-08-31' } })
+    await user.type(screen.getByLabelText('Jour'), '2026-08-31')
     await user.type(screen.getByLabelText('Montant'), '0,20')
     await user.click(screen.getByRole('button', { name: 'Constater le Règlement' }))
 
