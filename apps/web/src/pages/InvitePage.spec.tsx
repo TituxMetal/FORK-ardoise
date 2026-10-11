@@ -16,6 +16,10 @@ beforeEach(async () => {
 })
 
 describe('InvitePage', () => {
+  beforeEach(() => {
+    window.history.replaceState(null, '', '/')
+  })
+
   it('shows the Group name and Member count before sign-in', async () => {
     const lea = api.groups(testUsers.lea)
     const group = await lea.create('Potes de Bob')
@@ -49,6 +53,40 @@ describe('InvitePage', () => {
     })
     const joined = await lea.get(group.id)
     expect(joined.members.map(member => member.name)).toEqual(['Léa', 'Bob'])
+  })
+
+  it('keeps the Invite and its error when joining fails', async () => {
+    const lea = api.groups(testUsers.lea)
+    const group = await lea.create('Potes de Bob')
+    const bob = api.groups(testUsers.bob)
+    render(
+      <InvitePage
+        secret={group.invite.secret}
+        session={{ name: 'Bob' }}
+        client={{
+          ...bob,
+          join: async () => {
+            throw new Error('Adhésion impossible')
+          }
+        }}
+      />
+    )
+
+    await screen.findByText('Potes de Bob')
+    const pathname = window.location.pathname
+    const historyLength = window.history.length
+
+    await userEvent.click(screen.getByRole('button', { name: 'Rejoindre le Groupe' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe('Adhésion impossible')
+    })
+    expect(window.location.pathname).toBe(pathname)
+    expect(window.history.length).toBe(historyLength)
+    expect(screen.getByText('Potes de Bob')).toBeTruthy()
+    expect(
+      screen.getByRole('button', { name: 'Rejoindre le Groupe' }).hasAttribute('disabled')
+    ).toBe(false)
   })
 
   it('does not join when opening the Invite without a session', async () => {
