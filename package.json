@@ -9,7 +9,7 @@
   ],
   "type": "module",
   "scripts": {
-    "ready": "vp check && vp run -r test && vp run -r build",
+    "ready": "vp check && vp test && vp run -r build",
     "check:spec-coverage": "bun run tools/checkSpecCoverage.ts",
     "prepare": "vp config",
     "test:e2e": "playwright test"
